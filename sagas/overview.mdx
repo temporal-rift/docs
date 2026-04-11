@@ -42,13 +42,13 @@ graph TD
   E1 --> AR2[ActionRoundSaga round 2]
   E1 --> AR3[ActionRoundSaga round 3]
   E1 --> RS[ResolutionSaga]
-  RS --> PR[ParadoxResolutionSaga\n0..N per era]
+  RS --> PR[ParadoxResolutionSaga — 0..N per era]
   PR -->|3rd cascade| GE[GameEndSaga]
   E1 -->|no winner| E2[EraSaga era N+1]
   E2 -->|no winner| EN[...]
 
-  WCS[WeaverChainSaga\nspans era boundaries]
-  PRS[PlayerReconnectSaga\ninfrastructure-triggered]
+  WCS[WeaverChainSaga — spans era boundaries]
+  PRS[PlayerReconnectSaga — infrastructure-triggered]
 ```
 
 ## Orchestration rule

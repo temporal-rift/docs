@@ -11,12 +11,12 @@ description: "Card effect ordering, paradox detection, and score calculation"
 
 ```mermaid
 flowchart TD
-  A[ResolutionStarted] --> B[Apply all card effects\nto FutureEvent aggregates\nin submission order per round]
+  A[ResolutionStarted] --> B[Apply all card effects — to FutureEvent aggregates — in submission order per round]
   B --> C[emit ProbabilityStateCalculated 📢]
   C --> D{Paradoxes?}
   D -->|None| E[emit OutcomeApplied × events]
-  D -->|Found| F[emit ParadoxDetected\nTrigger ParadoxResolutionSaga]
-  F --> G[wait for ParadoxResolved\nor ParadoxCascaded]
+  D -->|Found| F[emit ParadoxDetected — Trigger ParadoxResolutionSaga]
+  F --> G[wait for ParadoxResolved — or ParadoxCascaded]
   G --> E
   E --> H[emit ScoresUpdated]
 ```

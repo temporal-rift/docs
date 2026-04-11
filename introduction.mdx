@@ -38,9 +38,9 @@ Temporal Rift is a **portfolio backend project** demonstrating production-grade 
 
 ```mermaid
 graph LR
-  GS[game-service\nSpring Modulith] -->|game.events| TL[timeline-service\nSpring Boot]
+  GS[game-service — Spring Modulith] -->|game.events| TL[timeline-service — Spring Boot]
   TL -->|timeline.events| GS
-  GS -->|game.events| RS[read-service\nSpring Modulith]
+  GS -->|game.events| RS[read-service — Spring Modulith]
   TL -->|timeline.events| RS
 ```
 

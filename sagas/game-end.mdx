@@ -11,12 +11,12 @@ description: "Freezing state, calculating final results, and releasing resources
 
 ```mermaid
 flowchart TD
-  A[Trigger received] --> B[Freeze game state\nreject all further commands]
-  B --> C[Calculate final results\nper ending type]
+  A[Trigger received] --> B[Freeze game state — reject all further commands]
+  B --> C[Calculate final results — per ending type]
   C --> D[emit GameEnded 🌐]
-  D --> E[emit FactionRevealed 🌐\nall factions now public]
+  D --> E[emit FactionRevealed 🌐 — all factions now public]
   E --> F[Persist final game record]
-  F --> G[Release resources\ncancel timers\nclose WebSocket sessions\nderegister Kafka consumer group offsets]
+  F --> G[Release resources — cancel timers — close WebSocket sessions — deregister Kafka consumer group offsets]
 ```
 
 ## Failure and compensation

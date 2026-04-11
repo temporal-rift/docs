@@ -20,14 +20,14 @@ Paradoxes occur when contradictory conditions exist simultaneously on the same e
 ```mermaid
 flowchart TD
   A[Paradox detected] --> B[ParadoxResolutionPhaseStarted]
-  B --> C[All players submit one card\nNo faction specials allowed]
+  B --> C[All players submit one card — No faction specials allowed]
   C --> D[Apply cards, re-run paradox detection]
   D --> E{Cleared?}
   E -->|Yes| F[ParadoxResolved]
   E -->|No| G[ParadoxCascaded]
   G --> H{3rd cascade?}
   H -->|Yes| I[TimelineCollapsed → GameEndSaga]
-  H -->|No| J[Event carries forward to next era\nwith current probability state]
+  H -->|No| J[Event carries forward to next era — with current probability state]
 ```
 
 ## Cascade rules

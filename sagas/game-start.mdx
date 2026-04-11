@@ -11,9 +11,9 @@ description: "Atomic faction assignment and game initialization"
 
 ```mermaid
 flowchart TD
-  A[StartGame command] --> B[Validate lobby\n3–5 players, all connected]
+  A[StartGame command] --> B[Validate lobby — 3–5 players, all connected]
   B --> C[Draw N factions randomly]
-  C --> D[Assign one faction per player\nemit FactionAssigned × N 🔒]
+  C --> D[Assign one faction per player — emit FactionAssigned × N 🔒]
   D --> E[emit FactionsDrawn 🌐]
   E --> F[emit GameStarted 🌐]
   F --> G[Trigger EraSaga era 1]

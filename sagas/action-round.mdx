@@ -11,12 +11,12 @@ description: "How the timer and all-submitted paths converge to a single ActionR
 
 ```mermaid
 flowchart TD
-  A[emit ActionRoundStarted\nwith timer] --> B{Race condition}
+  A[emit ActionRoundStarted — with timer] --> B{Race condition}
   B -->|All players submit| C[All submitted path]
   B -->|Timer expires| D[Timer path]
   D --> E[emit ActionRoundTimerExpired]
   E --> F[emit PlayerSkipped × missing players]
-  C --> G[emit ActionRoundClosed\nALL_SUBMITTED or TIMER_EXPIRED]
+  C --> G[emit ActionRoundClosed — ALL_SUBMITTED or TIMER_EXPIRED]
   F --> G
   G --> H[emit RoundSummaryPublished]
 ```

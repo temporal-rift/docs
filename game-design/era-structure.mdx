@@ -10,14 +10,14 @@ Each era (round) follows a fixed sequence of phases.
 
 ```mermaid
 flowchart TD
-  A[Reveal\n3 future events drawn] --> B[Action Round 1\nSealed, simultaneous]
-  B --> C[Action Round 2\nCategory & type of R1 visible]
-  C --> D[Action Round 3\nPartial probability shifts from R2 visible]
+  A[Reveal — 3 future events drawn] --> B[Action Round 1 — Sealed, simultaneous]
+  B --> C[Action Round 2 — Category & type of R1 visible]
+  C --> D[Action Round 3 — Partial probability shifts from R2 visible]
   D --> E{Paradoxes?}
-  E -->|None| G[Outcome\nFinal probs determine winners]
-  E -->|Found| F[Paradox Resolution\nAll play one card]
+  E -->|None| G[Outcome — Final probs determine winners]
+  E -->|Found| F[Paradox Resolution — All play one card]
   F --> G
-  G --> H[Era End\nCheck win conditions]
+  G --> H[Era End — Check win conditions]
   H -->|Winner| I[Game Over]
   H -->|No winner| A
 ```

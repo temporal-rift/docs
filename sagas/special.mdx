@@ -15,12 +15,12 @@ The only saga that spans multiple eras. Remains open across era boundaries until
 
 ```mermaid
 flowchart TD
-  A[THREAD special played] --> B{Validate causal link\npast outcome actually resolved?}
+  A[THREAD special played] --> B{Validate causal link — past outcome actually resolved?}
   B -->|Invalid| C[emit ThreadRejected 🔒]
-  B -->|Valid| D[emit ChainLinkAdded\nchainLength++]
+  B -->|Valid| D[emit ChainLinkAdded — chainLength++]
   D --> E{chainLength == 3?}
-  E -->|Yes| F[emit ChainCompleted\nsaga ends]
-  E -->|No| G[Saga stays open\nwait for next THREAD]
+  E -->|Yes| F[emit ChainCompleted — saga ends]
+  E -->|No| G[Saga stays open — wait for next THREAD]
 ```
 
 ### Era boundary events

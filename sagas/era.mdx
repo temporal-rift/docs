@@ -11,15 +11,15 @@ description: "Per-era orchestration from event draw through resolution and win c
 
 ```mermaid
 flowchart TD
-  A[EraStarted] --> B[Draw 3 events\nemit EventsDrawn 🌐]
-  B --> C[Deal 5 cards per player\nemit HandDealt × N 🔒]
-  C --> D[ActionRoundSaga round 1\nwait for ActionRoundClosed]
-  D --> E[ActionRoundSaga round 2\nwait for ActionRoundClosed]
-  E --> F[ActionRoundSaga round 3\nwait for ActionRoundClosed]
-  F --> G[ResolutionSaga\nwait for ScoresUpdated]
+  A[EraStarted] --> B[Draw 3 events — emit EventsDrawn 🌐]
+  B --> C[Deal 5 cards per player — emit HandDealt × N 🔒]
+  C --> D[ActionRoundSaga round 1 — wait for ActionRoundClosed]
+  D --> E[ActionRoundSaga round 2 — wait for ActionRoundClosed]
+  E --> F[ActionRoundSaga round 3 — wait for ActionRoundClosed]
+  F --> G[ResolutionSaga — wait for ScoresUpdated]
   G --> H{Win condition?}
   H -->|Winner found| I[Trigger GameEndSaga]
-  H -->|No winner| J[emit EraEnded\nTrigger EraSaga era N+1]
+  H -->|No winner| J[emit EraEnded — Trigger EraSaga era N+1]
 ```
 
 ## Failure and compensation
