@@ -1,18 +1,16 @@
 ---
-
-
+title: "Probability Model"
+description: "How outcome probabilities work, visibility tiers, and shift mechanics"
 ---
 
 
-# Probability Model
+Each event has three possible outcomes. At the start of an era, they are distributed evenly: two at 33% and one at 34%. From there, players spend their action rounds trying to shift those numbers in their favour.
 
-## Rules
+Three constraints hold throughout:
 
-- Each outcome starts at **33% probability** (equal baseline; one starts at 34%)
-- Floor: **0%** — ceiling: **90%** (no outcome can be guaranteed)
-- All 3 outcomes always sum to **100%**
-- Shifting one outcome redistributes proportionally across the other two
-- Exact probabilities are **hidden by default** — only visible to a player who played `SCAN` targeting that event
+- The floor is **0%** and the ceiling is **90%** — no outcome can be guaranteed or made impossible
+- All three outcomes always sum to **100%**; shifting one redistributes the remainder proportionally across the other two
+- Exact probabilities are **hidden by default** — only a player who played `SCAN` targeting that event in the current round can see them
 
 ## Banded probability reveal
 
@@ -26,11 +24,12 @@ After Action Round 2 closes, **probability bands** are publicly revealed:
 
 Bands reveal the *results* of Round 2, not in-progress plays. Exact state remains private — Scan card only.
 
-This is a two-tier model:
-- **Band** — public, post-Round-2, available to everyone
+This creates a deliberate two-tier visibility model:
+
+- **Band** — public, post-Round-2, available to all players
 - **Exact** — private, Scan card only
 
-Any new mechanic that reveals probability information must be evaluated against this two-tier model. Do not conflate them.
+Bands communicate directional momentum; exact values remain a strategic advantage for players who use Scan.
 
 ## Example shift
 
@@ -43,4 +42,4 @@ Player plays `PUSH` targeting outcome A (+20%):
 
 ## Scan card
 
-`SCAN` reveals the exact current probability state of one event to the player who played it. This information is delivered via the `ProbabilityStateCalculated` event — filtered so only the Scan player receives it.
+`SCAN` reveals the exact current probability state of one event to the player who played it. The result arrives via the `ProbabilityStateCalculated` event, which the notification module delivers only to the player who submitted the Scan — it is never broadcast.

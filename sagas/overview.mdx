@@ -1,23 +1,24 @@
 ---
-
-
+title: "Sagas"
+description: "Long-running distributed transactions coordinated through domain events"
 ---
 
-
-# Sagas Overview
 
 Sagas are long-running business transactions coordinated through domain events. Each saga instance is persisted to the database and survives service restarts.
 
 ## Saga state
 
-Every saga has:
-- `sagaId` — unique identifier
-- `gameId` — the game this saga belongs to
-- `status` — `STARTED` | `WAITING` | `COMPLETED` | `COMPENSATING` | `FAILED`
-- `currentStep` — where in the workflow we are
-- `context` — serialized blob of saga-specific data
+Each saga instance is stored as a row with the following fields:
 
-**Saga state must be persisted before emitting events.** If the process crashes after the event is emitted but before the state is saved, the saga cannot resume correctly.
+| Field | Description |
+|---|---|
+| `sagaId` | Unique identifier for this saga instance |
+| `gameId` | The game this saga belongs to |
+| `status` | `STARTED` \| `WAITING` \| `COMPLETED` \| `COMPENSATING` \| `FAILED` |
+| `currentStep` | Last completed step in the workflow |
+| `context` | Serialized saga-specific data needed to resume |
+
+State is persisted in the same transaction as the event that triggered the step. If the process crashes mid-saga, the relay republishes the outbox event on restart and the saga continues from its last persisted step.
 
 ## Sagas summary
 
@@ -52,6 +53,6 @@ graph TD
 
 ## Orchestration rule
 
-Sagas orchestrate — they do not contain business logic. **Invariants belong in aggregates.**
+Sagas coordinate — they sequence steps, wait for events, and trigger compensations. Business rules and invariant enforcement belong in aggregates, not in sagas.
 
-A saga that finds an invariant violated should emit a compensation event and return the system to a consistent state, not attempt to enforce the rule itself.
+When a saga step encounters a violated invariant, it emits a compensation event to unwind previous steps and return the system to a consistent state.

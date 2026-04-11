@@ -1,10 +1,8 @@
 ---
-
-
+title: "WebSocket"
+description: "Real-time per-player event stream from read-service"
 ---
 
-
-# WebSocket
 
 ```
 WS /ws/games/{gameId}?token=<jwt>
@@ -26,7 +24,7 @@ Receive-only per-player stream. All game actions go through REST. On connect the
 
 ## Per-player filtering
 
-`read-service` notification module enforces visibility rules. Any privacy leak is a game-breaking bug.
+`read-service` notification module enforces these visibility rules before forwarding events to subscribers. Delivering a private event to the wrong player would expose strategic information and break the game.
 
 | Event | Delivered to |
 |---|---|

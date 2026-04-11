@@ -1,10 +1,9 @@
 ---
-
-
+title: "Events & Kafka"
+description: "Topics, envelope schema, privacy rules, and schema evolution"
 ---
 
-
-# Events Overview
+All cross-service communication flows through Kafka. There are five topics in total, each scoped to a bounded context and partitioned by `gameId` to guarantee in-order delivery for every game.
 
 ## Topics
 
@@ -42,7 +41,7 @@ Every event is wrapped in the same envelope:
 | `aggregateType` | Type of aggregate e.g. `Lobby`, `FutureEvent` |
 | `gameId` | Always present — Kafka partition key |
 | `occurredAt` | ISO-8601 timestamp |
-| `version` | Schema version. Consumers must handle unknown versions by **logging and skipping**. |
+| `version` | Schema version. Unknown versions are logged and skipped — consumers never crash on unrecognised schemas. |
 | `payload` | Event-specific data |
 
 ## Privacy rules
@@ -53,11 +52,10 @@ Every event is wrapped in the same envelope:
 | 🔒 | **Private** — delivered only to the target player |
 | 📢 | **Filtered** — delivered to all but with fields redacted per visibility rules |
 
-The `notification` module in `read-service` enforces these rules. Any privacy leak is a game-breaking bug.
+The `notification` module in `read-service` enforces these rules before forwarding events to WebSocket subscribers. A privacy leak — for example, delivering `CardPlayed` to all players — would expose a player's strategy and break the game.
 
 ## Schema evolution
 
-- **Additive changes** (new optional fields) → increment `version`, backwards compatible
-- **Breaking changes** → new event type, old type deprecated with a sunset date
-- Consumers must **ignore unknown fields**
-- Consumers must **handle unknown `version`** values by logging and skipping
+Additive changes — new optional fields — increment `version` and remain backwards compatible. Breaking changes produce a new event type; the old type is deprecated with a sunset date.
+
+Consumers are expected to ignore unknown fields and skip events with unrecognised `version` values with a log entry. This keeps the system forward-compatible without coordinated deploys.

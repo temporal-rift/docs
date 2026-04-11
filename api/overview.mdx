@@ -1,18 +1,16 @@
 ---
-
-
+title: "API Reference"
+description: "Authentication, service overview, game phases, and error format"
 ---
 
 
-# API Overview
-
-All REST endpoints are versioned under `/api/v1`. Every request requires:
+All REST endpoints are versioned under `/api/v1`. Requests are authenticated with a JWT bearer token:
 
 ```http
 Authorization: Bearer <jwt>
 ```
 
-The JWT must contain a `playerId` claim.
+The token must include a `playerId` claim, which the services use to scope responses to the requesting player — including filtering private events and enforcing submission ownership.
 
 ## Services and their APIs
 

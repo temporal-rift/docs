@@ -1,10 +1,8 @@
 ---
-
-
+title: "Cards"
+description: "Card pool, types, and categories"
 ---
 
-
-# Cards
 
 All players share the same card pool. **5 cards dealt per player** at the start of each era. Deck has **30 cards total**.
 
@@ -45,12 +43,13 @@ All players share the same card pool. **5 cards dealt per player** at the start 
 
 ## Card categories
 
-```java
-// CardType enum groups
-PUSH, SUPPRESS, SWING, AMPLIFY       → PROBABILITY_SHIFTER
-INTERCEPT, SCAN, TRACE, DECOY        → INFORMATION
-JAM, STALL, REDIRECT, NULLIFY        → DISRUPTION
-COLLIDE, STABILIZE, DETONATE         → PARADOX
+Cards are grouped by category in the domain model. The `CardType` enum carries a `getCategory()` method, and `CardType.byCategory(CardCategory)` returns the full set of types in a category.
+
+```
+PROBABILITY_SHIFTER  →  PUSH, SUPPRESS, SWING, AMPLIFY
+INFORMATION          →  INTERCEPT, SCAN, TRACE, DECOY
+DISRUPTION           →  JAM, STALL, REDIRECT, NULLIFY
+PARADOX              →  COLLIDE, STABILIZE, DETONATE
 ```
 
-Java enums: `CardType` (with `getCategory()`) and `CardCategory`. Convenience: `CardType.byCategory(CardCategory)` returns `Set<CardType>`.
+The `RoundSummaryPublished` event exposes only category and family — never the specific card — to preserve information asymmetry for all players.
