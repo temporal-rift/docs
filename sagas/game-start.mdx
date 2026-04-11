@@ -1,0 +1,31 @@
+---
+
+
+---
+
+
+# GameStartSaga
+
+**Trigger:** `StartGame` command from host player  
+**Service:** `game-service` / session module
+
+## Steps
+
+```mermaid
+flowchart TD
+  A[StartGame command] --> B[Validate lobby\n3–5 players, all connected]
+  B --> C[Draw N factions randomly]
+  C --> D[Assign one faction per player\nemit FactionAssigned × N 🔒]
+  D --> E[emit FactionsDrawn 🌐]
+  E --> F[emit GameStarted 🌐]
+  F --> G[Trigger EraSaga era 1]
+```
+
+## Failure and compensation
+
+| Failure | Compensation |
+|---|---|
+| Faction assignment fails midway | Unassign all, emit `GameStartFailed`, return lobby to `WAITING` |
+| Player disconnects during steps 1–5 | Cancel start, emit `GameStartCancelled` |
+
+The faction assignment must be atomic — either all players get a faction or none do. The saga handles partial failure by rolling back all assignments before emitting `GameStartFailed`.

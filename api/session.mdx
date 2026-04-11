@@ -1,0 +1,67 @@
+---
+
+
+---
+
+
+# Session API
+
+Lobby management and game session endpoints served by `game-service`.
+
+## Create lobby
+
+```http
+POST /api/v1/lobbies
+```
+
+Creates a new lobby. The requesting player becomes host.
+
+**Request:**
+```json
+{ "playerName": "string" }
+```
+
+**Response `201`:**
+```json
+{
+  "lobbyId": "uuid",
+  "hostPlayerId": "uuid",
+  "joinCode": "string"
+}
+```
+
+
+## Leave lobby
+
+```http
+DELETE /api/v1/lobbies/{lobbyId}/players/me
+```
+
+**Response `204`**
+
+| Error | Code | Condition |
+|---|---|---|
+| `403` | `403-01` | Host cannot leave without transferring host role |
+| `404` | `404-01` | Lobby not found |
+
+
+## Get game summary
+
+```http
+GET /api/v1/games/{gameId}
+```
+
+Public game state only — no per-player data.
+
+**Response `200`:**
+```json
+{
+  "gameId": "uuid",
+  "status": "IN_PROGRESS",
+  "eraNumber": 2,
+  "playerCount": 3,
+  "cascadedParadoxCount": 1
+}
+```
+
+`status`: `IN_PROGRESS` or `GAME_ENDED`

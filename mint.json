@@ -1,0 +1,111 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Temporal Rift",
+  "logo": {
+    "light": "/logo.png",
+    "dark": "/logo.png"
+  },
+  "colors": {
+    "primary": "#4F46E5",
+    "light": "#818CF8",
+    "dark": "#3730A3",
+    "anchors": {
+      "from": "#4F46E5",
+      "to": "#818CF8"
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "GitHub",
+      "url": "https://github.com/temporal-rift"
+    }
+  ],
+  "anchors": [
+    {
+      "name": "API Reference",
+      "icon": "rectangle-terminal",
+      "url": "api"
+    },
+    {
+      "name": "Events",
+      "icon": "webhook",
+      "url": "events"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "",
+      "pages": ["introduction"]
+    },
+    {
+      "group": "Getting Started",
+      "pages": [
+        "getting-started/prerequisites",
+        "getting-started/local-infrastructure",
+        "getting-started/running",
+        "getting-started/build-and-test"
+      ]
+    },
+    {
+      "group": "Architecture",
+      "pages": [
+        "architecture/overview",
+        "architecture/hexagonal",
+        "architecture/modulith",
+        "architecture/outbox",
+        "architecture/event-sourcing",
+        "architecture/cqrs",
+        "architecture/kafka"
+      ]
+    },
+    {
+      "group": "Game Design",
+      "pages": [
+        "game-design/overview",
+        "game-design/factions",
+        "game-design/cards",
+        "game-design/era-structure",
+        "game-design/probability",
+        "game-design/paradox",
+        "game-design/scoring"
+      ]
+    },
+    {
+      "group": "API Reference",
+      "pages": [
+        "api/overview",
+        "api/session",
+        "api/action",
+        "api/scoring",
+        "api/read-service",
+        "api/websocket"
+      ]
+    },
+    {
+      "group": "Events & Kafka",
+      "pages": [
+        "events/overview",
+        "events/session-lobby",
+        "events/action-rounds",
+        "events/resolution",
+        "events/game-end",
+        "events/weaver-chain"
+      ]
+    },
+    {
+      "group": "Sagas",
+      "pages": [
+        "sagas/overview",
+        "sagas/game-start",
+        "sagas/era",
+        "sagas/action-round",
+        "sagas/resolution",
+        "sagas/game-end",
+        "sagas/special"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "github": "https://github.com/temporal-rift"
+  }
+}

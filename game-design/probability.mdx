@@ -1,0 +1,46 @@
+---
+
+
+---
+
+
+# Probability Model
+
+## Rules
+
+- Each outcome starts at **33% probability** (equal baseline; one starts at 34%)
+- Floor: **0%** — ceiling: **90%** (no outcome can be guaranteed)
+- All 3 outcomes always sum to **100%**
+- Shifting one outcome redistributes proportionally across the other two
+- Exact probabilities are **hidden by default** — only visible to a player who played `SCAN` targeting that event
+
+## Banded probability reveal
+
+After Action Round 2 closes, **probability bands** are publicly revealed:
+
+| Band | Range |
+|---|---|
+| LOW | 0–30% |
+| MEDIUM | 31–60% |
+| HIGH | 61–90% |
+
+Bands reveal the *results* of Round 2, not in-progress plays. Exact state remains private — Scan card only.
+
+This is a two-tier model:
+- **Band** — public, post-Round-2, available to everyone
+- **Exact** — private, Scan card only
+
+Any new mechanic that reveals probability information must be evaluated against this two-tier model. Do not conflate them.
+
+## Example shift
+
+Starting state: A=40%, B=35%, C=25%
+
+Player plays `PUSH` targeting outcome A (+20%):
+- A goes from 40% → 60% (+20)
+- B and C lose proportionally: B → 35 - 20×(35/60) ≈ 23%, C → 25 - 20×(25/60) ≈ 17%
+- Result: A=60%, B=23%, C=17% (sums to 100%)
+
+## Scan card
+
+`SCAN` reveals the exact current probability state of one event to the player who played it. This information is delivered via the `ProbabilityStateCalculated` event — filtered so only the Scan player receives it.

@@ -1,0 +1,63 @@
+---
+
+
+---
+
+
+# Events Overview
+
+## Topics
+
+| Topic | Producer | Consumers | Partition key | Retention |
+|---|---|---|---|---|
+| `game.events` | game-service | timeline-service, read-service | `gameId` | 7 days |
+| `timeline.events` | timeline-service | game-service, read-service | `gameId` | 7 days |
+| `game.commands` | API gateway | game-service | `lobbyId` or `gameId` | 1 day |
+| `timeline.commands` | game-service | timeline-service | `gameId` | 1 day |
+| `outbox.events` | all services | relay | `gameId` | 1 hour |
+| `game.dlq` | any service | ops | `gameId` | 30 days |
+
+## Event envelope
+
+Every event is wrapped in the same envelope:
+
+```json
+{
+  "eventId":       "uuid",
+  "eventType":     "session.GameStarted",
+  "aggregateId":   "uuid",
+  "aggregateType": "Lobby",
+  "gameId":        "uuid",
+  "occurredAt":    "2025-03-28T10:15:30Z",
+  "version":       1,
+  "payload":       {}
+}
+```
+
+| Field | Description |
+|---|---|
+| `eventId` | Unique per event instance. Used for idempotency. |
+| `eventType` | Fully qualified name e.g. `session.GameStarted` |
+| `aggregateId` | ID of the aggregate that produced this event |
+| `aggregateType` | Type of aggregate e.g. `Lobby`, `FutureEvent` |
+| `gameId` | Always present — Kafka partition key |
+| `occurredAt` | ISO-8601 timestamp |
+| `version` | Schema version. Consumers must handle unknown versions by **logging and skipping**. |
+| `payload` | Event-specific data |
+
+## Privacy rules
+
+| Symbol | Meaning |
+|---|---|
+| 🌐 | **Public** — delivered to all players in the game |
+| 🔒 | **Private** — delivered only to the target player |
+| 📢 | **Filtered** — delivered to all but with fields redacted per visibility rules |
+
+The `notification` module in `read-service` enforces these rules. Any privacy leak is a game-breaking bug.
+
+## Schema evolution
+
+- **Additive changes** (new optional fields) → increment `version`, backwards compatible
+- **Breaking changes** → new event type, old type deprecated with a sunset date
+- Consumers must **ignore unknown fields**
+- Consumers must **handle unknown `version`** values by logging and skipping

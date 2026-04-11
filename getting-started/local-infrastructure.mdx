@@ -1,0 +1,22 @@
+---
+title: "Local Infrastructure"
+description: "Start PostgreSQL and Kafka locally with Docker Compose"
+---
+
+Each service ships with a `docker-compose.yml`. All services share the same Kafka instance — start it once from any service repo.
+
+```bash
+docker-compose -f game-service/infrastructure/docker-compose.yml up -d
+```
+
+## Default ports
+
+| Service | Port | Notes |
+|---|---|---|
+| PostgreSQL | 5432 | |
+| Kafka | 9092 | |
+| Kafka UI | 8080 | Inspect topics, consumer groups, messages |
+
+<Tip>
+Kafka UI at [http://localhost:8080](http://localhost:8080) lets you inspect topics and trace event flow in real time during development.
+</Tip>

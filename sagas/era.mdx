@@ -1,0 +1,32 @@
+---
+
+
+---
+
+
+# EraSaga
+
+**Trigger:** `EraStarted` event  
+**Service:** `game-service` / session module
+
+## Steps
+
+```mermaid
+flowchart TD
+  A[EraStarted] --> B[Draw 3 events\nemit EventsDrawn 🌐]
+  B --> C[Deal 5 cards per player\nemit HandDealt × N 🔒]
+  C --> D[ActionRoundSaga round 1\nwait for ActionRoundClosed]
+  D --> E[ActionRoundSaga round 2\nwait for ActionRoundClosed]
+  E --> F[ActionRoundSaga round 3\nwait for ActionRoundClosed]
+  F --> G[ResolutionSaga\nwait for ScoresUpdated]
+  G --> H{Win condition?}
+  H -->|Winner found| I[Trigger GameEndSaga]
+  H -->|No winner| J[emit EraEnded\nTrigger EraSaga era N+1]
+```
+
+## Failure and compensation
+
+| Failure | Compensation |
+|---|---|
+| Deck runs out | Emit `GameEndedAbnormally` |
+| ResolutionSaga fails | Emit `EraFailed`, trigger `GameEndedAbnormally` |

@@ -1,0 +1,119 @@
+---
+
+
+---
+
+
+# Read Service API
+
+`read-service` serves denormalized, per-player views of game state. This is the primary endpoint clients use on load and reconnect.
+
+## Get full game state
+
+```http
+GET /api/v1/games/{gameId}/state
+```
+
+Full per-player view — no raw probabilities, no other players' factions.
+
+**Response `200`:**
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 2,
+  "phase": "ACTION_ROUND_2",
+  "myFaction": "ERASERS",
+  "myHand": [
+    { "cardInstanceId": "uuid", "cardType": "PUSH" },
+    { "cardInstanceId": "uuid", "cardType": "NULLIFY" }
+  ],
+  "myScore": 12,
+  "mySpecialActions": ["ANNIHILATE", "CORRUPT", "CASCADE"],
+  "myJammedUntilRound": null,
+  "activeEvents": [
+    {
+      "eventId": "uuid",
+      "title": "string",
+      "isCascaded": false,
+      "outcomes": [
+        { "outcomeId": "uuid", "description": "string" },
+        { "outcomeId": "uuid", "description": "string" },
+        { "outcomeId": "uuid", "description": "string" }
+      ]
+    }
+  ],
+  "players": [
+    { "playerId": "uuid", "playerName": "string", "score": 8, "isConnected": true, "faction": null }
+  ],
+  "lastRoundSummary": {
+    "roundNumber": 1,
+    "actionSummaries": [
+      { "playerId": "uuid", "actionCategory": "PROBABILITY_SHIFTER", "actionFamily": "CARD", "skipped": false }
+    ]
+  }
+}
+```
+
+<Note title="Faction visibility">
+`faction` on other players is `null` until `FactionRevealed` fires at game end. Your own faction is always visible in `myFaction`.
+</Note>
+
+
+
+## Timeline service endpoints
+
+These endpoints are gated by round state and served by `timeline-service`.
+
+### Get probability state
+
+```http
+GET /api/v1/games/{gameId}/events/{eventId}/probability-state
+```
+
+<Warning title="Restricted">
+Only accessible to a player who played `SCAN` targeting this event in the current round.
+</Warning>
+
+
+**Response `200`:**
+```json
+{
+  "eventId": "uuid",
+  "outcomes": [
+    { "outcomeId": "uuid", "description": "string", "probability": 45, "isAnnihilated": false, "isSealed": false },
+    { "outcomeId": "uuid", "description": "string", "probability": 35, "isAnnihilated": false, "isSealed": false },
+    { "outcomeId": "uuid", "description": "string", "probability": 20, "isAnnihilated": true,  "isSealed": false }
+  ]
+}
+```
+
+| Error | Condition |
+|---|---|
+| `403` | Player has not played Scan this round |
+| `404` | Event not in current era |
+
+### Get Weaver chain
+
+```http
+GET /api/v1/games/{gameId}/chains
+```
+
+<Warning title="Restricted">
+Only accessible to the player assigned the Weavers faction.
+</Warning>
+
+
+**Response `200`:**
+```json
+{
+  "chainId": "uuid",
+  "status": "ACTIVE",
+  "chainLength": 2,
+  "links": [
+    { "eventId": "uuid", "outcomeId": "uuid", "eraNumber": 1 },
+    { "eventId": "uuid", "outcomeId": "uuid", "eraNumber": 2 }
+  ]
+}
+```
+
+`status`: `ACTIVE`, `COMPLETED`, or `BROKEN`

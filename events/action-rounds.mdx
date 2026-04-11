@@ -1,0 +1,113 @@
+---
+
+
+---
+
+
+# Action Round Events
+
+Events produced during action rounds by `game-service` action module.
+
+## ActionRoundStarted 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "roundNumber": 1,
+  "timerSeconds": 60,
+  "pendingPlayerIds": ["uuid"]
+}
+```
+
+## CardPlayed 🔒
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "roundNumber": 1,
+  "playerId": "uuid",
+  "cardInstanceId": "uuid",
+  "cardType": "PUSH",
+  "targetEventId": "uuid",
+  "targetOutcomeId": "uuid"
+}
+```
+
+Stored in full for resolution. **Never forwarded to other players.**
+
+## SpecialActionPlayed 🔒
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "roundNumber": 1,
+  "playerId": "uuid",
+  "faction": "ERASERS",
+  "specialAction": "ANNIHILATE",
+  "targetEventId": "uuid",
+  "targetOutcomeId": "uuid",
+  "targetPlayerId": null
+}
+```
+
+`targetPlayerId` is non-null for player-targeting specials (`JAM`, `CORRUPT`, `UNRAVEL`, `EXPOSE`).
+
+## ActionRoundTimerExpired 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "roundNumber": 1,
+  "missingPlayerIds": ["uuid"]
+}
+```
+
+## PlayerSkipped 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "roundNumber": 1,
+  "playerId": "uuid",
+  "reason": "TIMER_EXPIRED"
+}
+```
+
+## ActionRoundClosed 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "roundNumber": 1,
+  "closedReason": "ALL_SUBMITTED",
+  "totalActions": 3
+}
+```
+
+`closedReason`: `ALL_SUBMITTED` or `TIMER_EXPIRED`
+
+## RoundSummaryPublished 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "roundNumber": 1,
+  "actionSummaries": [
+    {
+      "playerId": "uuid",
+      "actionCategory": "PROBABILITY_SHIFTER",
+      "actionFamily": "CARD",
+      "skipped": false
+    }
+  ]
+}
+```
+
+Deliberately minimal — **no targets, no specific card types**. Only category and family visible to all. This preserves the information asymmetry that makes the game interesting.

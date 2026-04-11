@@ -1,0 +1,56 @@
+---
+
+
+---
+
+
+# Cards
+
+All players share the same card pool. **5 cards dealt per player** at the start of each era. Deck has **30 cards total**.
+
+## Probability Shifters
+
+| Card | Effect | `cardType` |
+|---|---|---|
+| **Push** | +20% to one outcome | `PUSH` |
+| **Suppress** | −20% to one outcome | `SUPPRESS` |
+| **Swing** | Move 30% from one outcome to another on same event | `SWING` |
+| **Amplify** | Double effect of next card played this round | `AMPLIFY` |
+
+## Information
+
+| Card | Effect | `cardType` |
+|---|---|---|
+| **Intercept** | See one card from another player's hand secretly | `INTERCEPT` |
+| **Scan** | See current probability state of one event (normally hidden) | `SCAN` |
+| **Trace** | See which player influenced a specific event last round | `TRACE` |
+| **Decoy** | Play a fake action visible to others but with no effect | `DECOY` |
+
+## Disruption
+
+| Card | Effect | `cardType` |
+|---|---|---|
+| **Jam** | Target player cannot use special actions next round | `JAM` |
+| **Stall** | Delay resolution of one event by one round | `STALL` |
+| **Redirect** | Move another player's last probability shift to a different outcome | `REDIRECT` |
+| **Nullify** | Cancel the last card played by any player this round | `NULLIFY` |
+
+## Paradox
+
+| Card | Effect | `cardType` |
+|---|---|---|
+| **Collide** | Force two outcomes to equal probability, guaranteeing a paradox | `COLLIDE` |
+| **Stabilize** | Prevent a paradox from triggering on one event this round | `STABILIZE` |
+| **Detonate** | If a paradox exists, double its negative score effect on all players except you | `DETONATE` |
+
+## Card categories
+
+```java
+// CardType enum groups
+PUSH, SUPPRESS, SWING, AMPLIFY       → PROBABILITY_SHIFTER
+INTERCEPT, SCAN, TRACE, DECOY        → INFORMATION
+JAM, STALL, REDIRECT, NULLIFY        → DISRUPTION
+COLLIDE, STABILIZE, DETONATE         → PARADOX
+```
+
+Java enums: `CardType` (with `getCategory()`) and `CardCategory`. Convenience: `CardType.byCategory(CardCategory)` returns `Set<CardType>`.

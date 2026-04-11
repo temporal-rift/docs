@@ -1,0 +1,31 @@
+---
+
+
+---
+
+
+# GameEndSaga
+
+**Trigger:** `WinConditionMet`, `TimelineCollapsed`, or `TimelineStabilized`  
+**Service:** `game-service` / session module
+
+## Steps
+
+```mermaid
+flowchart TD
+  A[Trigger received] --> B[Freeze game state\nreject all further commands]
+  B --> C[Calculate final results\nper ending type]
+  C --> D[emit GameEnded 🌐]
+  D --> E[emit FactionRevealed 🌐\nall factions now public]
+  E --> F[Persist final game record]
+  F --> G[Release resources\ncancel timers\nclose WebSocket sessions\nderegister Kafka consumer group offsets]
+```
+
+## Failure and compensation
+
+| Failure | Compensation |
+|---|---|
+| Final record persistence fails | Retry with exponential backoff — events already emitted so players have results |
+| Resource cleanup fails | Log and alert — non-blocking, game result already delivered |
+
+Resource cleanup failure is non-critical because the game result has already been delivered to players via `GameEnded` and `FactionRevealed`. Leaked resources (timers, WebSocket sessions) are cleaned up by TTL mechanisms.

@@ -1,0 +1,48 @@
+---
+
+
+---
+
+
+# WebSocket
+
+```
+WS /ws/games/{gameId}?token=<jwt>
+```
+
+Receive-only per-player stream. All game actions go through REST. On connect the server immediately pushes the current game state snapshot.
+
+## Message format
+
+**Server → client:**
+```json
+{ "type": "EVENT", "eventType": "ActionRoundStarted", "occurredAt": "ISO-8601", "payload": {} }
+```
+
+**Client → server (keepalive only):**
+```json
+{ "type": "PING" }
+```
+
+## Per-player filtering
+
+`read-service` notification module enforces visibility rules. Any privacy leak is a game-breaking bug.
+
+| Event | Delivered to |
+|---|---|
+| `FactionAssigned` | Assigned player only |
+| `HandDealt` | Receiving player only |
+| `CardPlayed` | Nobody |
+| `SpecialActionPlayed` | Nobody |
+| `ProbabilityStateCalculated` | Players who played Scan this round |
+| `ParadoxResolutionCardPlayed` | Nobody |
+| `FactionRevealed` | All players |
+| All other events | All players in the game |
+
+## Reconnection
+
+When a player reconnects after a disconnect, `PlayerReconnectSaga` handles state restoration:
+
+1. Server pushes current game state snapshot immediately on reconnect
+2. If the player reconnects within the grace period (30s default), they rejoin seamlessly
+3. If the grace period expires, the player is marked `ABANDONED` and auto-skipped for remaining rounds

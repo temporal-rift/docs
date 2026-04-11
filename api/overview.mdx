@@ -1,0 +1,51 @@
+---
+
+
+---
+
+
+# API Overview
+
+All REST endpoints are versioned under `/api/v1`. Every request requires:
+
+```http
+Authorization: Bearer <jwt>
+```
+
+The JWT must contain a `playerId` claim.
+
+## Services and their APIs
+
+| Service | Endpoints |
+|---|---|
+| `game-service` | Session (lobbies, game summary), Action (submit, status), Scoring |
+| `timeline-service` | Probability state, Weaver chains |
+| `read-service` | Full game state, history, WebSocket stream |
+
+## Game phases
+
+| Phase | Description |
+|---|---|
+| `LOBBY` | Game not started |
+| `ERA_START` | Events drawn, hands dealt |
+| `ACTION_ROUND_1` | First action round |
+| `ACTION_ROUND_2` | Second action round |
+| `ACTION_ROUND_3` | Third action round |
+| `PARADOX_RESOLUTION` | Paradox resolution phase |
+| `RESOLUTION` | System resolving outcomes |
+| `ERA_END` | Win conditions being checked |
+| `GAME_ENDED` | Game over |
+
+## Error format
+
+All errors follow [RFC 9457 Problem Details](https://www.rfc-editor.org/rfc/rfc9457).
+
+```json
+{
+  "type": "https://temporal-rift.example/errors/round-already-closed",
+  "title": "Round Already Closed",
+  "status": 409,
+  "detail": "Action round 2 is already closed for game 3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "instance": "/api/v1/games/3fa85f64/rounds/2/actions"
+}
+```

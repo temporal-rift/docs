@@ -1,0 +1,56 @@
+---
+
+
+---
+
+
+# Weaver Chain Events
+
+Events produced by `timeline-service` tracking the Weavers faction's chain mechanic.
+
+## ChainLinkAdded 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "chainId": "uuid",
+  "playerId": "uuid",
+  "linkedEventId": "uuid",
+  "linkedOutcomeId": "uuid",
+  "chainLength": 2,
+  "previousLinkEventId": "uuid"
+}
+```
+
+Emitted when a valid `THREAD` special action links a new event to the chain.
+
+## ChainCompleted 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "chainId": "uuid",
+  "playerId": "uuid",
+  "links": [
+    { "eventId": "uuid", "outcomeId": "uuid", "eraNumber": 1 },
+    { "eventId": "uuid", "outcomeId": "uuid", "eraNumber": 2 },
+    { "eventId": "uuid", "outcomeId": "uuid", "eraNumber": 3 }
+  ]
+}
+```
+
+Emitted when `chainLength` reaches 3. Triggers Weaver win-condition scoring (+10 pts).
+
+## ChainBroken 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "chainId": "uuid",
+  "brokenByPlayerId": "uuid",
+  "targetPlayerId": "uuid",
+  "chainLengthAtBreak": 2
+}
+```
+
+Emitted when `UNRAVEL` successfully targets the Weaver's chain. The Weaver loses −3 pts and must start a new chain from scratch.

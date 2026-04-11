@@ -1,0 +1,36 @@
+---
+
+
+---
+
+
+# Special Sagas
+
+## WeaverChainSaga
+
+**Trigger:** `SpecialActionPlayed` where `specialAction = THREAD`  
+**Service:** `timeline-service`
+
+The only saga that spans multiple eras. Remains open across era boundaries until completed, broken, or game ends.
+
+### Steps
+
+```mermaid
+flowchart TD
+  A[THREAD special played] --> B{Validate causal link\npast outcome actually resolved?}
+  B -->|Invalid| C[emit ThreadRejected 🔒]
+  B -->|Valid| D[emit ChainLinkAdded\nchainLength++]
+  D --> E{chainLength == 3?}
+  E -->|Yes| F[emit ChainCompleted\nsaga ends]
+  E -->|No| G[Saga stays open\nwait for next THREAD]
+```
+
+### Era boundary events
+
+| Event | Outcome |
+|---|---|
+| `UNRAVEL` targets this chain | Emit `ChainBroken`, saga ends |
+| `ANNIHILATE` removes a linked outcome | Emit `ChainLinkInvalidated`, length decremented |
+| `GameEnded` with chain < 3 | Incomplete chain, no bonus |
+| `GameEnded` with chain ≥ 3 | `ChainCompleted` already fired before `GameEnded` |
+

@@ -1,0 +1,77 @@
+---
+
+
+---
+
+
+# Action API
+
+Action round submission endpoints served by `game-service`.
+
+## Submit action
+
+```http
+POST /api/v1/games/{gameId}/rounds/{roundNumber}/actions
+```
+
+Submit a card or faction special for the current action round. **One submission per player per round.**
+
+**Card action:**
+```json
+{
+  "actionType": "CARD",
+  "cardInstanceId": "uuid",
+  "targetEventId": "uuid",
+  "targetOutcomeId": "uuid"
+}
+```
+
+**Special action:**
+```json
+{
+  "actionType": "SPECIAL",
+  "specialAction": "ANNIHILATE",
+  "targetEventId": "uuid",
+  "targetOutcomeId": "uuid",
+  "targetPlayerId": null
+}
+```
+
+`targetPlayerId` is `null` for event-targeting specials. Required for player-targeting specials: `CORRUPT`, `UNRAVEL`, `JAM`, `EXPOSE`.
+
+**Response `202`:**
+```json
+{ "actionId": "uuid", "status": "SUBMITTED" }
+```
+
+| Error | Code | Condition |
+|---|---|---|
+| `409` | `409-01` | Round already closed |
+| `409` | `409-02` | Player already submitted |
+| `422` | `422-01` | Card not in hand |
+| `422` | `422-02` | Player is Jammed |
+| `422` | `422-03` | Round number mismatch |
+| `422` | `422-04` | Invalid target |
+
+
+## Get round status
+
+```http
+GET /api/v1/games/{gameId}/rounds/{roundNumber}/status
+```
+
+Shows who has submitted. **Never reveals what was submitted.**
+
+**Response `200`:**
+```json
+{
+  "roundNumber": 1,
+  "status": "OPEN",
+  "timerRemainingSeconds": 42,
+  "submittedCount": 2,
+  "totalPlayers": 3,
+  "pendingPlayerIds": ["uuid"]
+}
+```
+
+`status`: `OPEN` or `CLOSED`

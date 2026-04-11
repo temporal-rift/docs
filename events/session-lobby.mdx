@@ -1,0 +1,103 @@
+---
+
+
+---
+
+
+# Session & Lobby Events
+
+Events produced by `game-service` session module.
+
+## LobbyCreated 🌐
+
+```json
+{ "lobbyId": "uuid", "hostPlayerId": "uuid", "createdAt": "ISO-8601" }
+```
+
+## PlayerJoinedLobby 🌐
+
+```json
+{ "lobbyId": "uuid", "playerId": "uuid", "playerName": "string" }
+```
+
+## PlayerLeftLobby 🌐
+
+```json
+{ "lobbyId": "uuid", "playerId": "uuid" }
+```
+
+## FactionsDrawn 🌐
+
+```json
+{ "gameId": "uuid", "lobbyId": "uuid", "factions": ["ERASERS", "PROPHETS", "WEAVERS"] }
+```
+
+Lists which factions are in play this game. Does not reveal assignments.
+
+## FactionAssigned 🔒
+
+```json
+{ "gameId": "uuid", "playerId": "uuid", "faction": "ERASERS" }
+```
+
+Produced once per player. The `notification` module delivers each copy only to the assigned player.
+
+## GameStarted 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "lobbyId": "uuid",
+  "playerIds": ["uuid", "uuid", "uuid"],
+  "totalFactions": 3,
+  "deckSize": 30
+}
+```
+
+## EraStarted 🌐
+
+```json
+{ "gameId": "uuid", "eraNumber": 1, "cascadedEventIds": ["uuid"] }
+```
+
+`cascadedEventIds` is empty on era 1. On subsequent eras it lists events carried forward from paradox cascades.
+
+## EventsDrawn 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "events": [{
+    "eventId": "uuid",
+    "title": "string",
+    "outcomes": [
+      { "outcomeId": "uuid", "description": "string", "initialProbability": 33 },
+      { "outcomeId": "uuid", "description": "string", "initialProbability": 33 },
+      { "outcomeId": "uuid", "description": "string", "initialProbability": 34 }
+    ],
+    "isCascaded": false
+  }]
+}
+```
+
+Cascaded events carry their last known probability state — not reset to 33/33/34.
+
+## HandDealt 🔒
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "playerId": "uuid",
+  "cards": [
+    { "cardInstanceId": "uuid", "cardType": "PUSH" },
+    { "cardInstanceId": "uuid", "cardType": "SCAN" },
+    { "cardInstanceId": "uuid", "cardType": "JAM" },
+    { "cardInstanceId": "uuid", "cardType": "COLLIDE" },
+    { "cardInstanceId": "uuid", "cardType": "AMPLIFY" }
+  ]
+}
+```
+
+`cardInstanceId` distinguishes two copies of the same card type in the same hand.

@@ -1,0 +1,71 @@
+---
+title: "Hexagonal Architecture"
+description: "Package structure, dependency rules, and conventions enforced across all services"
+---
+
+Every service and every module inside `game-service` follows the same package layout, enforced by ArchUnit.
+
+## Package structure
+
+```
+{module}/
+├── domain/
+│   ├── {aggregate}/        ← aggregate root + value objects + enums + exceptions
+│   ├── event/              ← internal domain events (immutable records)
+│   └── port/out/           ← driven port interfaces (repository, messaging)
+├── application/
+│   ├── port/in/            ← use case interfaces (driving ports)
+│   ├── command/            ← command handlers
+│   ├── query/              ← query handlers
+│   └── saga/               ← saga orchestrators
+└── infrastructure/
+    ├── adapter/in/
+    │   ├── rest/            ← Spring MVC controllers (generated from OpenAPI)
+    │   └── kafka/           ← Kafka consumers
+    ├── adapter/out/
+    │   ├── persistence/     ← JPA repositories
+    │   └── kafka/           ← Kafka producers
+    └── config/
+```
+
+## Dependency rules
+
+```
+infrastructure → application → domain
+```
+
+Nothing flows the other way. Enforced by ArchUnit on every build.
+
+| Rule | Detail |
+|---|---|
+| `domain` is pure Java | Zero imports from `org.springframework.*` or `jakarta.persistence.*` |
+| `application` is framework-agnostic | Zero imports from `infrastructure` |
+| Driven ports | `domain/port/out/` interfaces implemented **only** by `infrastructure/adapter/out/` |
+
+## Game rules via port
+
+Game rules (`min-players`, `max-players`, `max-eras`, etc.) never leak into domain or application code. They are accessed exclusively through `GameRulesPort` — a driven port interface implemented by an infrastructure adapter wrapping `@ConfigurationProperties`.
+
+```yaml
+game:
+  rules:
+    min-players: 3
+    max-players: 5
+    max-eras: 5
+    max-cascaded-paradoxes: 3
+    events-per-era: 3
+    action-round-timer-seconds: 60
+```
+
+<Tip>
+This makes game rules configuration — testable, changeable without recompiling, and completely absent from the domain.
+</Tip>
+
+## Domain conventions
+
+| Convention | Rule |
+|---|---|
+| Value objects | Records — immutable by default |
+| Domain events | Records — never mutable. Emit a corrective event instead. |
+| Lombok | Not allowed in the domain layer |
+| Constants | `lowerCamelCase`, not `SCREAMING_SNAKE_CASE` |

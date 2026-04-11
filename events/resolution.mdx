@@ -1,0 +1,136 @@
+---
+
+
+---
+
+
+# Resolution Events
+
+Events produced during outcome resolution by `timeline-service`.
+
+## ResolutionStarted 🌐
+
+```json
+{ "gameId": "uuid", "eraNumber": 1 }
+```
+
+## ProbabilityStateCalculated 📢
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "eventStates": [{
+    "eventId": "uuid",
+    "outcomes": [
+      { "outcomeId": "uuid", "probability": 45, "isAnnihilated": false, "isSealed": false },
+      { "outcomeId": "uuid", "probability": 35, "isAnnihilated": false, "isSealed": false },
+      { "outcomeId": "uuid", "probability": 20, "isAnnihilated": true,  "isSealed": false }
+    ]
+  }]
+}
+```
+
+Filtered — only players who played `SCAN` this round receive the probability values.
+
+## ParadoxDetected 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "paradoxes": [{
+    "paradoxId": "uuid",
+    "type": "DEAD_HEAT",
+    "affectedEventId": "uuid",
+    "affectedOutcomeIds": ["uuid", "uuid"],
+    "description": "string"
+  }]
+}
+```
+
+## ParadoxResolutionPhaseStarted 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "paradoxIds": ["uuid"],
+  "timerSeconds": 60
+}
+```
+
+## ParadoxResolutionCardPlayed 🔒
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "playerId": "uuid",
+  "cardInstanceId": "uuid",
+  "cardType": "STABILIZE",
+  "targetEventId": "uuid",
+  "targetOutcomeId": "uuid"
+}
+```
+
+No faction special actions are allowed during paradox resolution.
+
+## ParadoxResolved 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "paradoxId": "uuid",
+  "resolvedByPlayerId": "uuid"
+}
+```
+
+## ParadoxCascaded 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "paradoxId": "uuid",
+  "affectedEventId": "uuid",
+  "carryForwardProbabilityState": [
+    { "outcomeId": "uuid", "probability": 50 },
+    { "outcomeId": "uuid", "probability": 50 },
+    { "outcomeId": "uuid", "probability": 0 }
+  ]
+}
+```
+
+## OutcomeApplied 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "eventId": "uuid",
+  "winningOutcomeId": "uuid",
+  "finalProbabilities": [
+    { "outcomeId": "uuid", "probability": 65 },
+    { "outcomeId": "uuid", "probability": 25 },
+    { "outcomeId": "uuid", "probability": 10 }
+  ]
+}
+```
+
+## ScoresUpdated 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "updates": [{
+    "playerId": "uuid",
+    "faction": "PROPHETS",
+    "pointsDelta": 4,
+    "reason": "EVENT_RESOLVED_AS_WRITTEN",
+    "newTotal": 12
+  }]
+}
+```

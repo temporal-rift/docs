@@ -1,0 +1,20 @@
+---
+title: "Prerequisites"
+description: "Tools required to build and run Temporal Rift locally"
+---
+
+## Required tools
+
+| Tool | Minimum version | Notes |
+|---|---|---|
+| Java | 25 | JDK, not JRE |
+| Maven | 3.9.13 | |
+| Docker | any recent | For Testcontainers + local infrastructure |
+
+## Maven Central — no credentials needed
+
+`domain-events` and `temporal-rift-bom` are published to **Maven Central**. No `~/.m2/settings.xml` configuration is required to consume them as dependencies.
+
+<Note>
+Publishing requires Sonatype Central Portal credentials + a GPG key in `~/.m2/settings.xml`. Consuming does not.
+</Note>

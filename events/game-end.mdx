@@ -1,0 +1,87 @@
+---
+
+
+---
+
+
+# Game End Events
+
+## EraEnded 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "cascadedParadoxCount": 0,
+  "nextEraNumber": 2
+}
+```
+
+## WinConditionMet 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "winnerId": "uuid",
+  "faction": "WEAVERS",
+  "finalScore": 20,
+  "winType": "SCORE_THRESHOLD"
+}
+```
+
+## TimelineCollapsed 🌐
+
+Emitted when the 3rd paradox cascades.
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 3,
+  "winners": [{ "playerId": "uuid", "faction": "ERASERS" }],
+  "losers":  [{ "playerId": "uuid", "faction": "PROPHETS" }]
+}
+```
+
+## TimelineStabilized 🌐
+
+Emitted when 5 eras complete with no winner.
+
+```json
+{
+  "gameId": "uuid",
+  "winners": [
+    { "playerId": "uuid", "faction": "PROPHETS" },
+    { "playerId": "uuid", "faction": "WEAVERS", "activeChainLength": 3 }
+  ],
+  "losers": [{ "playerId": "uuid", "faction": "ERASERS" }]
+}
+```
+
+## GameEnded 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "endReason": "SCORE_THRESHOLD",
+  "finalScores": [
+    { "playerId": "uuid", "faction": "WEAVERS", "score": 20 },
+    { "playerId": "uuid", "faction": "ERASERS", "score": 14 }
+  ]
+}
+```
+
+`endReason`: `SCORE_THRESHOLD`, `TIMELINE_COLLAPSED`, or `TIMELINE_STABILIZED`
+
+## FactionRevealed 🌐
+
+Produced after `GameEnded`. Factions become public to all players.
+
+```json
+{
+  "gameId": "uuid",
+  "reveals": [
+    { "playerId": "uuid", "faction": "ERASERS" },
+    { "playerId": "uuid", "faction": "PROPHETS" }
+  ]
+}
+```

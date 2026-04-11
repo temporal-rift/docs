@@ -1,0 +1,41 @@
+---
+title: "Kafka Design"
+description: "Topics, partitioning strategy, and consumer idempotency"
+---
+
+## Topics
+
+| Topic | Producer | Consumers | Partition key | Retention |
+|---|---|---|---|---|
+| `game.events` | game-service | timeline-service, read-service | `gameId` | 7 days |
+| `timeline.events` | timeline-service | game-service, read-service | `gameId` | 7 days |
+| `game.commands` | API gateway | game-service | `lobbyId` or `gameId` | 1 day |
+| `timeline.commands` | game-service | timeline-service | `gameId` | 1 day |
+| `outbox.events` | all services | relay | `gameId` | 1 hour |
+| `game.dlq` | any service | ops | `gameId` | 30 days |
+
+## Partitioned by gameId
+
+The partition key is always `gameId`. This guarantees all events for a single game arrive at the same partition **in order** — required for correct event sourcing replay in `timeline-service` and correct read model projection in `read-service`.
+
+## Design decisions
+
+<AccordionGroup>
+  <Accordion title="One topic per bounded context, not one per event type">
+    Splitting by event type would create hundreds of topics, fragment consumer group coordination, and make it impossible to guarantee ordering across related events for the same game.
+  </Accordion>
+  <Accordion title="Commands and events on separate topics">
+    Different retention policies — events are durable (7 days), commands are ephemeral (1 day). Different consumer groups with different failure semantics.
+  </Accordion>
+  <Accordion title="Dead letter queue (game.dlq)">
+    Events that fail processing after all retries land here. Operations team monitors for anomalies. 30-day retention allows post-incident investigation.
+  </Accordion>
+</AccordionGroup>
+
+## Consumer requirements
+
+Every Kafka consumer must:
+
+1. Check `processed_events` for `eventId` before processing
+2. Handle unknown `version` values by **logging and skipping** — never crash or block
+3. Be idempotent — at-least-once delivery means duplicates will arrive

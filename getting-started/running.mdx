@@ -1,0 +1,46 @@
+---
+title: "Running game-service"
+description: "Start game-service locally with the dev profile"
+---
+
+`game-service` is the only service with runnable code right now.
+
+## Environment variables
+
+| Variable | Default (dev profile) | Required in prod |
+|---|---|---|
+| `DB_HOST` | `localhost` | ✔ |
+| `DB_PORT` | `5432` | ✔ |
+| `DB_NAME` | `temporal_rift` | ✔ |
+| `DB_USER` | `temporal_rift` | ✔ |
+| `DB_PASSWORD` | `temporal_rift` | ✔ |
+| `KAFKA_BOOTSTRAP_SERVERS` | `localhost:9092` | ✔ |
+
+## Start with dev defaults
+
+The `dev` profile fills in all environment variables — nothing to configure locally.
+
+```bash
+mvn -f game-service/pom.xml spring-boot:run -Dspring-boot.run.profiles=dev
+```
+
+## Artifact publication order
+
+When publishing to Maven Central for the first time, order matters:
+
+<Steps>
+  <Step title="build-tools">
+    Shared Checkstyle and Spotless configuration
+  </Step>
+  <Step title="temporal-rift-bom">
+    Parent POM and plugin management
+  </Step>
+  <Step title="domain-events">
+    Shared event contracts library
+  </Step>
+  <Step title="Service artifacts">
+    game-service, timeline-service, read-service
+  </Step>
+</Steps>
+
+The `temporal-rift-bom` CI workflow publishes `build-tools` and the BOM in a single job in the correct order.

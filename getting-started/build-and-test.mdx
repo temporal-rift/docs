@@ -1,0 +1,75 @@
+---
+title: "Build and Test"
+description: "Running tests, code quality gates, and publishing the shared library"
+---
+
+## Running tests
+
+```bash
+# All tests (unit + integration via Testcontainers)
+mvn -f game-service/pom.xml test
+
+# Single test class
+mvn -f game-service/pom.xml test -Dtest="LobbyTest"
+
+# Architecture tests only
+mvn -f game-service/pom.xml test -Dtest="*ArchitectureTest"
+
+# Integration test (Testcontainers PostgreSQL + Kafka + Modulith verify)
+mvn -f game-service/pom.xml test -Dtest="GameServiceApplicationIT"
+```
+
+## Test categories
+
+| Category | Naming convention | Spring context | Infrastructure |
+|---|---|---|---|
+| Unit tests | `{Subject}Test` | None | None |
+| Slice tests | `{Module}ModuleTest` | `@ApplicationModuleTest` | None |
+| Integration test | `GameServiceApplicationIT` | Full | Testcontainers |
+| Architecture tests | `*ArchitectureTest` | None | None |
+
+`GameServiceApplicationIT` starts real PostgreSQL and Kafka via Testcontainers and runs `ApplicationModules.verify()` to assert Spring Modulith module boundaries.
+
+## Code quality gates
+
+Both run automatically on every build via the `validate` phase:
+
+<CodeGroup>
+```bash Check formatting
+mvn -f game-service/pom.xml spotless:check
+```
+
+```bash Fix formatting
+mvn -f game-service/pom.xml spotless:apply
+```
+
+```bash Checkstyle
+mvn -f game-service/pom.xml checkstyle:check
+```
+
+```bash Run both
+mvn -f game-service/pom.xml validate
+```
+</CodeGroup>
+
+## Shared library publishing
+
+`domain-events` is published to **Maven Central** — no local install needed to consume it.
+
+```bash
+# 1. Bump version in domain-events/pom.xml, push to main
+# GitHub Actions publishes automatically to Maven Central
+
+# 2. Update game-service dependency version and test
+mvn -f game-service/pom.xml test
+```
+
+For manual publishing (requires Sonatype credentials + GPG key in `~/.m2/settings.xml`):
+
+```bash
+mvn -f domain-events/pom.xml clean deploy -Pcentral
+```
+
+<Warning>
+**Never use `mvn install` for shared artifacts.** `mvn install` only writes to your local `.m2` cache. Other developers and CI will fail to resolve the dependency. Always publish via `deploy -Pcentral`.
+</Warning>

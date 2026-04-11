@@ -1,0 +1,30 @@
+---
+
+
+---
+
+
+# Scoring API
+
+Score querying endpoints served by `game-service`.
+
+## Get current scores
+
+```http
+GET /api/v1/games/{gameId}/scores
+```
+
+Factions are hidden (`null`) until `FactionRevealed` fires at game end.
+
+**Response `200`:**
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 2,
+  "scores": [
+    { "playerId": "uuid", "playerName": "string", "score": 12, "faction": null },
+    { "playerId": "uuid", "playerName": "string", "score": 8,  "faction": null }
+  ]
+}
+```
+
