@@ -24,6 +24,22 @@ Events produced by `game-service` session module.
 { "lobbyId": "uuid", "playerId": "uuid" }
 ```
 
+## HostTransferred 🌐
+
+```json
+{ "lobbyId": "uuid", "previousHostId": "uuid", "newHostId": "uuid" }
+```
+
+Emitted when the host leaves a lobby that still has other players. Always followed by `PlayerLeftLobby` for the previous host in the same transaction.
+
+## LobbyClosed 🌐
+
+```json
+{ "lobbyId": "uuid", "gameId": "uuid" }
+```
+
+Emitted when the lobby is disbanded — either explicitly via `CloseLobby` or implicitly when the host leaves as the sole remaining player.
+
 ## FactionsDrawn 🌐
 
 ```json

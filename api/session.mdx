@@ -29,18 +29,75 @@ Creates a new lobby. The requesting player becomes host.
 ```
 
 
+## Join lobby
+
+```http
+POST /api/v1/lobbies/{lobbyId}/join
+```
+
+Join an existing lobby.
+
+**Request:**
+```json
+{ "playerName": "string" }
+```
+
+**Response `200`:**
+```json
+{
+  "lobbyId": "uuid",
+  "playerId": "uuid",
+  "currentPlayers": [
+    { "playerId": "uuid", "playerName": "string", "isHost": true }
+  ]
+}
+```
+
+| Error | Code | Condition |
+|---|---|---|
+| `404` | `404-01` | Lobby not found |
+| `409` | `409-01` | Lobby already started |
+| `422` | `422-01` | Lobby full |
+
+
 ## Leave lobby
 
 ```http
 DELETE /api/v1/lobbies/{lobbyId}/players/me
 ```
 
+Behaviour varies by who is leaving:
+
+| Caller | Result |
+|---|---|
+| Non-host player | Removed from lobby. Emits `PlayerLeftLobby`. |
+| Host — other players present | Host role transferred to earliest-joined remaining player. Emits `HostTransferred` then `PlayerLeftLobby`. |
+| Host — sole player in lobby | Lobby disbanded. Emits `LobbyClosed`. |
+
 **Response `204`**
 
 | Error | Code | Condition |
 |---|---|---|
-| `403` | `403-01` | Host cannot leave without transferring host role |
 | `404` | `404-01` | Lobby not found |
+
+
+## Start game
+
+```http
+POST /api/v1/lobbies/{lobbyId}/start
+```
+
+Host starts the game. Triggers `GameStartSaga` asynchronously.
+
+**Response `202`:**
+```json
+{ "gameId": "uuid" }
+```
+
+| Error | Code | Condition |
+|---|---|---|
+| `403` | `403-01` | Caller is not the host |
+| `422` | `422-01` | Fewer than 3 players in lobby |
 
 
 ## Get game summary
