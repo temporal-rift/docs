@@ -42,6 +42,7 @@
       "group": "Getting Started",
       "pages": [
         "getting-started/prerequisites",
+        "getting-started/ide-setup",
         "getting-started/local-infrastructure",
         "getting-started/running",
         "getting-started/build-and-test"

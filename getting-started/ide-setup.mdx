@@ -1,0 +1,41 @@
+---
+title: "IDE Setup"
+description: "Configuring IntelliJ IDEA for consistent code style"
+---
+
+## EditorConfig (IntelliJ)
+
+Code style is enforced at build time by Spotless and Checkstyle (both configured in `temporal-rift-bom`).
+For live editing comfort in IntelliJ, a matching `.editorconfig` is shipped in the `temporal-rift-bom` repository.
+
+Copy it one level above all your cloned repos so IntelliJ discovers it as the workspace root:
+
+```
+your-workspace/          ← place .editorconfig here
+├── temporal-rift-bom/
+├── game-service/
+├── domain-events/
+└── ...
+```
+
+```bash
+# run from your workspace root
+cp temporal-rift-bom/.editorconfig .
+```
+
+IntelliJ reads it automatically via its built-in EditorConfig support — no manual scheme import needed.
+The `root = true` header stops IntelliJ from searching further up the filesystem.
+
+<Note>
+The `.editorconfig` includes all `ij_java_*` settings, including the import group order that matches
+what Checkstyle enforces at build time. If your IDE is reordering imports differently, check that
+EditorConfig support is enabled under **Settings → Editor → Code Style** and that no other code style
+plugin (Spring Java Format, Palantir IntelliJ plugin) is active — they conflict with EditorConfig on save.
+</Note>
+
+## Formatting on save
+
+Enable **Reformat Code** on save via **Settings → Tools → Actions on Save** and tick **Reformat code**.
+This applies the `.editorconfig` rules automatically whenever you save a file.
+
+Do not enable **Rearrange code** — it conflicts with the import ordering enforced by EditorConfig.
