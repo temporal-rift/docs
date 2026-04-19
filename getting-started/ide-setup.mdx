@@ -38,4 +38,8 @@ plugin (Spring Java Format, Palantir IntelliJ plugin) is active — they conflic
 Enable **Reformat Code** on save via **Settings → Tools → Actions on Save** and tick **Reformat code**.
 This applies the `.editorconfig` rules automatically whenever you save a file.
 
-Do not enable **Rearrange code** — it conflicts with the import ordering enforced by EditorConfig.
+<Warning>
+Do not install the **Palantir Java Format** or **Spring Java Format** IntelliJ plugins. They override the
+formatter independently of `.editorconfig` and introduce tabs when combined with **Rearrange Code on Save**.
+The BOM's Spotless plugin handles Palantir formatting at build time — no IDE plugin is needed.
+</Warning>
