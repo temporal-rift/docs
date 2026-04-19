@@ -35,8 +35,10 @@ plugin (Spring Java Format, Palantir IntelliJ plugin) is active — they conflic
 
 ## Formatting on save
 
-Enable **Reformat Code** on save via **Settings → Tools → Actions on Save** and tick **Reformat code**.
-This applies the `.editorconfig` rules automatically whenever you save a file.
+Enable the following under **Settings → Tools → Actions on Save**:
+
+- **Reformat code** — applies all `.editorconfig` formatting rules on save
+- **Optimize imports** — removes unused imports and reorders them according to the import groups defined in `.editorconfig`
 
 <Warning>
 Do not install the **Palantir Java Format** or **Spring Java Format** IntelliJ plugins. They override the
