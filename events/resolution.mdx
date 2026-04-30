@@ -31,6 +31,25 @@ Events produced during outcome resolution by `timeline-service`.
 
 Filtered — only players who played `SCAN` this round receive the probability values.
 
+## BandedProbabilityPublished 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "eventStates": [{
+    "eventId": "uuid",
+    "outcomes": [
+      { "outcomeId": "uuid", "band": "HIGH" },
+      { "outcomeId": "uuid", "band": "MEDIUM" },
+      { "outcomeId": "uuid", "band": "LOW" }
+    ]
+  }]
+}
+```
+
+Published to all players after Action Round 2 closes. Bands (`LOW` 0–30%, `MEDIUM` 31–60%, `HIGH` 61–90%) are derived from cumulative probability state of Rounds 1 and 2. Exact values remain private — only `SCAN` card players receive those via `ProbabilityStateCalculated`.
+
 ## ParadoxDetected 🌐
 
 ```json

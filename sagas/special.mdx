@@ -32,3 +32,33 @@ flowchart TD
 | `GameEnded` with chain < 3 | Incomplete chain, no bonus |
 | `GameEnded` with chain ≥ 3 | `ChainCompleted` already fired before `GameEnded` |
 
+---
+
+## PlayerReconnectSaga
+
+**Trigger:** Player WebSocket disconnects during an active game
+**Service:** `game-service` / session module
+
+One saga instance runs per disconnecting player — multiple disconnects run independently in parallel.
+
+### Steps
+
+```mermaid
+flowchart TD
+  A[WebSocket disconnect] --> B[Mark player DISCONNECTED — emit PlayerDisconnected 🌐]
+  B --> C[Start grace timer — default 30s, configurable via GameRulesPort]
+  C --> D{Player reconnects?}
+  D -->|Yes — within grace period| E[Restore session — push current state from read-service projection]
+  D -->|No — timer expires| F[Mark player ABANDONED — emit PlayerAbandoned 🌐 — auto-skip remaining rounds]
+  F --> G{Last remaining player?}
+  G -->|Yes| H[Trigger GameEndSaga — GameEndedAbnormally]
+  G -->|No| I[Continue game with remaining players]
+```
+
+### Compensation
+
+| Failure | Compensation |
+|---|---|
+| Player reconnects after `ABANDONED` | Reject reconnection — game already adapted |
+| All players disconnect simultaneously | One `PlayerReconnectSaga` per player runs independently; last survivor triggers `GameEndSaga` if also abandoned |
+| Timer service fails | Fallback: force abandonment after 2× grace period |

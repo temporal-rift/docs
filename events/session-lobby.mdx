@@ -68,6 +68,38 @@ Produced once per player. The `notification` module delivers each copy only to t
 }
 ```
 
+## GameStartFailed 🌐
+
+```json
+{ "gameId": "uuid", "lobbyId": "uuid", "reason": "string" }
+```
+
+Emitted when faction assignment fails midway. All already-assigned factions are rolled back and the lobby returns to `WAITING`. `reason` is a human-readable failure description (e.g. `"FACTION_ASSIGNMENT_FAILED"`).
+
+## GameStartCancelled 🌐
+
+```json
+{ "gameId": "uuid", "lobbyId": "uuid" }
+```
+
+Emitted when a player disconnects during game start steps 1–5. The lobby returns to `WAITING`.
+
+## PlayerDisconnected 🌐
+
+```json
+{ "gameId": "uuid", "playerId": "uuid" }
+```
+
+Emitted when a player's WebSocket disconnects during an active game. Notifies all remaining players. A reconnect grace timer starts immediately — see [PlayerReconnectSaga](/sagas/special#playerreconnectsaga).
+
+## PlayerAbandoned 🌐
+
+```json
+{ "gameId": "uuid", "playerId": "uuid" }
+```
+
+Emitted when the reconnect grace timer expires. The player is auto-skipped for remaining rounds. If this was the last remaining player, `GameEndSaga` is triggered.
+
 ## EraStarted 🌐
 
 ```json
