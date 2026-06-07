@@ -27,3 +27,5 @@ flowchart TD
 | Player disconnects during steps 1–5 | Cancel start, emit `GameStartCancelled` |
 
 The faction assignment must be atomic — either all players get a faction or none do. The saga handles partial failure by rolling back all assignments before emitting `GameStartFailed`.
+
+The saga owns the start-game check-and-act boundary: it loads the lobby with a row-level write lock, validates the host/start preconditions, and persists saga state with the lobby/game mutations in the same local transaction.

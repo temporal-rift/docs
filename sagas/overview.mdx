@@ -15,10 +15,9 @@ Each saga instance is stored as a row with the following fields:
 | `sagaId` | Unique identifier for this saga instance |
 | `gameId` | The game this saga belongs to |
 | `status` | `STARTED` \| `WAITING` \| `COMPLETED` \| `COMPENSATING` \| `FAILED` |
-| `currentStep` | Last completed step in the workflow |
 | `context` | Serialized saga-specific data needed to resume |
 
-State is persisted in the same transaction as the event that triggered the step. If the process crashes mid-saga, the relay republishes the outbox event on restart and the saga continues from its last persisted step.
+State is persisted in the same transaction as the aggregate mutation or event that triggered the step. If a failure must be recorded despite rollback, the compensation path persists that failure state in a separate transaction.
 
 ## Sagas summary
 
