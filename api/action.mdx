@@ -9,10 +9,11 @@ Action round submission endpoints served by `game-service`.
 ## Submit action
 
 ```http
-POST /api/v1/games/{gameId}/rounds/{roundNumber}/actions
+POST /api/v1/games/{gameId}/eras/{eraNumber}/rounds/{roundNumber}/actions
 ```
 
 Submit a card or faction special for the current action round. **One submission per player per round.**
+`eraNumber` and `roundNumber` are public game coordinates and are validated as stale-state guards.
 
 **Card action:**
 ```json
@@ -20,9 +21,12 @@ Submit a card or faction special for the current action round. **One submission 
   "actionType": "CARD",
   "cardInstanceId": "uuid",
   "targetEventId": "uuid",
+  "sourceOutcomeId": "uuid",
   "targetOutcomeId": "uuid"
 }
 ```
+
+`sourceOutcomeId` is required when the submitted card resolves as `SWING`. For single-target cards it may be omitted.
 
 **Special action:**
 ```json
@@ -39,23 +43,30 @@ Submit a card or faction special for the current action round. **One submission 
 
 **Response `202`:**
 ```json
-{ "actionId": "uuid", "status": "SUBMITTED" }
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "roundNumber": 1,
+  "playerId": "uuid",
+  "status": "SUBMITTED",
+  "roundClosed": false
+}
 ```
 
 | Error | Code | Condition |
 |---|---|---|
+| `404` | `404-01` | Round not found |
 | `409` | `409-01` | Round already closed |
 | `409` | `409-02` | Player already submitted |
 | `422` | `422-01` | Card not in hand |
 | `422` | `422-02` | Player is Jammed |
-| `422` | `422-03` | Round number mismatch |
-| `422` | `422-04` | Invalid target |
+| `422` | `422-03` | Invalid target |
 
 
 ## Get round status
 
 ```http
-GET /api/v1/games/{gameId}/rounds/{roundNumber}/status
+GET /api/v1/games/{gameId}/eras/{eraNumber}/rounds/{roundNumber}/status
 ```
 
 Shows who has submitted. **Never reveals what was submitted.**
@@ -63,6 +74,7 @@ Shows who has submitted. **Never reveals what was submitted.**
 **Response `200`:**
 ```json
 {
+  "eraNumber": 1,
   "roundNumber": 1,
   "status": "OPEN",
   "timerRemainingSeconds": 42,
