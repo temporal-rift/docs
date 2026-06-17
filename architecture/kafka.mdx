@@ -36,6 +36,13 @@ The partition key is always `gameId`. This guarantees all events for a single ga
 
 Every Kafka consumer must:
 
-1. Check `processed_events` for `eventId` before processing
-2. Handle unknown `version` values by **logging and skipping** — never crash or block
-3. Be idempotent — at-least-once delivery means duplicates will arrive
+1. Atomically claim `EventEnvelope.eventId` in `processed_events` before business work
+2. Skip the message when the claim already exists for the same logical consumer
+3. Handle unknown `version` values by **logging and skipping** — never crash or block
+
+Use a service-local `processed_events` table keyed by `(event_id, consumer)`. The claim must be an insert-first
+operation such as `INSERT ... ON CONFLICT DO NOTHING`, not an `exists` check followed by a save. If the consumer mutates
+state or publishes internal Spring events, the claim and side effects run in the same local transaction.
+
+Same-process `game-service` module handoff uses typed Spring Modulith events. A replay or cross-instance Kafka consumer
+for one of those same events is still a Kafka consumer and must use this idempotency guard.

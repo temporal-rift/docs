@@ -50,9 +50,13 @@ Because the relay delivers at-least-once, consumers may receive the same event m
 
 ```sql
 CREATE TABLE processed_events (
-    event_id     UUID PRIMARY KEY,
-    processed_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    event_id     UUID NOT NULL,
+    consumer     VARCHAR(100) NOT NULL,
+    processed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (event_id, consumer)
 );
 ```
 
-Check before processing, insert in the same transaction as the business operation.
+Claim before processing with an atomic insert-first operation such as `INSERT ... ON CONFLICT DO NOTHING`. If the insert affects zero rows, skip the duplicate message. Do not use `exists` followed by `save`, because concurrent duplicate delivery can pass both checks before either insert commits.
+
+When a consumer has side effects, claim the event and perform the business operation in the same local transaction.
