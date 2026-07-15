@@ -87,7 +87,7 @@ Behaviour varies by who is leaving:
 POST /api/v1/lobbies/{lobbyId}/start
 ```
 
-Host starts the game. Triggers `GameStartSaga` asynchronously.
+Host starts the game. Triggers `StartGameSaga` asynchronously.
 
 **Response `202`:**
 ```json
@@ -96,8 +96,8 @@ Host starts the game. Triggers `GameStartSaga` asynchronously.
 
 | Error | Code | Condition |
 |---|---|---|
-| `403` | `403-01` | Caller is not the host |
-| `422` | `422-01` | Fewer than 3 players in lobby |
+| `403` | `403-02` | Caller is not the host |
+| `422` | `422-02` | Fewer than 3 players in lobby |
 
 
 ## Get game summary

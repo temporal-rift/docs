@@ -51,7 +51,7 @@ flowchart TD
   D -->|Yes — within grace period| E[Restore session — push current state from read-service projection]
   D -->|No — timer expires| F[Mark player ABANDONED — emit PlayerAbandoned 🌐 — auto-skip remaining rounds]
   F --> G{Last remaining player?}
-  G -->|Yes| H[Trigger GameEndSaga — GameEndedAbnormally]
+  G -->|Yes| H[Trigger EndGameSaga — GameEndedAbnormally]
   G -->|No| I[Continue game with remaining players]
 ```
 
@@ -60,5 +60,5 @@ flowchart TD
 | Failure | Compensation |
 |---|---|
 | Player reconnects after `ABANDONED` | Reject reconnection — game already adapted |
-| All players disconnect simultaneously | One `PlayerReconnectSaga` per player runs independently; last survivor triggers `GameEndSaga` if also abandoned |
+| All players disconnect simultaneously | One `PlayerReconnectSaga` per player runs independently; last survivor triggers `EndGameSaga` if also abandoned |
 | Timer service fails | Fallback: force abandonment after 2× grace period |

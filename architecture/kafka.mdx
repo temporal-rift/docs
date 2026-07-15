@@ -11,8 +11,10 @@ description: "Topics, partitioning strategy, and consumer idempotency"
 | `timeline.events` | timeline-service | game-service, read-service | `gameId` | 7 days |
 | `game.commands` | API gateway | game-service | `lobbyId` or `gameId` | 1 day |
 | `timeline.commands` | game-service | timeline-service | `gameId` | 1 day |
-| `outbox.events` | all services | relay | `gameId` | 1 hour |
-| `game.dlq` | any service | ops | `gameId` | 30 days |
+
+<Note>
+The transactional outbox is **not** a Kafka topic — it is the Spring Modulith `event_publication` table, read by a relay that publishes directly to the domain topics above. See [Outbox Pattern](/architecture/outbox).
+</Note>
 
 ## Partitioned by gameId
 
@@ -26,9 +28,6 @@ The partition key is always `gameId`. This guarantees all events for a single ga
   </Accordion>
   <Accordion title="Commands and events on separate topics">
     Different retention policies — events are durable (7 days), commands are ephemeral (1 day). Different consumer groups with different failure semantics.
-  </Accordion>
-  <Accordion title="Dead letter queue (game.dlq)">
-    Events that fail processing after all retries land here. Operations team monitors for anomalies. 30-day retention allows post-incident investigation.
   </Accordion>
 </AccordionGroup>
 

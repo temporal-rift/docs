@@ -23,12 +23,12 @@ State is persisted in the same transaction as the aggregate mutation or event th
 
 | Saga | Service | Trigger | Key complexity |
 |---|---|---|---|
-| `GameStartSaga` | game-service / session | `StartGame` command | Faction assignment atomicity |
+| `StartGameSaga` | game-service / session | `StartGame` command | Faction assignment atomicity |
 | `EraSaga` | game-service / session | `EraStarted` | Orchestrates 3 child sagas |
 | `ActionRoundSaga` | game-service / action | Round N opened | Timer vs all-submitted race condition |
 | `ResolutionSaga` | timeline-service | `ResolutionStarted` | Action ordering, paradox branching |
 | `ParadoxResolutionSaga` | timeline-service | `ParadoxDetected` | Nested within ResolutionSaga |
-| `GameEndSaga` | game-service / session | Win / collapse / stabilize | Resource cleanup |
+| `EndGameSaga` | game-service / session | Win / collapse / stabilize | Resource cleanup |
 | `WeaverChainSaga` | timeline-service | `THREAD` special action | Only saga spanning multiple eras |
 | `PlayerReconnectSaga` | game-service / session | WebSocket disconnect | Grace timer, state restoration |
 
@@ -36,13 +36,13 @@ State is persisted in the same transaction as the aggregate mutation or event th
 
 ```mermaid
 graph TD
-  GS[GameStartSaga] --> E1[EraSaga era 1]
+  GS[StartGameSaga] --> E1[EraSaga era 1]
   E1 --> AR1[ActionRoundSaga round 1]
   E1 --> AR2[ActionRoundSaga round 2]
   E1 --> AR3[ActionRoundSaga round 3]
   E1 --> RS[ResolutionSaga]
   RS --> PR[ParadoxResolutionSaga — 0..N per era]
-  PR -->|3rd cascade| GE[GameEndSaga]
+  PR -->|3rd cascade| GE[EndGameSaga]
   E1 -->|no winner| E2[EraSaga era N+1]
   E2 -->|no winner| EN[...]
 

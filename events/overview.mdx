@@ -13,8 +13,10 @@ All cross-service communication flows through Kafka. There are five topics in to
 | `timeline.events` | timeline-service | game-service, read-service | `gameId` | 7 days |
 | `game.commands` | API gateway | game-service | `lobbyId` or `gameId` | 1 day |
 | `timeline.commands` | game-service | timeline-service | `gameId` | 1 day |
-| `outbox.events` | all services | relay | `gameId` | 1 hour |
-| `game.dlq` | any service | ops | `gameId` | 30 days |
+
+<Note>
+There is **no `outbox.events` Kafka topic**. The transactional outbox is the Spring Modulith `event_publication` database table — a background relay reads it and publishes directly to the domain topics above. See [Outbox Pattern](/architecture/outbox).
+</Note>
 
 ## Event envelope
 

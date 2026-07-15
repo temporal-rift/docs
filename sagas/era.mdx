@@ -18,7 +18,7 @@ flowchart TD
   E --> F[ActionRoundSaga round 3 — wait for ActionRoundClosed]
   F --> G[ResolutionSaga — wait for ScoresUpdated]
   G --> H{Win condition?}
-  H -->|Winner found| I[Trigger GameEndSaga]
+  H -->|Winner found| I[Trigger EndGameSaga]
   H -->|No winner| J[emit EraEnded — Trigger EraSaga era N+1]
 ```
 

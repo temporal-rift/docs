@@ -26,7 +26,7 @@ flowchart TD
   E -->|Yes| F[ParadoxResolved]
   E -->|No| G[ParadoxCascaded]
   G --> H{3rd cascade?}
-  H -->|Yes| I[TimelineCollapsed → GameEndSaga]
+  H -->|Yes| I[TimelineCollapsed → EndGameSaga]
   H -->|No| J[Event carries forward to next era — with current probability state]
 ```
 

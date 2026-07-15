@@ -3,7 +3,6 @@ title: "Weaver Chain Events"
 description: "Events tracking the Weavers faction chain mechanic"
 ---
 
-
 Events produced by `timeline-service` tracking the Weavers faction's chain mechanic.
 
 ## ChainLinkAdded 🌐
@@ -27,6 +26,7 @@ Emitted when a valid `THREAD` special action links a new event to the chain.
 ```json
 {
   "gameId": "uuid",
+  "eraNumber": 3,
   "chainId": "uuid",
   "playerId": "uuid",
   "links": [
@@ -37,13 +37,14 @@ Emitted when a valid `THREAD` special action links a new event to the chain.
 }
 ```
 
-Emitted when `chainLength` reaches 3. Triggers Weaver win-condition scoring (+10 pts).
+Emitted when `chainLength` reaches 3. Triggers Weaver win-condition scoring (+10 pts). Top-level `eraNumber` is the era of the completing link (the last entry in `links`).
 
 ## ChainBroken 🌐
 
 ```json
 {
   "gameId": "uuid",
+  "eraNumber": 2,
   "chainId": "uuid",
   "brokenByPlayerId": "uuid",
   "targetPlayerId": "uuid",
@@ -51,4 +52,4 @@ Emitted when `chainLength` reaches 3. Triggers Weaver win-condition scoring (+10
 }
 ```
 
-Emitted when `UNRAVEL` successfully targets the Weaver's chain. The Weaver loses −3 pts and must start a new chain from scratch.
+Emitted when `UNRAVEL` successfully targets the Weaver's chain. The Weaver loses −3 pts and must start a new chain from scratch. Top-level `eraNumber` is the era in which the break happened.
