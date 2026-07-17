@@ -57,6 +57,7 @@ Join an existing lobby.
 |---|---|---|
 | `404` | `404-01` | Lobby not found |
 | `409` | `409-01` | Lobby already started |
+| `409` | `409-02` | Player already in lobby |
 | `422` | `422-01` | Lobby full |
 
 
@@ -120,3 +121,7 @@ Public game state only — no per-player data.
 ```
 
 `status`: `IN_PROGRESS` or `GAME_ENDED`
+
+| Error | Code | Condition |
+|---|---|---|
+| `404` | `404-02` | Game not found, or the requesting player is not a participant of the game |
