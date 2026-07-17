@@ -79,6 +79,7 @@ Behaviour varies by who is leaving:
 | Error | Code | Condition |
 |---|---|---|
 | `404` | `404-01` | Lobby not found |
+| `404` | `404-03` | Player not in lobby |
 
 
 ## Start game
@@ -97,6 +98,7 @@ Host starts the game. Triggers `StartGameSaga` asynchronously.
 | Error | Code | Condition |
 |---|---|---|
 | `403` | `403-02` | Caller is not the host |
+| `409` | `409-03` | One or more players disconnected (`disconnectedPlayerIds` lists them) |
 | `422` | `422-02` | Fewer than 3 players in lobby |
 
 
