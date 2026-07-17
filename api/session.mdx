@@ -89,7 +89,9 @@ Behaviour varies by who is leaving:
 POST /api/v1/lobbies/{lobbyId}/start
 ```
 
-Host starts the game. Triggers `StartGameSaga` asynchronously.
+Host starts the game. Start preconditions — host role, player count, and everyone connected — are validated
+synchronously: on failure the request returns the matching error below and no `202` is issued. Only after
+validation passes does the remaining game setup continue asynchronously via `StartGameSaga`.
 
 **Response `202`:**
 ```json
@@ -99,7 +101,7 @@ Host starts the game. Triggers `StartGameSaga` asynchronously.
 | Error | Code | Condition |
 |---|---|---|
 | `403` | `403-02` | Caller is not the host |
-| `409` | `409-03` | One or more players disconnected (`disconnectedPlayerIds` lists them) |
+| `409` | `409-03` | One or more players disconnected — rejected before the `202` (`disconnectedPlayerIds` lists them) |
 | `422` | `422-02` | Fewer than 3 players in lobby |
 
 

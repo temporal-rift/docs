@@ -44,7 +44,8 @@ All errors follow [RFC 9457 Problem Details](https://www.rfc-editor.org/rfc/rfc9
   "title": "Round Already Closed",
   "status": 409,
   "detail": "Action round 2 is already closed for game 3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "instance": "/api/v1/games/3fa85f64/rounds/2/actions"
+  "instance": "/api/v1/games/3fa85f64/rounds/2/actions",
+  "code": "409-01"
 }
 ```
 
@@ -53,5 +54,5 @@ Unexpected server errors return a sanitized `500` without a `code`.
 
 ## Rate limiting
 
-Every authenticated endpoint is rate limited per player. Exceeding the limit returns `429 Too Many Requests`
+Every authenticated endpoint is rate-limited per player. Exceeding the limit returns `429 Too Many Requests`
 with a problem-details body; retry after backing off.
