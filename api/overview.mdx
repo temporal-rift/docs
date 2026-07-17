@@ -47,3 +47,11 @@ All errors follow [RFC 9457 Problem Details](https://www.rfc-editor.org/rfc/rfc9
   "instance": "/api/v1/games/3fa85f64/rounds/2/actions"
 }
 ```
+
+Errors carry a stable `code` property (`<status>-<nn>`, per module) — branch on it rather than parsing `detail`.
+Unexpected server errors return a sanitized `500` without a `code`.
+
+## Rate limiting
+
+Every authenticated endpoint is rate limited per player. Exceeding the limit returns `429 Too Many Requests`
+with a problem-details body; retry after backing off.
