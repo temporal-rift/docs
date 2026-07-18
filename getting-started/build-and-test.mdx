@@ -52,22 +52,22 @@ mvn -f game-service/pom.xml validate
 ```
 </CodeGroup>
 
-## Shared library publishing
+## Event contract publishing
 
-`domain-events` is published to **Maven Central** — no local install needed to consume it.
+Event contracts live in the **`apis`** repo as spec-first AsyncAPI definitions — one spec module per bounded context (`session-event`, `action-event`, `scoring-event`, `timeline-event`). Each is published to **Maven Central** as a spec-only jar; consuming services code-generate their producers/consumers from it at build time.
 
 ```bash
-# 1. Bump version in domain-events/pom.xml, push to main
+# 1. Bump version in apis/<module>/pom.xml, push to main
 # GitHub Actions publishes automatically to Maven Central
 
-# 2. Update game-service dependency version and test
+# 2. Update the game-service dependency version and test
 mvn -f game-service/pom.xml test
 ```
 
 For manual publishing (requires Sonatype credentials + GPG key in `~/.m2/settings.xml`):
 
 ```bash
-mvn -f domain-events/pom.xml clean deploy -Pcentral
+mvn -f apis/session-event/pom.xml clean deploy -Pcentral
 ```
 
 <Warning>

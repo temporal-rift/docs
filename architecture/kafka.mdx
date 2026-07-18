@@ -35,7 +35,7 @@ The partition key is always `gameId`. This guarantees all events for a single ga
 
 Every Kafka consumer must:
 
-1. Atomically claim `EventEnvelope.eventId` in `processed_events` before business work
+1. Atomically claim the message's `eventId` header in `processed_events` before business work
 2. Skip the message when the claim already exists for the same logical consumer
 3. Handle unknown `version` values by **logging and skipping** — never crash or block
 

@@ -20,31 +20,20 @@ There is **no `outbox.events` Kafka topic**. The transactional outbox is the Spr
 
 ## Event envelope
 
-Every event is wrapped in the same envelope:
+Every event carries the same set of envelope fields as **Kafka message headers**, with the event body as the message
+payload. The event contract is defined spec-first as [AsyncAPI](https://www.asyncapi.com/) and each service
+code-generates its producers and consumers from it, so the wire format cannot drift from the spec.
 
-```json
-{
-  "eventId":       "uuid",
-  "eventType":     "session.GameStarted",
-  "aggregateId":   "uuid",
-  "aggregateType": "Lobby",
-  "gameId":        "uuid",
-  "occurredAt":    "2025-03-28T10:15:30Z",
-  "version":       1,
-  "payload":       {}
-}
-```
-
-| Field | Description |
+| Header | Description |
 |---|---|
 | `eventId` | Unique per event instance. Used for idempotency. |
-| `eventType` | Fully qualified name e.g. `session.GameStarted` |
 | `aggregateId` | ID of the aggregate that produced this event |
 | `aggregateType` | Type of aggregate e.g. `Lobby`, `FutureEvent` |
 | `gameId` | Always present — Kafka partition key |
 | `occurredAt` | ISO-8601 timestamp |
 | `version` | Schema version. Unknown versions are logged and skipped — consumers never crash on unrecognised schemas. |
-| `payload` | Event-specific data |
+
+The event *type* is the AsyncAPI message identity, not a separate string field.
 
 ## Privacy rules
 

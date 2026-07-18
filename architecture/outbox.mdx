@@ -46,7 +46,7 @@ spring:
 
 ## Consumer idempotency
 
-Because the relay delivers at-least-once, consumers may receive the same event more than once. Every consumer must be idempotent using `eventId` from the `EventEnvelope`:
+Because the relay delivers at-least-once, consumers may receive the same event more than once. Every consumer must be idempotent using the message's `eventId` header:
 
 ```sql
 CREATE TABLE processed_events (
