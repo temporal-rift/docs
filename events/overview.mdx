@@ -3,7 +3,7 @@ title: "Events & Kafka"
 description: "Topics, envelope schema, privacy rules, and schema evolution"
 ---
 
-All cross-service communication flows through Kafka. There are five topics in total, each scoped to a bounded context and partitioned by `gameId` to guarantee in-order delivery for every game.
+All cross-service communication flows through Kafka. There are four topics in total, each scoped to a bounded context and partitioned by `gameId` to guarantee in-order delivery for every game.
 
 ## Topics
 
@@ -21,8 +21,10 @@ There is **no `outbox.events` Kafka topic**. The transactional outbox is the Spr
 ## Event envelope
 
 Every event carries the same set of envelope fields as **Kafka message headers**, with the event body as the message
-payload. The event contract is defined spec-first as [AsyncAPI](https://www.asyncapi.com/) and each service
-code-generates its producers and consumers from it, so the wire format cannot drift from the spec.
+payload. The event contract is defined spec-first as [AsyncAPI](https://www.asyncapi.com/). `game-service` generates its
+producers from the published event specifications; inbound paths whose upstream consumer is not generated yet use the
+typed `InboundEnvelope` carrier for routing. This keeps the wire format anchored to the specification without implying
+that every service already has generated producers and consumers.
 
 | Header | Description |
 |---|---|

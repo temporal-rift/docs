@@ -37,8 +37,12 @@ The aggregate state update and the outbox record are written in **one local tran
 spring:
   modulith:
     events:
-      republish-outstanding-events-on-restart: true
+      republish-outstanding-events-on-restart: false
 ```
+
+Restart-bound republication is disabled because a restarted instance could replay work that is still being processed by
+another live instance. `game-service` instead uses `IncompleteEventPublicationResubmitter` to resubmit publications
+that have remained incomplete past the configured minimum age.
 
 <Warning>
 **Never call `kafkaTemplate.send()` from a command handler.** If the transaction commits and the Kafka publish fails, the event is lost permanently. The outbox relay is the only component that sends to Kafka.
