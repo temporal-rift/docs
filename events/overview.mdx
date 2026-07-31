@@ -47,6 +47,10 @@ The event *type* is the AsyncAPI message identity, not a separate string field.
 
 The `notification` module in `read-service` enforces these rules before forwarding events to WebSocket subscribers. A privacy leak — for example, delivering `CardPlayed` to all players — would expose a player's strategy and break the game.
 
+`ActivistDeclarationRecorded`, `ExposeSignatureRevealed`, and `ExposeBehaviorChanged` are deliberately filtered public
+projections: forward only their documented payloads. Do not derive a public notification from `SpecialActionPlayed`, and
+never include an Expose target's Round-3 signature.
+
 ## Schema evolution
 
 Additive changes — new optional fields — increment `version` and remain backwards compatible. Breaking changes produce a new event type; the old type is deprecated with a sunset date.

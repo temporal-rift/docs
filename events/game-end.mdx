@@ -31,12 +31,16 @@ description: "Events emitted at era end and game conclusion"
 
 Emitted when the 3rd paradox cascades.
 
+For Activists, the collapsing-event predicate is separate from normal scoring: a player is a winner only when that
+player's current-era declaration targets the event whose `EraResolutionCompleted` reveal-order cascade raised the
+game-wide count from two to three. The declared outcome is not evaluated.
+
 ```json
 {
   "gameId": "uuid",
   "eraNumber": 3,
-  "winners": [{ "playerId": "uuid", "faction": "ERASERS" }],
-  "losers":  [{ "playerId": "uuid", "faction": "PROPHETS" }]
+  "winners": [{ "playerId": "uuid", "faction": "ACTIVISTS" }],
+  "losers":  [{ "playerId": "uuid", "faction": "ERASERS" }]
 }
 ```
 

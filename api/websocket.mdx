@@ -31,6 +31,9 @@ Receive-only per-player stream. All game actions go through REST. On connect the
 | `HandDealt` | Receiving player only |
 | `CardPlayed` | Nobody |
 | `SpecialActionPlayed` | Nobody |
+| `ActivistDeclarationRecorded` | All players: declaration mode, event, and outcome |
+| `ExposeSignatureRevealed` | All players: exposed Round-1 signature only |
+| `ExposeBehaviorChanged` | All players: changed-behaviour result only, never the Round-3 signature |
 | `ProbabilityStateCalculated` | Players who played Scan this round |
 | `ParadoxResolutionCardPlayed` | Nobody |
 | `FactionRevealed` | All players |

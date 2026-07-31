@@ -10,7 +10,8 @@ Each era (round) follows a fixed sequence of phases.
 
 ```mermaid
 flowchart TD
-  A[Reveal — 3 future events drawn] --> B[Action Round 1 — Sealed, simultaneous]
+  A[Reveal — 3 future events drawn] --> D[Declaration window — Rally or eligible Momentum]
+  D --> B[Action Round 1 — Sealed, simultaneous]
   B --> C[Action Round 2 — Category & type of R1 visible]
   C --> D[Action Round 3 — Partial probability shifts from R2 visible]
   D --> E{Paradoxes?}
@@ -27,9 +28,10 @@ flowchart TD
 | Phase | Description |
 |---|---|
 | **Reveal** | 3 future events drawn and shown with their 3 possible outcomes |
+| **Declaration window** | Before Round 1, an Activist may use Rally or eligible Momentum to publicly declare one current-era event/outcome; Momentum applies its one-time +10 percentage-point bonus here |
 | **Action Round 1** | Players secretly submit 1 card or 1 special. Limited info — act on instinct |
-| **Action Round 2** | Category and type of Round 1 actions visible. Adapt. |
-| **Action Round 3** | Partial probability shifts from Round 2 visible. Final positioning. |
+| **Action Round 2** | Category and type of Round 1 actions visible. An Expose target's qualifying Round-1 signature is revealed at close. |
+| **Action Round 3** | Partial probability shifts from Round 2 visible. A successful Expose announces only changed behaviour, not the response signature. |
 | **Paradox Check** | System detects paradoxes. None: skip to Outcome. Found: open Paradox Resolution. |
 | **Paradox Resolution** | All players play one card (no specials). Paradox resolves or cascades. |
 | **Outcome** | Final probabilities determine winning outcomes. Scores updated per faction rules. |
@@ -55,3 +57,6 @@ Timer is player-count-dependent by configuration — never hard-code it:
 | Probability band (LOW/MED/HIGH) | — | ✔ | ✔ |
 | Exact probability (Scan only) | — | — | ✔ (to Scan player) |
 | Which player played which | — | — | — (never public) |
+| Activist declaration of record | ✔ | ✔ | ✔ |
+| Exposed Round-1 signature | — | ✔ | ✔ |
+| Expose Round-3 response signature | — | — | — (never public) |

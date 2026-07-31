@@ -22,9 +22,12 @@ All values provisional — balance determined through playtesting.
 | 🧵 Weavers | Event added to an active chain | +2 |
 | | Completed chain of 3 connected events | +10 |
 | | Chain broken by Unravel | −3 |
-| 📣 Activists | Declared outcome wins with Rally active | +8 |
-| | Declared outcome wins without Rally | +4 |
-| | Expose visibly changed another player's behavior | +2 |
+| 📣 Activists | Rally-mode declaration's exact outcome wins | +8 |
+| | Momentum-mode declaration's exact outcome wins | +4 |
+| | Expose target's qualifying Round-3 signature differs from the exposed Round-1 signature | +2 |
+
+A cascaded declaration has no winning outcome and earns no declaration score. Each fact is recorded and consumed at
+most once for its game, era, player, and reason.
 
 ## Win conditions
 
@@ -34,8 +37,8 @@ All values provisional — balance determined through playtesting.
 
 | Faction | Timeline Collapse (3 paradoxes) | Timeline Stabilization (5 eras, no winner) |
 |---|---|---|
-| ⚡ Erasers | WIN — thrive in chaos | LOSE |
+| ⚡ Erasers | LOSE | LOSE |
 | 📜 Prophets | LOSE — need stability | WIN |
-| 🔄 Revisionists | WIN — thrive in chaos | LOSE |
+| 🔄 Revisionists | LOSE | LOSE |
 | 🧵 Weavers | LOSE — need stability | WIN if active chain of 3+ |
-| 📣 Activists | WIN only if they declared the collapsing event correctly | LOSE |
+| 📣 Activists | WIN only if their current-era declaration targets the collapsing event; its outcome is irrelevant | LOSE |

@@ -6,6 +6,49 @@ description: "Action round submission and round status endpoints"
 
 Action round submission endpoints served by `game-service`.
 
+## Record Activist declaration
+
+```http
+POST /api/v1/games/{gameId}/eras/{eraNumber}/declarations
+```
+
+During the public declaration window — after event reveal and before private Round 1 submissions — an Activist may use
+Rally or eligible Momentum to record one current-era declaration. This consumes the Round-1 special-action slot; it is
+not a free declaration action.
+
+```json
+{
+  "specialAction": "RALLY",
+  "targetEventId": "uuid",
+  "targetOutcomeId": "uuid"
+}
+```
+
+`specialAction` is `RALLY` or `MOMENTUM`. The target must be an active current-era event and outcome. Momentum requires
+the same player's successful declaration in the immediately preceding era.
+
+**Response `202`:**
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "playerId": "uuid",
+  "specialAction": "RALLY",
+  "targetEventId": "uuid",
+  "targetOutcomeId": "uuid",
+  "status": "DECLARED"
+}
+```
+
+| Error | Code | Condition |
+|---|---|---|
+| `409` | `409-03` | Declaration window closed |
+| `409` | `409-04` | Round-1 special slot or declaration already used |
+| `422` | `422-07` | Faction/special mismatch |
+| `422` | `422-08` | Momentum not eligible |
+| `422` | `422-09` | Target event or outcome is not active in this era |
+
 ## Submit action
 
 ```http
@@ -40,6 +83,9 @@ Submit a card or faction special for the current action round. **One submission 
 ```
 
 `targetPlayerId` is `null` for event-targeting specials. Required for player-targeting specials: `CORRUPT`, `UNRAVEL`, `JAM`, `EXPOSE`.
+
+`RALLY` and `MOMENTUM` are accepted only by the declaration endpoint. `EXPOSE` is valid only in Action Round 2 against
+a player whose Round-1 action has a qualifying Push, Suppress, or Swing signature.
 
 **Response `202`:**
 ```json

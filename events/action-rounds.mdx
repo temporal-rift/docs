@@ -53,6 +53,57 @@ Stored in full for resolution. **Never forwarded to other players.**
 
 `targetPlayerId` is non-null for player-targeting specials (`JAM`, `CORRUPT`, `UNRAVEL`, `EXPOSE`).
 
+## ActivistDeclarationRecorded 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "roundNumber": 1,
+  "playerId": "uuid",
+  "mode": "RALLY",
+  "targetEventId": "uuid",
+  "targetOutcomeId": "uuid"
+}
+```
+
+The public projection of a Rally or Momentum declaration of record. The raw `SpecialActionPlayed` remains private.
+
+## ExposeSignatureRevealed 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "roundNumber": 2,
+  "activistPlayerId": "uuid",
+  "targetPlayerId": "uuid",
+  "signature": {
+    "type": "SWING",
+    "targetEventId": "uuid",
+    "sourceOutcomeId": "uuid",
+    "targetOutcomeId": "uuid"
+  }
+}
+```
+
+Published at Round 2 close. Only the exposed Round-1 signature is public.
+
+## ExposeBehaviorChanged 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "roundNumber": 3,
+  "activistPlayerId": "uuid",
+  "targetPlayerId": "uuid"
+}
+```
+
+Published at Round 3 close only when the target changes to a different qualifying signature. It never includes the
+Round-3 signature or its target.
+
 ## ActionRoundTimerExpired 🌐
 
 ```json

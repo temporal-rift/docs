@@ -45,7 +45,8 @@ graph TD
 
   S -->|GameStarted, EraStarted, EraEnded| TL
   A -->|CardPlayed, ActionRoundClosed| TL
-  TL -->|OutcomeApplied, ParadoxCascaded| SC
+  TL -->|OutcomeApplied, EraResolutionCompleted| SC
+  TL -->|EraResolutionCompleted| S
   TL --> P & N
   S --> P & N
   A --> P & N

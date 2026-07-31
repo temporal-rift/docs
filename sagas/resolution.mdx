@@ -13,12 +13,18 @@ flowchart TD
   A[ResolutionStarted] --> B[Apply all card effects — to FutureEvent aggregates — in submission order per round]
   B --> C[emit ProbabilityStateCalculated 📢]
   C --> D{Paradoxes?}
-  D -->|None| E[emit OutcomeApplied × events]
+  D -->|None| E[emit individual terminal OutcomeApplied facts]
   D -->|Found| F[emit ParadoxDetected — Trigger ParadoxResolutionSaga]
   F --> G[wait for ParadoxResolved — or ParadoxCascaded]
   G --> E
-  E --> H[emit ScoresUpdated]
+  E --> H[emit EraResolutionCompleted in EventsDrawn reveal order]
+  H --> I[game-service applies ordered cascades and scores completed inputs]
 ```
+
+`EraResolutionCompleted` is emitted once after the individual `OutcomeApplied` and `ParadoxCascaded` facts have been
+durably produced. It contains one terminal result for every active event in the original `EventsDrawn.events` order.
+Consumers must use this barrier—not individual cascade arrival order—to determine the collapsing event and scoring
+completion.
 
 ## Card effect application order
 
