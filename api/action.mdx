@@ -85,7 +85,9 @@ Submit a card or faction special for the current action round. **One submission 
 `targetPlayerId` is `null` for event-targeting specials. Required for player-targeting specials: `CORRUPT`, `UNRAVEL`, `JAM`, `EXPOSE`.
 
 `RALLY` and `MOMENTUM` are accepted only by the declaration endpoint. `EXPOSE` is valid only in Action Round 2 against
-a player whose Round-1 action has a qualifying Push, Suppress, or Swing signature.
+a player whose Round-1 action has a qualifying Push, Suppress, or Swing signature. The generic action request still
+requires `targetEventId` and `targetOutcomeId` for Expose; those values are accepted but ignored because Expose targets
+only `targetPlayerId`.
 
 **Response `202`:**
 ```json
@@ -104,6 +106,7 @@ a player whose Round-1 action has a qualifying Push, Suppress, or Swing signatur
 | `404` | `404-01` | Round not found |
 | `409` | `409-01` | Round already closed |
 | `409` | `409-02` | Player already submitted |
+| `409` | `409-05` | Expose already used in this era |
 | `422` | `422-01` | Card not in hand |
 | `422` | `422-02` | Player is Jammed |
 | `422` | `422-03` | Invalid target |
