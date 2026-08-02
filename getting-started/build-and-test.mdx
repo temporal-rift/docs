@@ -55,9 +55,10 @@ mvn -f game-service/pom.xml validate
 ## Contract publishing
 
 REST and event contracts live in the **`apis`** repo as independently versioned, spec-only Maven artifacts. AsyncAPI
-modules (`session-event`, `action-event`, `scoring-event`, `timeline-event`) generate Kafka producers and consumers;
-OpenAPI modules (`session-api`, `action-api`, `scoring-api`, `projection-api`) generate REST interfaces. Consumers unpack
-the published spec during their Maven build, so no service keeps a duplicate contract copy.
+modules (`session-event`, `action-event`, `scoring-event`, `timeline-event`) and OpenAPI modules (`session-api`,
+`action-api`, `scoring-api`, `projection-api`) publish the specifications. Consuming services unpack the published spec
+during their Maven build and generate the producer, consumer, or REST-interface artifacts their workflow supports, so no
+service keeps a duplicate contract copy.
 
 ```bash
 # 1. Bump version in apis/<module>/pom.xml and merge to main
