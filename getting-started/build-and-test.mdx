@@ -52,24 +52,24 @@ mvn -f game-service/pom.xml validate
 ```
 </CodeGroup>
 
-## Event contract publishing
+## Contract publishing
 
-Event contracts live in the **`apis`** repo as spec-first AsyncAPI definitions — one spec module per bounded context (`session-event`, `action-event`, `scoring-event`, `timeline-event`). Each is published to **Maven Central** as a spec-only jar; consuming services code-generate their producers/consumers from it at build time.
+REST and event contracts live in the **`apis`** repo as independently versioned, spec-only Maven artifacts. AsyncAPI
+modules (`session-event`, `action-event`, `scoring-event`, `timeline-event`) and OpenAPI modules (`session-api`,
+`action-api`, `scoring-api`, `projection-api`) publish the specifications. `temporal-rift-bom` unpacks contract
+resources during `initialize` into an artifact-isolated build directory, so services only declare their dependencies and
+generate the producer, consumer, or REST-interface artifacts their workflow supports. No service keeps a duplicate
+contract copy.
 
 ```bash
-# 1. Bump version in apis/<module>/pom.xml, push to main
+# 1. Bump version in apis/<module>/pom.xml and merge to main
 # GitHub Actions publishes automatically to Maven Central
 
-# 2. Update the game-service dependency version and test
+# 2. After Central publishes it, update the consuming service dependency version and test
 mvn -f game-service/pom.xml test
 ```
 
-For manual publishing (requires Sonatype credentials + GPG key in `~/.m2/settings.xml`):
-
-```bash
-mvn -f apis/session-event/pom.xml clean deploy -Pcentral
-```
-
 <Warning>
-**Never use `mvn install` for shared artifacts.** `mvn install` only writes to your local `.m2` cache. Other developers and CI will fail to resolve the dependency. Always publish via `deploy -Pcentral`.
+**Never use `mvn install` or manually run `mvn deploy` for shared artifacts.** Local publication makes builds
+non-reproducible. Merge the version bump to `apis` `main` and let its publishing workflow release the artifact.
 </Warning>

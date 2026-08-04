@@ -20,7 +20,7 @@ Every service and every module inside `game-service` follows the same package la
 │   └── saga/               ← saga orchestrators
 └── infrastructure/
     ├── adapter/in/
-    │   ├── rest/            ← Spring MVC controllers (generated from OpenAPI)
+    │   ├── rest/            ← Spring MVC controllers implementing interfaces generated from published OpenAPI contracts
     │   └── kafka/           ← Kafka consumers
     ├── adapter/out/
     │   ├── persistence/     ← JPA repositories
