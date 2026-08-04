@@ -1,22 +1,38 @@
 ---
 title: "Local Infrastructure"
-description: "Start PostgreSQL and Kafka locally with Docker Compose"
+description: "Start all services and local dependencies with Docker Compose"
 ---
 
-Each service ships with a `docker-compose.yml`. All services share the same Kafka instance — start it once from any service repo.
+The `infrastructure` repository owns the shared Compose topology. Run it from the workspace root, where
+`infrastructure`, `game-service`, `timeline-service`, and `read-service` are sibling directories.
 
 ```bash
-docker-compose -f game-service/infrastructure/docker-compose.yml up -d
+docker compose -f infrastructure/compose.yml up --build
 ```
+
+One PostgreSQL container is used for local convenience, but each service connects to its own database: `game_service`,
+`timeline_service`, or `read_service`. This does not represent a shared production database.
+
+Each service owns its own repository-root Dockerfile. The infrastructure repository's `compose.yml` is only the local
+orchestrator.
+Before services start, its `kafka-topics` job creates `game.events`, `timeline.events`, `game.commands`, and `game.dlq`
+with three partitions each; broker auto-creation is disabled to prevent mismatched topic layouts. Service containers
+become healthy only when their `/actuator/health` endpoint is healthy.
 
 ## Default ports
 
 | Service | Port | Notes |
 |---|---|---|
+| Game service | 8080 | |
+| Timeline service | 8081 | |
+| Read service | 8082 | |
+| Kafka UI | 8083 | Inspect topics, consumer groups, messages |
+| Zipkin | 9411 | Search and visualize traces |
 | PostgreSQL | 5432 | |
 | Kafka | 9092 | |
-| Kafka UI | 8080 | Inspect topics, consumer groups, messages |
 
 <Tip>
-Kafka UI at [http://localhost:8080](http://localhost:8080) lets you inspect topics and trace event flow in real time during development.
+Kafka UI at [http://localhost:8083](http://localhost:8083) lets you inspect topics and consumer groups. Zipkin at
+[http://localhost:9411](http://localhost:9411) shows distributed traces. Supply a reachable `JWT_ISSUER_URI` before
+calling authenticated game-service or read-service endpoints.
 </Tip>
