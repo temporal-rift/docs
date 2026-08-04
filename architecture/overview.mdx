@@ -55,6 +55,13 @@ graph TD
 
 All inter-service communication goes through Kafka. No direct service-to-service HTTP calls.
 
+## Operational observability
+
+Every implemented service emits Micrometer traces to Zipkin. A trace can follow an HTTP request through direct Kafka
+listeners and producers. In `game-service` and `read-service`, it also covers cross-module Spring Modulith event
+listeners; in `timeline-service`, it covers the transactional-outbox Spring event listener and Kafka relay.
+Propagation headers are transport metadata; the documented event headers and payload schemas do not change.
+
 ## lobbyId vs gameId
 
 <Note>

@@ -10,7 +10,9 @@ All REST endpoints are versioned under `/api/v1`. Requests are authenticated wit
 Authorization: Bearer <jwt>
 ```
 
-The token must include a `playerId` claim, which the services use to scope responses to the requesting player — including filtering private events and enforcing submission ownership.
+The services derive the internal `playerId` used to scope responses from the validated token identity: a UUID-valued
+`sub` is used directly, while an opaque OpenID Connect subject is deterministically mapped from the token's `iss` and
+`sub` claims. This includes filtering private events and enforcing submission ownership.
 
 ## Services and their APIs
 
