@@ -154,7 +154,8 @@ individual `OutcomeApplied` and `ParadoxCascaded` facts for the era. Entries are
 
 `revealIndex` and array index match the zero-based position in `EventsDrawn.events`; producers and consumers validate
 that every active event appears exactly once in that order. Session uses this ordered set to determine the collapsing
-event; scoring uses it to finish cascaded declarations without waiting for an outcome that cannot arrive.
+event and durably retain each `CASCADED` event ID for the next `EraStarted` after scoring; scoring uses it to finish
+cascaded declarations without waiting for an outcome that cannot arrive.
 
 ## ScoresUpdated 🌐
 
