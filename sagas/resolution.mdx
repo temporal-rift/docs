@@ -21,11 +21,13 @@ flowchart TD
   H --> I[game-service counts ordered cascades, retains typed carry-overs, and scores completed inputs]
 ```
 
-`EraResolutionCompleted` is emitted once after the individual `OutcomeApplied` and `ParadoxCascaded` facts have been
-durably produced. It contains one terminal result for every active event in the original `EventsDrawn.events` order.
-Consumers must use this barrier—not individual cascade arrival order—to determine the collapsing event and scoring
-completion. `CASCADED` entries advance collapse accounting; both `CASCADED` and `STALLED` entries carry forward in
-the barrier's reveal order.
+`EraResolutionCompleted` is emitted once after all resolvable `OutcomeApplied` and `ParadoxCascaded` facts have been
+durably produced. A `STALL` card ends its selected event as `STALLED` in this barrier; it produces neither an outcome
+fact nor a paradox fact. It contains one terminal result for every active event in the original `EventsDrawn.events`
+order. Consumers must use this barrier—not individual cascade arrival order—to determine the collapsing event and
+scoring completion. `CASCADED` entries advance collapse accounting; both `CASCADED` and `STALLED` entries carry
+forward in the barrier's reveal order. A paradox-resolution timeout force-cascades unresolved paradoxes; it does not
+produce `STALLED`.
 
 ## Card effect application order
 

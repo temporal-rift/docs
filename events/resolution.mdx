@@ -137,9 +137,11 @@ No faction special actions are allowed during paradox resolution.
 
 ## EraResolutionCompleted 🔒
 
-This is service-coordination data, not a standalone player notification. Timeline emits it exactly once after the
-individual `OutcomeApplied` and `ParadoxCascaded` facts for the era. Entries are in the original
-`EventsDrawn.events` reveal order, including carried-over events.
+This is service-coordination data, not a standalone player notification. Timeline emits it exactly once after all
+resolvable `OutcomeApplied` and `ParadoxCascaded` facts for the era. A `STALL` card places its selected event in the
+barrier as `STALLED`; it emits neither an outcome fact nor a paradox fact. A paradox-resolution timeout instead
+force-cascades unresolved paradoxes. Entries are in the original `EventsDrawn.events` reveal order, including
+carried-over events.
 
 ```json
 {
