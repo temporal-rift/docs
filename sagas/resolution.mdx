@@ -12,13 +12,17 @@ description: "Card effect ordering, paradox detection, and score calculation"
 flowchart TD
   A[ResolutionStarted] --> B[Apply all card effects — to FutureEvent aggregates — in submission order per round]
   B --> C[emit ProbabilityStateCalculated 📢]
-  C --> D{Paradoxes?}
-  D -->|None| E[emit individual terminal OutcomeApplied facts]
-  D -->|Found| F[emit ParadoxDetected — Trigger ParadoxResolutionSaga]
+  C --> D{Terminal path}
+  D -->|No paradox| E[emit OutcomeApplied]
+  D -->|Paradox detected| F[emit ParadoxDetected — Trigger ParadoxResolutionSaga]
   F --> G[wait for ParadoxResolved — or ParadoxCascaded]
-  G --> E
-  E --> H[emit EraResolutionCompleted in EventsDrawn reveal order]
-  H --> I[game-service counts ordered cascades, retains typed carry-overs, and scores completed inputs]
+  G --> H[emit ParadoxCascaded]
+  D -->|STALL card| I[record barrier-only STALLED]
+  E --> J[assemble terminal results in EventsDrawn reveal order]
+  H --> J
+  I --> J
+  J --> K[emit EraResolutionCompleted]
+  K --> L[game-service counts ordered cascades, retains typed carry-overs, and scores completed inputs]
 ```
 
 `EraResolutionCompleted` is emitted once after all resolvable `OutcomeApplied` and `ParadoxCascaded` facts have been
