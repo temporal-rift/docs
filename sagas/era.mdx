@@ -19,8 +19,16 @@ flowchart TD
   F --> G[ResolutionSaga — wait for ScoresUpdated]
   G --> H{Win condition?}
   H -->|Winner found| I[Trigger EndGameSaga]
-  H -->|No winner| J[emit EraEnded — Trigger EraSaga era N+1]
+  H -->|No winner| J[Drain pending cascade carry-overs]
+  J --> K[emit EraEnded and EraStarted for era N+1]
 ```
+
+## Cascade carry-forward
+
+When session consumes `EraResolutionCompleted`, it applies the barrier's `CASCADED` entries in reveal order to the
+global cascade counter and durably records their event IDs on the game. After scoring completes without ending the
+game, session atomically drains that pending ordered list into the next `EraStarted`. This preserves the exact events
+that replace fresh draws in the next era when resolution and scoring run in separate transactions.
 
 ## Failure and compensation
 

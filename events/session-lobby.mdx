@@ -106,7 +106,9 @@ Emitted when the reconnect grace timer expires. The player is auto-skipped for r
 { "gameId": "uuid", "eraNumber": 1, "cascadedEventIds": ["uuid"] }
 ```
 
-`cascadedEventIds` is empty on era 1. On subsequent eras it lists events carried forward from paradox cascades.
+`cascadedEventIds` is empty on era 1. On subsequent eras it contains the exact reveal-ordered IDs session retained
+from the preceding `EraResolutionCompleted` barrier. Session records `CASCADED` IDs durably, then drains that pending
+list into the next era only after scoring completes without ending the game.
 
 ## EventsDrawn 🌐
 
