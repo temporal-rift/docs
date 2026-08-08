@@ -31,7 +31,7 @@ Full per-player view — no raw probabilities, no other players' factions.
     {
       "eventId": "uuid",
       "title": "string",
-      "isCascaded": false,
+      "carryOverState": "FRESH",
       "outcomes": [
         { "outcomeId": "uuid", "description": "string" },
         { "outcomeId": "uuid", "description": "string" },
@@ -50,6 +50,8 @@ Full per-player view — no raw probabilities, no other players' factions.
   }
 }
 ```
+
+Every active event has required `carryOverState`: `FRESH`, `CASCADED`, or `STALLED`.
 
 <Note title="Faction visibility">
 `faction` on other players is `null` until `FactionRevealed` fires at game end. Your own faction is always visible in `myFaction`.

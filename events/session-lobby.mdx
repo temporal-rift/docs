@@ -103,12 +103,11 @@ Emitted when the reconnect grace timer expires. The player is auto-skipped for r
 ## EraStarted 🌐
 
 ```json
-{ "gameId": "uuid", "eraNumber": 1, "cascadedEventIds": ["uuid"] }
+{ "gameId": "uuid", "eraNumber": 1, "carryOverEventIds": ["uuid"] }
 ```
 
-`cascadedEventIds` is empty on era 1. On subsequent eras it contains the exact reveal-ordered IDs session retained
-from the preceding `EraResolutionCompleted` barrier. Session records `CASCADED` IDs durably, then drains that pending
-list into the next era only after scoring completes without ending the game.
+`carryOverEventIds` is empty on era 1. On subsequent eras it lists the reveal-ordered events carried forward from
+either a paradox cascade or a stall.
 
 ## EventsDrawn 🌐
 
@@ -124,12 +123,13 @@ list into the next era only after scoring completes without ending the game.
       { "outcomeId": "uuid", "description": "string", "initialProbability": 33 },
       { "outcomeId": "uuid", "description": "string", "initialProbability": 34 }
     ],
-    "isCascaded": false
+    "carryOverState": "FRESH"
   }]
 }
 ```
 
-Cascaded events carry their last known probability state — not reset to 33/33/34.
+`carryOverState` is required: `FRESH`, `CASCADED`, or `STALLED`. Carried events retain their last known probability
+state rather than being reset to 33/33/34.
 
 ## HandDealt 🔒
 

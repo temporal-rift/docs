@@ -23,12 +23,9 @@ flowchart TD
   J --> K[emit EraEnded and EraStarted for era N+1]
 ```
 
-## Cascade carry-forward
-
-When session consumes `EraResolutionCompleted`, it applies the barrier's `CASCADED` entries in reveal order to the
-global cascade counter and durably records their event IDs on the game. After scoring completes without ending the
-game, session atomically drains that pending ordered list into the next `EraStarted`. This preserves the exact events
-that replace fresh draws in the next era when resolution and scoring run in separate transactions.
+On a continuing game, session drains the reveal-ordered carry-over set into `EraStarted.carryOverEventIds`. It counts
+only `CASCADED` terminal entries toward timeline collapse, but retains both `CASCADED` and `STALLED` entries. The
+following `EventsDrawn` labels each entry `FRESH`, `CASCADED`, or `STALLED`.
 
 ## Failure and compensation
 
