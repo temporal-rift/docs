@@ -147,20 +147,15 @@ individual `OutcomeApplied` and `ParadoxCascaded` facts for the era. Entries are
   "eraNumber": 1,
   "terminalResolutions": [
     { "eventId": "uuid", "revealIndex": 0, "terminalState": "OUTCOME_APPLIED", "winningOutcomeId": "uuid" },
-    { "eventId": "uuid", "revealIndex": 1, "terminalState": "CASCADED" },
-    { "eventId": "uuid", "revealIndex": 2, "terminalState": "STALLED" }
+    { "eventId": "uuid", "revealIndex": 1, "terminalState": "STALLED" }
   ]
 }
 ```
 
 `revealIndex` and array index match the zero-based position in `EventsDrawn.events`; producers and consumers validate
-that every active event appears exactly once in that order. Session uses this ordered set to determine the collapsing
-event and durably retain each `CASCADED` event ID for the next `EraStarted` after scoring; scoring uses it to finish
-cascaded declarations without waiting for an outcome that cannot arrive.
-
-`STALLED` marks an event delayed by a `Stall` card (GDD §3): like `CASCADED`, it carries no winning outcome and the
-event carries into the next era instead of resolving this one. Unlike `CASCADED`, it is not a paradox and does not
-count toward timeline collapse.
+that every active event appears exactly once in that order. Session uses `CASCADED` entries to determine the
+collapsing event, carries both `CASCADED` and `STALLED` entries into the next era, and keeps a stalled event out of
+collapse accounting. Scoring finishes either non-applied state without waiting for an outcome that cannot arrive.
 
 ## ScoresUpdated 🌐
 

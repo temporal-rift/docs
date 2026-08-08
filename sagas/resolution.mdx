@@ -18,14 +18,14 @@ flowchart TD
   F --> G[wait for ParadoxResolved — or ParadoxCascaded]
   G --> E
   E --> H[emit EraResolutionCompleted in EventsDrawn reveal order]
-  H --> I[game-service applies cascades, persists carry-overs, and scores inputs]
+  H --> I[game-service counts ordered cascades, retains typed carry-overs, and scores completed inputs]
 ```
 
 `EraResolutionCompleted` is emitted once after the individual `OutcomeApplied` and `ParadoxCascaded` facts have been
 durably produced. It contains one terminal result for every active event in the original `EventsDrawn.events` order.
 Consumers must use this barrier—not individual cascade arrival order—to determine the collapsing event and scoring
-completion. Session also durably retains its `CASCADED` event IDs in this order, then emits them in the next
-`EraStarted` after scoring completes without ending the game.
+completion. `CASCADED` entries advance collapse accounting; both `CASCADED` and `STALLED` entries carry forward in
+the barrier's reveal order.
 
 ## Card effect application order
 
