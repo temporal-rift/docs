@@ -34,10 +34,15 @@ Receive-only per-player stream. All game actions go through REST. On connect the
 | `ActivistDeclarationRecorded` | All players: declaration mode, event, and outcome |
 | `ExposeSignatureRevealed` | All players: exposed Round-1 signature only |
 | `ExposeBehaviorChanged` | All players: changed-behaviour result only, never the Round-3 signature |
-| `ProbabilityStateCalculated` | Players who played Scan this round |
+| `ProbabilityStateCalculated` | Nobody in MVP 3 |
 | `ParadoxResolutionCardPlayed` | Nobody |
+| `EraResolutionCompleted` | Nobody — private service-coordination barrier |
+| `ParadoxCascaded` | All players in the game |
 | `FactionRevealed` | All players |
-| All other events | All players in the game |
+| Unknown or unsupported events | Nobody |
+
+All other player-visible events are forwarded only when they are explicitly listed as public in the event contract.
+There is no fallback that broadcasts an unclassified event.
 
 ## Reconnection
 
