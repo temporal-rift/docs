@@ -10,7 +10,7 @@ description: "Card effect ordering, paradox detection, and score calculation"
 
 ```mermaid
 flowchart TD
-  A[ResolutionStarted] --> B[Apply all card effects — to FutureEvent aggregates — in submission order per round]
+  A[ResolutionStarted] --> B[Apply all card effects — to FutureEvent aggregates — in fixed priority order, submission timestamp order only breaks ties within the remaining-cards tier]
   B --> C[emit ProbabilityStateCalculated 📢]
   C --> D{Terminal path}
   D -->|No paradox| E[emit OutcomeApplied]
