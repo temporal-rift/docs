@@ -1,6 +1,6 @@
 ---
 title: "Action API"
-description: "Action round submission and round status endpoints"
+description: "Action round, declaration, and paradox-resolution submission endpoints"
 ---
 
 
@@ -71,6 +71,9 @@ Submit a card or faction special for the current action round. **One submission 
 
 `sourceOutcomeId` is required when the submitted card resolves as `SWING`. For single-target cards it may be omitted.
 
+`STABILIZE` and `DETONATE` are rejected here because they are reactive paradox-resolution cards. `COLLIDE` remains an
+ordinary action-round card.
+
 **Special action:**
 ```json
 {
@@ -111,6 +114,45 @@ only `targetPlayerId`.
 | `422` | `422-02` | Player is Jammed |
 | `422` | `422-03` | Invalid target |
 | `422` | `422-04` | Faction required for special action |
+| `422` | `422-10` | Card type is not eligible during an action round |
+
+## Submit paradox-resolution card
+
+```http
+POST /api/v1/games/{gameId}/eras/{eraNumber}/paradox-resolution/actions
+```
+
+Submit the authenticated player's single card while the named era's paradox-resolution phase is open. `eraNumber` is
+a stale-state guard. There is no `roundNumber` because paradox resolution begins after the action rounds close.
+Eligible cards are `PUSH`, `SUPPRESS`, `STABILIZE`, and `DETONATE`. `COLLIDE` remains action-round-only, and `SWING`
+is unavailable because this submission has no source outcome.
+
+```json
+{
+  "cardInstanceId": "uuid",
+  "targetEventId": "uuid",
+  "targetOutcomeId": "uuid"
+}
+```
+
+**Response `202`:**
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "playerId": "uuid",
+  "status": "SUBMITTED"
+}
+```
+
+| Error | Code | Condition |
+|---|---|---|
+| `409` | `409-06` | Paradox-resolution phase is not open for this game and era |
+| `409` | `409-07` | Player already submitted during the open phase |
+| `422` | `422-01` | Card not in hand |
+| `422` | `422-06` | Target event or outcome is outside the current game and era |
+| `422` | `422-10` | Card type is not eligible during paradox resolution |
 
 
 ## Get round status
