@@ -46,9 +46,9 @@ Effects are applied in this fixed order within each round — not submission tim
 | 5 | `AMPLIFY` | Doubles the next card's effect |
 | 6+ | All remaining cards, including `COLLIDE` | In submission timestamp order |
 
-`STABILIZE` and `DETONATE` (the other two Group 4 "Paradox" cards) never go through this ordering — they're the
-single reactive card a player submits during `ParadoxResolutionSaga` once a paradox is already detected, not an
-ordinary card played during a round.
+`STABILIZE` and `DETONATE` (the other two Group 4 "Paradox" cards) never go through this ordering — during
+`ParadoxResolutionSaga`, a player submits exactly one card, chosen from `PUSH`, `SUPPRESS`, `STABILIZE`, or
+`DETONATE`, once a paradox is already detected, not an ordinary card played during a round.
 
 ## Failure and compensation
 
