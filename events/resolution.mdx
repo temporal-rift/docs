@@ -28,7 +28,8 @@ Events produced during outcome resolution by `timeline-service`.
 }
 ```
 
-Filtered — only players who played `SCAN` this round receive the probability values.
+The result is private to the player who played `SCAN` this round. WebSocket delivery of
+`ProbabilityStateCalculated` is deferred beyond MVP 3, so MVP 3 forwards it to nobody.
 
 ## BandedProbabilityPublished 🌐
 
@@ -47,7 +48,7 @@ Filtered — only players who played `SCAN` this round receive the probability v
 }
 ```
 
-Published to all players after Action Round 2 closes. Bands (`LOW` 0–30%, `MEDIUM` 31–60%, `HIGH` 61–90%) are derived from cumulative probability state of Rounds 1 and 2. Exact values remain private — only `SCAN` card players receive those via `ProbabilityStateCalculated`.
+Published to all players after Action Round 2 closes. Bands (`LOW` 0–30%, `MEDIUM` 31–60%, `HIGH` 61–90%) are derived from cumulative probability state of Rounds 1 and 2. Exact values remain private to the player who used `SCAN`; their WebSocket delivery is deferred beyond MVP 3.
 
 ## ParadoxDetected 🌐
 
