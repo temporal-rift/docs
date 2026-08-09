@@ -44,12 +44,16 @@ Effects are applied in this fixed order within each round — not submission tim
 | 3 | `ANNIHILATE` | Removes outcomes before probability shifts |
 | 4 | `CORRUPT` | Inverts other cards before they apply |
 | 5 | `AMPLIFY` | Doubles the next card's effect |
-| 6+ | All remaining cards | In submission timestamp order |
+| 6+ | All remaining cards, including `COLLIDE` | In submission timestamp order |
+
+`STABILIZE` and `DETONATE` (the other two Group 4 "Paradox" cards) never go through this ordering — they're the
+single reactive card a player submits during `ParadoxResolutionSaga` once a paradox is already detected, not an
+ordinary card played during a round.
 
 ## Failure and compensation
 
 | Failure | Compensation |
 |---|---|
 | `ParadoxResolutionSaga` times out | Force cascade on all unresolved paradoxes |
-| Probability state doesn't sum to 100 | Emit `ResolutionFailed`, trigger `GameEndedAbnormally` |
+| Probability state doesn't sum to 100 | `timeline-service` emits `ResolutionFailed`; game-service's `EraSaga` consumes it, emits `EraFailed`, and triggers `GameEndedAbnormally` |
 | Conflicting effects produce impossible state | Log, apply last-write-wins, emit `ResolutionWarning` |
