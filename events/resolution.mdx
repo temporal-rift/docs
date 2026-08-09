@@ -1,9 +1,10 @@
 ---
 title: "Resolution Events"
-description: "Events produced during outcome resolution by timeline-service"
+description: "Events exchanged during outcome and paradox resolution"
 ---
 
-Events produced during outcome resolution by `timeline-service`.
+Resolution lifecycle events are produced by `timeline-service` except `ParadoxResolutionCardPlayed`, which is the
+private player-submission fact produced by `game-service` on `game.events` and consumed by timeline-service.
 
 ## ResolutionStarted 🌐
 
@@ -79,6 +80,9 @@ Published to all players after Action Round 2 closes. Bands (`LOW` 0–30%, `MED
 
 ## ParadoxResolutionCardPlayed 🔒
 
+Published by `game-service`'s action module to `game.events`; consumed by `timeline-service`. It is never published on
+`timeline.events` and is never forwarded to players.
+
 ```json
 {
   "gameId": "uuid",
@@ -91,7 +95,8 @@ Published to all players after Action Round 2 closes. Bands (`LOW` 0–30%, `MED
 }
 ```
 
-No faction special actions are allowed during paradox resolution.
+No faction special actions are allowed during paradox resolution. Eligible cards are `PUSH`, `SUPPRESS`, `STABILIZE`,
+and `DETONATE`; the phase-scoped event has no `roundNumber`.
 
 ## ParadoxResolved 🌐
 
@@ -116,9 +121,57 @@ No faction special actions are allowed during paradox resolution.
     { "outcomeId": "uuid", "probability": 50 },
     { "outcomeId": "uuid", "probability": 50 },
     { "outcomeId": "uuid", "probability": 0 }
-  ]
+  ],
+  "detonatedByPlayerIds": ["uuid"]
 }
 ```
+
+`detonatedByPlayerIds` lists every player, if any, whose `DETONATE` card targeted this cascade — empty when none
+did. Multiple `DETONATE`s on the same cascade don't stack. This is a fact only; the doubled score penalty for
+every other player is applied by scoring, not carried in this event.
+
+## CorruptInversionConfirmed 🔒
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "roundNumber": 2,
+  "corruptingPlayerId": "uuid",
+  "targetEventId": "uuid",
+  "targetOutcomeId": "uuid",
+  "tookEffect": true
+}
+```
+
+Service-coordination data, not a standalone player notification. Confirms whether a round's `CORRUPT` actually
+inverted its target card's effect, or was blocked by a same-round `SEAL` (`tookEffect: false`).
+
+## ResolutionFailed 🔒
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "affectedEventId": "uuid",
+  "reason": "PROBABILITY_SUM_INVALID"
+}
+```
+
+Internal-only: signals an invalid probability state after resolution. Not expected in normal play.
+
+## ResolutionWarning 🔒
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "roundNumber": 2,
+  "detail": "string"
+}
+```
+
+Internal-only: logs a non-fatal ordering ambiguity that was resolved deterministically. No player-visible effect.
 
 ## OutcomeApplied 🌐
 
