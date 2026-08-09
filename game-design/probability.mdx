@@ -42,4 +42,4 @@ Player plays `PUSH` targeting outcome A (+20%):
 
 ## Scan card
 
-`SCAN` reveals the exact current probability state of one event to the player who played it. The result arrives via the `ProbabilityStateCalculated` event, which the notification module delivers only to the player who submitted the Scan — it is never broadcast.
+`SCAN` reveals the exact current probability state of one event to the player who played it. The result is private and is never broadcast. WebSocket delivery of the `ProbabilityStateCalculated` event is deferred beyond MVP 3, so MVP 3 forwards it to nobody.
