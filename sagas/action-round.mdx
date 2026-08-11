@@ -19,7 +19,23 @@ flowchart TD
   C --> G[emit ActionRoundClosed — ALL_SUBMITTED or TIMER_EXPIRED]
   F --> G
   G --> H[emit RoundSummaryPublished]
+  H --> I[emit private reveals — one per viewer]
 ```
+
+## Private reveals at round close
+
+After the public round summary, the saga emits the Information-card results earned this round. Each goes to exactly
+one player.
+
+| Reveal | For |
+|---|---|
+| `ProbabilityStateRevealed` | every player with an active Scan this era — re-sent each round until the era ends |
+| `InfluenceTraced` | each player who played Trace this round |
+| `HandCardIntercepted` | each player who played Intercept this round |
+| `PlayerJammed` | each player targeted by a Jam this round |
+
+Reveals come after the summary so a player never sees private detail before the public fact it refines. None of them
+names the player who triggered it.
 
 ## Race condition handling
 

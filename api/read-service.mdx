@@ -21,12 +21,22 @@ Full per-player view — no raw probabilities, no other players' factions.
   "phase": "ACTION_ROUND_2",
   "myFaction": "ERASERS",
   "myHand": [
-    { "cardInstanceId": "uuid", "cardType": "PUSH" },
-    { "cardInstanceId": "uuid", "cardType": "NULLIFY" }
+    { "cardInstanceId": "uuid", "cardType": "PUSH", "grade": "II", "isPlayableThisRound": true },
+    { "cardInstanceId": "uuid", "cardType": "SCAN", "grade": "I", "isPlayableThisRound": false }
   ],
   "myScore": 12,
   "mySpecialActions": ["ANNIHILATE", "CORRUPT", "CASCADE"],
   "myJammedUntilRound": null,
+  "myRevealedIntel": [
+    {
+      "kind": "PROBABILITY",
+      "observedInRound": 2,
+      "eventId": "uuid",
+      "outcomes": [
+        { "outcomeId": "uuid", "probability": 45, "isAnnihilated": false, "isSealed": false }
+      ]
+    }
+  ],
   "activeEvents": [
     {
       "eventId": "uuid",
@@ -57,39 +67,28 @@ Every active event has required `carryOverState`: `FRESH`, `CASCADED`, or `STALL
 `faction` on other players is `null` until `FactionRevealed` fires at game end. Your own faction is always visible in `myFaction`.
 </Note>
 
+### Hand fields
 
+`grade` is always present — single-grade cards carry `I`. `isPlayableThisRound` tells the client which cards to grey
+out; it changes as rounds advance without a new hand being dealt.
+
+### Revealed intel
+
+`myRevealedIntel` holds what you have bought with Information cards **this era**, and is emptied when the era ends.
+Each entry carries `observedInRound` so the client can show how fresh it is.
+
+| `kind` | From | Contents |
+|---|---|---|
+| `PROBABILITY` | Scan | exact outcome values for one event, refreshed every round until era end |
+| `INFLUENCE` | Trace | which players acted on one event last round |
+| `HAND_CARD` | Intercept | a card seen in another player's hand |
+
+<Note title="This is the only source of exact probabilities">
+Scan results reach you here and over the WebSocket — there is no probability endpoint. Every other player sees only
+Low/Medium/High bands after Action Round 2.
+</Note>
 
 ## Timeline service endpoints
-
-These endpoints are gated by round state and served by `timeline-service`.
-
-### Get probability state
-
-```http
-GET /api/v1/games/{gameId}/events/{eventId}/probability-state
-```
-
-<Warning title="Restricted">
-Only accessible to a player who played `SCAN` targeting this event in the current round.
-</Warning>
-
-
-**Response `200`:**
-```json
-{
-  "eventId": "uuid",
-  "outcomes": [
-    { "outcomeId": "uuid", "description": "string", "probability": 45, "isAnnihilated": false, "isSealed": false },
-    { "outcomeId": "uuid", "description": "string", "probability": 35, "isAnnihilated": false, "isSealed": false },
-    { "outcomeId": "uuid", "description": "string", "probability": 20, "isAnnihilated": true,  "isSealed": false }
-  ]
-}
-```
-
-| Error | Condition |
-|---|---|
-| `403` | Player has not played Scan this round |
-| `404` | Event not in current era |
 
 ### Get Weaver chain
 

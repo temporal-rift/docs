@@ -139,13 +139,17 @@ state rather than being reset to 33/33/34.
   "eraNumber": 1,
   "playerId": "uuid",
   "cards": [
-    { "cardInstanceId": "uuid", "cardType": "PUSH" },
-    { "cardInstanceId": "uuid", "cardType": "SCAN" },
-    { "cardInstanceId": "uuid", "cardType": "JAM" },
-    { "cardInstanceId": "uuid", "cardType": "COLLIDE" },
-    { "cardInstanceId": "uuid", "cardType": "AMPLIFY" }
+    { "cardInstanceId": "uuid", "cardType": "PUSH", "grade": "II" },
+    { "cardInstanceId": "uuid", "cardType": "SCAN", "grade": "I" },
+    { "cardInstanceId": "uuid", "cardType": "JAM", "grade": "I" },
+    { "cardInstanceId": "uuid", "cardType": "COLLIDE", "grade": "I" },
+    { "cardInstanceId": "uuid", "cardType": "AMPLIFY", "grade": "III" }
   ]
 }
 ```
 
-`cardInstanceId` distinguishes two copies of the same card type in the same hand.
+`cardInstanceId` distinguishes two copies of the same card type in the same hand. `grade` is always present;
+single-grade cards carry `I`.
+
+The hand holds the 5 cards kept from the 7 dealt. `HandDealt` **replaces** the player's hand — hands do not accumulate
+across eras. Stabilize and Detonate never appear here; they are dealt separately if a Paradox Resolution phase opens.

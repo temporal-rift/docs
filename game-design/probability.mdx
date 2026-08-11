@@ -10,7 +10,7 @@ Three constraints hold throughout:
 
 - The floor is **0%** and the ceiling is **90%** — no outcome can be guaranteed or made impossible
 - All three outcomes always sum to **100%**; shifting one redistributes the remainder proportionally across the other two
-- Exact probabilities are **hidden by default** — only a player who played `SCAN` targeting that event in the current round can see them
+- Exact probabilities are **hidden by default** — only a player who played `SCAN` on that event can see them
 
 ## Banded probability reveal
 
@@ -42,4 +42,14 @@ Player plays `PUSH` targeting outcome A (+20%):
 
 ## Scan card
 
-`SCAN` reveals the exact current probability state of one event to the player who played it. The result is private and is never broadcast. WebSocket delivery of the `ProbabilityStateCalculated` event is deferred beyond MVP 3, so MVP 3 forwards it to nobody.
+`SCAN` reveals the exact probability state of one event to the player who played it, and **keeps it current for the
+rest of the era**. You see updated values at the close of every remaining round, while everyone else waits for bands
+after Round 2. Each reading is stamped with the round it was taken, so you can tell how fresh it is.
+
+The reveal is private and is never broadcast — no other player learns you scanned, or what you saw. It does not carry
+into the next era, since that era draws new events.
+
+The `SCAN` grade decides how many events one play covers: **I** one event, **II** two, **III** all three.
+
+Scan cannot be played in Round 3 — the era resolves immediately afterwards, so there would be no action left to use
+what you learned.

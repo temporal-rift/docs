@@ -29,8 +29,32 @@ private player-submission fact produced by `game-service` on `game.events` and c
 }
 ```
 
-The result is private to the player who played `SCAN` this round. WebSocket delivery of
-`ProbabilityStateCalculated` is deferred beyond MVP 3, so MVP 3 forwards it to nobody.
+Era-level, emitted once at resolution, and **never delivered to any player**. It exists for downstream resolution and
+history. Exact probabilities reach players only through `ProbabilityStateRevealed`, below.
+
+## ProbabilityStateRevealed 🔒
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "roundNumber": 2,
+  "playerId": "uuid",
+  "eventId": "uuid",
+  "outcomes": [
+    { "outcomeId": "uuid", "probability": 45, "isAnnihilated": false, "isSealed": false },
+    { "outcomeId": "uuid", "probability": 35, "isAnnihilated": false, "isSealed": false },
+    { "outcomeId": "uuid", "probability": 20, "isAnnihilated": true,  "isSealed": false }
+  ]
+}
+```
+
+The payout for a `SCAN`. `playerId` is the **scanning** player, and the message goes to them alone — one message per
+scanned event, so a Scan on one event never discloses another.
+
+Scan is live for the rest of the era: a reveal is published at the close of the round it was played and at every
+subsequent round close, so the values stay current while other players wait for bands. `roundNumber` stamps when the
+values were observed. Scans do not carry into the next era.
 
 ## BandedProbabilityPublished 🌐
 
@@ -49,7 +73,7 @@ The result is private to the player who played `SCAN` this round. WebSocket deli
 }
 ```
 
-Published to all players after Action Round 2 closes. Bands (`LOW` 0–30%, `MEDIUM` 31–60%, `HIGH` 61–90%) are derived from cumulative probability state of Rounds 1 and 2. Exact values remain private to the player who used `SCAN`; their WebSocket delivery is deferred beyond MVP 3.
+Published to all players after Action Round 2 closes. Bands (`LOW` 0–30%, `MEDIUM` 31–60%, `HIGH` 61–90%) are derived from cumulative probability state of Rounds 1 and 2. Exact values remain private to players who used `SCAN`, and reach them through `ProbabilityStateRevealed`.
 
 ## ParadoxDetected 🌐
 

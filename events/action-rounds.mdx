@@ -28,12 +28,67 @@ Events produced during action rounds by `game-service` action module.
   "playerId": "uuid",
   "cardInstanceId": "uuid",
   "cardType": "PUSH",
+  "grade": "II",
   "targetEventId": "uuid",
-  "targetOutcomeId": "uuid"
+  "targetOutcomeId": "uuid",
+  "targetPlayerId": null
 }
 ```
 
 Stored in full for resolution. **Never forwarded to other players.**
+
+Exactly one of `targetEventId` / `targetPlayerId` is set, decided by card type. `NULLIFY`, `REDIRECT`, `AMPLIFY`,
+`JAM` and `INTERCEPT` target a player; every other card targets an event. `grade` is always present and sets the
+card's magnitude or scope.
+
+## PlayerJammed 🔒
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "playerId": "uuid",
+  "jammedUntilRound": 2
+}
+```
+
+`playerId` is the **suppressed** player, and only they receive it — so their client can disable faction specials
+instead of letting a submission fail. It deliberately carries no indication of who played the Jam.
+
+## InfluenceTraced 🔒
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 2,
+  "roundNumber": 1,
+  "playerId": "uuid",
+  "targetEventId": "uuid",
+  "influencerPlayerIds": ["uuid", "uuid"]
+}
+```
+
+The payout for a `TRACE`. `playerId` is the **tracing** player. Names who influenced the event last round and nothing
+else — never the card, direction or magnitude. `DECOY` plays do not register. An empty list is valid and means nobody
+acted. The traced players are never told.
+
+## HandCardIntercepted 🔒
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "roundNumber": 1,
+  "playerId": "uuid",
+  "targetPlayerId": "uuid",
+  "revealedCards": [
+    { "cardInstanceId": "uuid", "cardType": "SWING", "grade": "III" }
+  ]
+}
+```
+
+The payout for an `INTERCEPT`. `playerId` is the **intercepting** player. Cards are chosen at random from the target's
+hand at round close; the grade decides how many. Empty when the target's hand was empty. The target is never told.
 
 ## SpecialActionPlayed 🔒
 

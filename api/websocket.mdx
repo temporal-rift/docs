@@ -34,7 +34,11 @@ Receive-only per-player stream. All game actions go through REST. On connect the
 | `ActivistDeclarationRecorded` | All players: declaration mode, event, and outcome |
 | `ExposeSignatureRevealed` | All players: exposed Round-1 signature only |
 | `ExposeBehaviorChanged` | All players: changed-behaviour result only, never the Round-3 signature |
-| `ProbabilityStateCalculated` | Nobody in MVP 3 |
+| `ProbabilityStateCalculated` | Nobody |
+| `ProbabilityStateRevealed` | Scanning player only |
+| `InfluenceTraced` | Tracing player only |
+| `HandCardIntercepted` | Intercepting player only |
+| `PlayerJammed` | Jammed player only |
 | `BandedProbabilityPublished` | All players in the game |
 | `ParadoxResolutionCardPlayed` | Nobody |
 | `EraResolutionCompleted` | Nobody — private service-coordination barrier |
@@ -44,6 +48,18 @@ Receive-only per-player stream. All game actions go through REST. On connect the
 
 All other player-visible events are forwarded only when they are explicitly listed as public in the event contract.
 There is no fallback that broadcasts an unclassified event.
+
+## Private reveals
+
+The four reveal events above are how Information cards pay out. Each names a single **viewer** — the player the
+message is for — and goes to that player's session alone.
+
+They never identify who caused them. A player who is traced or intercepted is told nothing at all. A jammed player is
+told they are suppressed, so their client can disable faction specials rather than let a submission fail, but is never
+told who jammed them.
+
+Scan is the one reveal that repeats: `ProbabilityStateRevealed` is re-sent at the close of every round for the rest of
+the era, so the scanning player's values stay current.
 
 ## Reconnection
 
