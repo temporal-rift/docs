@@ -88,6 +88,49 @@ Scan results reach you here and over the WebSocket — there is no probability e
 Low/Medium/High bands after Action Round 2.
 </Note>
 
+## Get full game history
+
+```http
+GET /api/v1/games/{gameId}/history
+```
+
+Full era-by-era history of resolved outcomes and paradoxes, plus your own dealt hand for each era — useful for
+catching up after a disconnect that spans an era transition, since the live `/state` endpoint only ever shows the
+current era's hand.
+
+**Response `200`:**
+```json
+{
+  "gameId": "uuid",
+  "eras": [
+    {
+      "eraNumber": 1,
+      "outcomes": [
+        { "eventId": "uuid", "title": "string", "winningOutcomeId": "uuid", "winningOutcomeDescription": "string" }
+      ],
+      "paradoxesCascaded": 0,
+      "myHand": [
+        { "cardInstanceId": "uuid", "cardType": "PUSH", "grade": "II" }
+      ]
+    },
+    {
+      "eraNumber": 2,
+      "outcomes": [],
+      "paradoxesCascaded": 1,
+      "cascadedEvents": [
+        { "eventId": "uuid", "title": "string" }
+      ],
+      "myHand": []
+    }
+  ]
+}
+```
+
+<Note title="myHand is private to you">
+Every field on this endpoint except `myHand` is shared across all players in the game. `myHand` only ever contains
+cards dealt to you — never another player's hand, past or present.
+</Note>
+
 ## Timeline service endpoints
 
 ### Get Weaver chain
