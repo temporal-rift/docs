@@ -6,6 +6,41 @@ description: "Action round, declaration, and paradox-resolution submission endpo
 
 Action round submission endpoints served by `game-service`.
 
+## Select hand
+
+```http
+POST /api/v1/games/{gameId}/eras/{eraNumber}/hand-selection
+```
+
+Before Action Round 1, choose exactly five distinct cards from your private seven-card deal. The unresolved deal and
+the authoritative expiry time are in `pendingHandSelection` from the game-state endpoint.
+
+```json
+{
+  "keptCardInstanceIds": ["uuid", "uuid", "uuid", "uuid", "uuid"]
+}
+```
+
+**Response `202`:**
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "playerId": "uuid",
+  "status": "SELECTED"
+}
+```
+
+| Error | Code | Condition |
+|---|---|---|
+| `409` | `409-08` | Selection window is not open or has expired |
+| `409` | `409-09` | Your hand selection is already resolved |
+| `422` | `422-11` | A submitted card is not in your pending deal |
+
+If the timer expires, the server chooses one of the 21 possible five-card subsets uniformly at random. It does not
+favor a card, grade, category, or deal slot; timing out loses the filtering choice, not the fairness of the deal.
+
 ## Record Activist declaration
 
 ```http

@@ -4,9 +4,15 @@ description: "Card pool, types, and categories"
 ---
 
 
-All players share the same card pool. Each era you are dealt **7 cards and keep 5**, then play one per action round.
-Hands do not carry over — unplayed cards are discarded at the end of the era. Each dealt card slot selects a category,
-then a card within that category, then a grade; this keeps the deal mix stable as card types are added.
+All players share the same card pool. Each era you are dealt **7 cards** and choose exactly **5** during a private
+hand-selection window before Action Round 1, then play one per action round. Hands do not carry over — unplayed cards
+are discarded at the end of the era. Each dealt card slot selects a category, then a card within that category, then a
+grade; this keeps the deal mix stable as card types are added.
+
+The hand-selection duration is configuration, not a fixed game constant: its starting values are 60 seconds for a
+3-player game, 45 seconds for 4 players, and 30 seconds for 5 players. If you miss the window, the system chooses a
+five-card subset uniformly at random from the seven dealt. You lose the ability to filter cards, but the default does
+not optimize or systematically bias the resulting hand by category, grade, or deal order.
 
 ## Probability Shifters
 
