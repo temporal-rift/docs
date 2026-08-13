@@ -138,12 +138,15 @@ state rather than being reset to 33/33/34.
   "gameId": "uuid",
   "eraNumber": 1,
   "playerId": "uuid",
+  "selectionExpiresAt": "2026-08-13T20:00:00Z",
   "cards": [
-    { "cardInstanceId": "uuid", "cardType": "PUSH", "grade": "II" },
-    { "cardInstanceId": "uuid", "cardType": "SCAN", "grade": "I" },
-    { "cardInstanceId": "uuid", "cardType": "JAM", "grade": "I" },
-    { "cardInstanceId": "uuid", "cardType": "COLLIDE", "grade": "I" },
-    { "cardInstanceId": "uuid", "cardType": "AMPLIFY", "grade": "III" }
+    { "cardInstanceId": "uuid", "cardType": "PUSH", "grade": "II", "dealSlot": 1 },
+    { "cardInstanceId": "uuid", "cardType": "SCAN", "grade": "I", "dealSlot": 2 },
+    { "cardInstanceId": "uuid", "cardType": "JAM", "grade": "I", "dealSlot": 3 },
+    { "cardInstanceId": "uuid", "cardType": "COLLIDE", "grade": "I", "dealSlot": 4 },
+    { "cardInstanceId": "uuid", "cardType": "AMPLIFY", "grade": "III", "dealSlot": 5 },
+    { "cardInstanceId": "uuid", "cardType": "SUPPRESS", "grade": "II", "dealSlot": 6 },
+    { "cardInstanceId": "uuid", "cardType": "TRACE", "grade": "I", "dealSlot": 7 }
   ]
 }
 ```
@@ -151,5 +154,28 @@ state rather than being reset to 33/33/34.
 `cardInstanceId` distinguishes two copies of the same card type in the same hand. `grade` is always present;
 single-grade cards carry `I`.
 
-The hand holds the 5 cards kept from the 7 dealt. `HandDealt` **replaces** the player's hand — hands do not accumulate
-across eras. Stabilize and Detonate never appear here; they are dealt separately if a Paradox Resolution phase opens.
+This is the private pending seven-card selection pool, not the action hand. `dealSlot` is the stable deal order and
+`selectionExpiresAt` is the authoritative deadline. Stabilize and Detonate never appear here; they are dealt
+separately if a Paradox Resolution phase opens.
+
+## HandSelected 🔒
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "playerId": "uuid",
+  "selectionOrigin": "PLAYER",
+  "cards": [
+    { "cardInstanceId": "uuid", "cardType": "PUSH", "grade": "II", "dealSlot": 1 },
+    { "cardInstanceId": "uuid", "cardType": "SCAN", "grade": "I", "dealSlot": 2 },
+    { "cardInstanceId": "uuid", "cardType": "JAM", "grade": "I", "dealSlot": 3 },
+    { "cardInstanceId": "uuid", "cardType": "COLLIDE", "grade": "I", "dealSlot": 4 },
+    { "cardInstanceId": "uuid", "cardType": "AMPLIFY", "grade": "III", "dealSlot": 5 }
+  ]
+}
+```
+
+The selected five cards become the player's action hand. `selectionOrigin` is `PLAYER` for an accepted choice or
+`TIMEOUT_RANDOM` if the window expired. A timeout uniformly chooses one of the 21 possible five-card subsets; it
+never ranks cards or favors a deal slot, category, or grade.

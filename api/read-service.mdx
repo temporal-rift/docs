@@ -72,6 +72,22 @@ Every active event has required `carryOverState`: `FRESH`, `CASCADED`, or `STALL
 `grade` is always present — single-grade cards carry `I`. `isPlayableThisRound` tells the client which cards to grey
 out; it changes as rounds advance without a new hand being dealt.
 
+While the current-era hand choice is open, the response additionally contains a private `pendingHandSelection`:
+
+```json
+{
+  "cards": [
+    { "cardInstanceId": "uuid", "cardType": "PUSH", "grade": "II", "dealSlot": 1 }
+  ],
+  "requiredSelectionCount": 5,
+  "expiresAt": "2026-08-13T20:00:00Z"
+}
+```
+
+It contains exactly seven cards in deal-slot order. During this window `myHand` remains the final playable hand, not
+the temporary selection pool. Once the player selects five cards—or the server makes a uniform random timeout
+selection—the field disappears and `myHand` contains those five cards.
+
 ### Revealed intel
 
 `myRevealedIntel` holds what you have bought with Information cards **this era**, and is emptied when the era ends.
