@@ -114,13 +114,14 @@ Published by `game-service`'s action module to `game.events`; consumed by `timel
   "playerId": "uuid",
   "cardInstanceId": "uuid",
   "cardType": "STABILIZE",
+  "grade": "I",
   "targetEventId": "uuid",
   "targetOutcomeId": "uuid"
 }
 ```
 
 No faction special actions are allowed during paradox resolution. Eligible cards are `PUSH`, `SUPPRESS`, `STABILIZE`,
-and `DETONATE`; the phase-scoped event has no `roundNumber`.
+and `DETONATE`; the phase-scoped event has no `roundNumber`. `grade` is always present; single-grade cards carry `I`.
 
 ## ParadoxResolved 🌐
 
