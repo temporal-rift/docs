@@ -5,7 +5,8 @@ description: "Card pool, types, and categories"
 
 
 All players share the same card pool. Each era you are dealt **7 cards and keep 5**, then play one per action round.
-Hands do not carry over — unplayed cards are discarded at the end of the era.
+Hands do not carry over — unplayed cards are discarded at the end of the era. Each dealt card slot selects a category,
+then a card within that category, then a grade; this keeps the deal mix stable as card types are added.
 
 ## Probability Shifters
 
@@ -25,7 +26,8 @@ Hands do not carry over — unplayed cards are discarded at the end of the era.
 | **Trace** | See which players influenced a specific event last round | `TRACE` |
 | **Decoy** | Play a fake action visible to others but with no effect | `DECOY` |
 
-Information cards reveal to you and nobody else. The player you trace or intercept is never told.
+Information cards reveal to you and nobody else. Intercept selects its revealed card uniformly at random from the target
+hand; the player you trace or intercept is never told.
 
 ## Disruption
 
@@ -49,7 +51,7 @@ A jammed player can still play cards — only faction specials are blocked, and 
 
 ## Card grades
 
-Every card carries a grade — **I**, **II** or **III** — that varies its magnitude or scope. Grade II is the baseline.
+Graded cards carry grade **I**, **II** or **III**, which varies their magnitude or scope. Grade II is the baseline.
 
 | Card | I | II | III |
 |---|---|---|---|
@@ -62,8 +64,9 @@ Every card carries a grade — **I**, **II** or **III** — that varies its magn
 | **Trace** | one event | all events | — |
 | **Nullify** | cancel 1 | cancel 2 | — |
 
-Jam, Stall, Decoy, Redirect and Collide are single-grade. High grades are rare, so holding one is a decision about
-when to spend it rather than a free upgrade.
+Jam, Stall, Decoy, Redirect and Collide are single-grade. Grade rarity is configurable; the starting distribution is
+**I 60% · II 30% · III 10%**. High grades are rare, so holding one is a decision about when to spend it rather than a
+free upgrade.
 
 ## When you can play a card
 
@@ -93,7 +96,15 @@ PARADOX              →  COLLIDE, STABILIZE, DETONATE
 ```
 
 Categories are also how hands are dealt: each card slot picks a category first, then a card within it, so the balance
-of play styles in your hand stays consistent. Stabilize and Detonate are never in your action hand — they are dealt
-only if a Paradox Resolution phase opens.
+of play styles in your hand stays consistent. The category weights are configuration, with these starting values:
+
+| Category | Starting weight |
+|---|---|
+| Probability Shifter | 35% |
+| Information | 25% |
+| Disruption | 25% |
+| Paradox | 15% |
+
+Stabilize and Detonate are never in your action hand — they are dealt only if a Paradox Resolution phase opens.
 
 The `RoundSummaryPublished` event exposes only category and family — never the specific card — to preserve information asymmetry for all players.

@@ -39,12 +39,15 @@ Effects are applied in this fixed order within each round — not submission tim
 
 | Priority | Card / Effect | Reason |
 |---|---|---|
-| 1 | `NULLIFY` | Cancels the last card; must be applied before the cancelled card has any effect |
+| 1 | `NULLIFY` | Cancels the named player's eligible action before it has any effect |
 | 2 | `SEAL` | Locks outcomes before other effects can modify them |
 | 3 | `ANNIHILATE` | Removes outcomes before probability shifts |
 | 4 | `CORRUPT` | Inverts other cards before they apply |
-| 5 | `AMPLIFY` | Doubles the next card's effect |
+| 5 | `AMPLIFY` | Multiplies the named player's eligible card effect |
 | 6+ | All remaining cards, including `COLLIDE` | In submission timestamp order |
+
+`NULLIFY`, `REDIRECT` and `AMPLIFY` each target a named player, never an action's submission position. Each is a
+clean no-op when its target skipped, has no eligible action, or was already cancelled.
 
 `STABILIZE` and `DETONATE` (the other two Group 4 "Paradox" cards) never go through this ordering — during
 `ParadoxResolutionSaga`, a player submits exactly one card, chosen from `PUSH`, `SUPPRESS`, `STABILIZE`, or
