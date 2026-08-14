@@ -7,7 +7,8 @@ description: "Card pool, types, and categories"
 All players share the same card pool. Each era you are dealt **7 cards** and choose exactly **5** during a private
 hand-selection window before Action Round 1, then play one per action round. Hands do not carry over — unplayed cards
 are discarded at the end of the era. Each dealt card slot selects a category, then a card within that category, then a
-grade; this keeps the deal mix stable as card types are added.
+grade. Categories with no ordinary card compatible with an enabled grade are excluded before applying category
+weights, and the remaining configured weights are normalized. This keeps the deal mix stable as card types are added.
 
 The hand-selection duration is configuration, not a fixed game constant: its starting values are 60 seconds for a
 3-player game, 45 seconds for 4 players, and 30 seconds for 5 players. If you miss the window, the system chooses a
