@@ -35,10 +35,10 @@ Emitted when the host leaves a lobby that still has other players. Always follow
 ## LobbyClosed 🌐
 
 ```json
-{ "lobbyId": "uuid", "gameId": "uuid" }
+{ "lobbyId": "uuid", "gameId": "uuid | null" }
 ```
 
-Emitted when the lobby is disbanded — either explicitly via `CloseLobby` or implicitly when the host leaves as the sole remaining player.
+Emitted when the lobby is disbanded — either explicitly via `CloseLobby` or implicitly when the host leaves as the sole remaining player. `gameId` is null unless a game was already started.
 
 ## FactionsDrawn 🌐
 
