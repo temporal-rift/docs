@@ -152,6 +152,13 @@ only `targetPlayerId`.
 | `422` | `422-04` | Faction required for special action |
 | `422` | `422-10` | Card type is not eligible during an action round |
 
+<Note>
+Your client's cached game state can lag the server by a moment right after a round changes. If you submit a card
+immediately after seeing a new round start and get `422-01` (Card not in hand) for a card you're sure you still
+have, this usually means your view is a beat behind — re-fetch the current player state and try again rather than
+treating it as a hard failure.
+</Note>
+
 ## Submit paradox-resolution card
 
 ```http

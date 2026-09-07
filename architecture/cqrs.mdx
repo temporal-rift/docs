@@ -31,6 +31,13 @@ After a command is processed, the read model in `read-service` will be slightly 
 
 Clients receive real-time updates via WebSocket instead of relying on read-your-writes consistency. A `202 Accepted` response on action submit is followed by a WebSocket push when the state updates.
 
+<Note>
+Different fields of the same read model can catch up at slightly different times — for example, a round
+transition can appear before a just-played card has been dropped from the hand shown in the same response. Treat
+a rejection like `422-01` (Card not in hand) right after observing a state change as a cue to refresh and retry,
+not as a hard error to show the player.
+</Note>
+
 ## Rules
 
 <Warning>
