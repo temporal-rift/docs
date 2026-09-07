@@ -90,8 +90,9 @@ selection—the field disappears and `myHand` contains those five cards.
 
 ### Revealed intel
 
-`myRevealedIntel` holds what you have bought with Information cards **this era**, and is emptied when the era ends.
-Each entry carries `observedInRound` so the client can show how fresh it is.
+`myRevealedIntel` is always present. It holds what you have bought with Information cards **this era**, is `[]` when
+you have bought none, and is emptied when the era ends. Each entry carries `observedInRound` so the client can show
+how fresh it is.
 
 | `kind` | From | Contents |
 |---|---|---|
