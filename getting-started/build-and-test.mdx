@@ -61,6 +61,11 @@ resources during `initialize` into an artifact-isolated build directory, so serv
 generate the producer, consumer, or REST-interface artifacts their workflow supports. No service keeps a duplicate
 contract copy.
 
+Each module follows SemVer independently: use a patch increment for a backward-compatible bug fix or documentation-only
+correction, a minor increment for a backward-compatible addition such as a new optional field, endpoint, or event, and
+a major increment for any backward-incompatible change. Do not use a minor version by default; classify the change
+against the previously published module version before editing its `pom.xml`.
+
 ```bash
 # 1. Bump version in apis/<module>/pom.xml and merge to main
 # GitHub Actions publishes automatically to Maven Central
