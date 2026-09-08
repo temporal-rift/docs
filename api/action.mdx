@@ -93,7 +93,7 @@ POST /api/v1/games/{gameId}/eras/{eraNumber}/rounds/{roundNumber}/actions
 Submit a card or faction special for the current action round. **One submission per player per round.**
 `eraNumber` and `roundNumber` are public game coordinates and are validated as stale-state guards.
 
-**Card action:**
+**Card action — scalar event target:**
 ```json
 {
   "actionType": "CARD",
@@ -105,6 +105,21 @@ Submit a card or faction special for the current action round. **One submission 
 ```
 
 `sourceOutcomeId` is required when the submitted card resolves as `SWING`. For single-target cards it may be omitted.
+
+**Card action — multi-event selection:**
+
+```json
+{
+  "actionType": "CARD",
+  "cardInstanceId": "uuid",
+  "targetEventIds": ["uuid", "uuid"]
+}
+```
+
+Every card action has exactly one target mode: scalar `targetEventId`, list `targetEventIds`, or `targetPlayerId`.
+The list holds one to three distinct UUIDs and cannot be combined with scalar event, player, source-outcome, or
+target-outcome fields. The request does not contain `cardType` or `grade`; `game-service` resolves `cardInstanceId`
+and validates that SCAN uses one event at grade I, two at grade II, or the complete current-era set at grade III.
 
 `STABILIZE` and `DETONATE` are rejected here because they are reactive paradox-resolution cards. `COLLIDE` remains an
 ordinary action-round card.

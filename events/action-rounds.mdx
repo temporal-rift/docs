@@ -27,19 +27,18 @@ Events produced during action rounds by `game-service` action module.
   "roundNumber": 1,
   "playerId": "uuid",
   "cardInstanceId": "uuid",
-  "cardType": "PUSH",
+  "cardType": "SCAN",
   "grade": "II",
-  "targetEventId": "uuid",
-  "targetOutcomeId": "uuid",
-  "targetPlayerId": null
+  "targetEventIds": ["uuid", "uuid"]
 }
 ```
 
 Stored in full for resolution. **Never forwarded to other players.**
 
-Exactly one of `targetEventId` / `targetPlayerId` is set, decided by card type. `NULLIFY`, `REDIRECT`, `AMPLIFY`,
-`JAM` and `INTERCEPT` target a player; every other card targets an event. `grade` is always present and sets the
-card's magnitude or scope.
+Exactly one target mode is set: scalar `targetEventId`, list `targetEventIds`, or `targetPlayerId`. The list contains
+one to three distinct UUIDs and cannot carry scalar, player, or outcome targets. `NULLIFY`, `REDIRECT`, `AMPLIFY`,
+`JAM` and `INTERCEPT` target a player; SCAN uses list mode and other event-targeting cards use scalar mode. The
+producer resolves card type and grade to enforce SCAN's grade-specific list size and current-era membership.
 
 ## PlayerJammed 🔒
 
