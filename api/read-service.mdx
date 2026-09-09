@@ -89,6 +89,12 @@ It contains exactly seven cards in deal-slot order. During this window `myHand` 
 the temporary selection pool. Once the player selects five cards—or the server makes a uniform random timeout
 selection—the field disappears and `myHand` contains those five cards.
 
+### Jam status
+
+`myJammedUntilRound` is private to the authenticated player. It is `null` when that player is not jammed and otherwise
+contains the round through which faction specials are blocked. The value clears after that round passes and never
+carries across an era boundary. Jam does not prevent the player from playing cards.
+
 ### Revealed intel
 
 `myRevealedIntel` is always present. It holds what you have bought with Information cards **this era**, is `[]` when

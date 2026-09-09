@@ -28,9 +28,11 @@ flowchart TD
 player with a live Scan entitlement this era, publishes `ProbabilityStateRevealed` — re-sent each round until the
 era ends. That reveal never names the player who triggered it.
 
-`TRACE` and `INTERCEPT` payouts, and jam status, are not published as events at all — they're delivered through
-`read-service`'s game-state response (`myRevealedIntel` and `myJammedUntilRound`) instead — see
-[Read Service API](/api/read-service#revealed-intel).
+Trace and Jam have dedicated private action-event result contracts: `InfluenceTraced` addresses the tracing player,
+and `PlayerJammed` addresses the suppressed player. Both omit the player who caused the result. `read-service`
+retains the same information in reconnect-safe state (`myRevealedIntel` and `myJammedUntilRound`) — see
+[Read Service API](/api/read-service#revealed-intel). Intercept follows the same private projection model when its
+viewer-facing slice lands.
 
 ## Race condition handling
 
