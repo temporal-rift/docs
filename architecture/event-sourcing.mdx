@@ -3,7 +3,7 @@ title: "Event Sourcing"
 description: "How timeline-service rebuilds aggregate state by replaying events"
 ---
 
-`timeline-service` is fully event-sourced. `FutureEvent` and `WeaverChain` aggregates are rebuilt by replaying their stored event history rather than reading a current-state row.
+`timeline-service` is fully event-sourced. Its `FutureEvent` aggregate is rebuilt by replaying its stored event history rather than reading a current-state row.
 
 ## How it works
 
@@ -39,16 +39,6 @@ CREATE UNIQUE INDEX ON event_store (aggregate_id, sequence_nr);
 ```
 
 `sequence_nr` provides **optimistic concurrency** — a unique constraint violation means two processes tried to append events for the same aggregate concurrently. The loser retries.
-
-## Snapshots
-
-`WeaverChain` can span all 5 eras. Snapshots are taken every 20 events to avoid full replay on every load.
-
-```
-Snapshot @seq=20 → Event 21 → Event 22 → Event 23 → current state
-```
-
-On load: find the latest snapshot, replay only events after it.
 
 ## Why here specifically
 

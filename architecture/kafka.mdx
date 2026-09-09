@@ -5,12 +5,16 @@ description: "Topics, partitioning strategy, and consumer idempotency"
 
 ## Topics
 
-| Topic | Producer | Consumers | Partition key | Retention |
-|---|---|---|---|---|
-| `game.events` | game-service | timeline-service, read-service | `gameId` | 7 days |
-| `timeline.events` | timeline-service | game-service, read-service | `gameId` | 7 days |
-| `game.commands` | API gateway | game-service | `lobbyId` or `gameId` | 1 day |
-| `timeline.commands` | game-service | timeline-service | `gameId` | 1 day |
+| Topic | Producer | Consumers | Partition key |
+|---|---|---|---|
+| `game.events` | game-service | timeline-service, read-service | `gameId` |
+| `timeline.events` | timeline-service | game-service, read-service | `gameId` |
+| `game.commands` | *(no in-workspace producer)* | game-service (`PlayerReconnectKafkaConsumer`) | `lobbyId` or `gameId` |
+| `game.dlq` | game-service (`KafkaErrorHandlingConfig` dead-letter target after retries are exhausted) | — | `gameId` |
+
+All four topics are created with three partitions and no explicit `retention.ms` override — provisioning
+(`infrastructure/compose.yml`'s `kafka-topics` job) only sets partition count and replication factor, so retention
+follows the broker default rather than a per-topic policy.
 
 <Note>
 The transactional outbox is **not** a Kafka topic — it is the Spring Modulith `event_publication` table, read by a relay that publishes directly to the domain topics above. See [Outbox Pattern](/architecture/outbox).
@@ -27,7 +31,8 @@ The partition key is always `gameId`. This guarantees all events for a single ga
     Splitting by event type would create hundreds of topics, fragment consumer group coordination, and make it impossible to guarantee ordering across related events for the same game.
   </Accordion>
   <Accordion title="Commands and events on separate topics">
-    Different retention policies — events are durable (7 days), commands are ephemeral (1 day). Different consumer groups with different failure semantics.
+    Commands and events carry different failure semantics and consumer group lifecycles, which justifies keeping
+    them on separate topics.
   </Accordion>
 </AccordionGroup>
 

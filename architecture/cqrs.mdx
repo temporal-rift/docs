@@ -43,14 +43,13 @@ Never query the write-side database from a read endpoint. Write-side tables are 
 ## Database isolation
 
 ```
-game-service DB          timeline-service DB       read-service DB
-┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
-│ lobby            │     │ event_store       │     │ game_view        │
-│ game             │     │ weaver_chain      │     │ player_view      │
-│ action_round     │     │ saga_state        │     │ era_history      │
-│ saga_state       │     └──────────────────┘     └──────────────────┘
-│ event_publication│
-└──────────────────┘
+game-service DB          timeline-service DB          read-service DB
+┌────────────────────┐   ┌─────────────────────────┐  ┌───────────────────────┐
+│ lobby               │  │ event_store              │  │ game_projection        │
+│ game                │  │ future_event_era_index   │  │ game_player            │
+│ action_round        │  │ era_players              │  │ game_active_event      │
+│ event_publication   │  │ outbox_events            │  │ player_game_state      │
+└────────────────────┘   └─────────────────────────┘  └───────────────────────┘
 ```
 
 Migrations managed by Liquibase with changelogs per module to keep schema ownership clear.

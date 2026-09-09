@@ -26,3 +26,35 @@ Factions are hidden (`null`) until `FactionRevealed` fires at game end.
 }
 ```
 
+| Error | Code | Condition |
+|---|---|---|
+| `404` | `404-01` | Game not found |
+
+## Get score history
+
+```http
+GET /api/v1/games/{gameId}/scores/history
+```
+
+Full era-by-era log of score deltas — every scoring event that contributed to the current totals, in the order it
+was applied.
+
+**Response `200`:**
+```json
+{
+  "gameId": "uuid",
+  "history": [
+    {
+      "eraNumber": 1,
+      "deltas": [
+        { "playerId": "uuid", "pointsDelta": 4, "reason": "EVENT_RESOLVED_AS_WRITTEN" }
+      ]
+    }
+  ]
+}
+```
+
+| Error | Code | Condition |
+|---|---|---|
+| `404` | `404-01` | Game not found |
+

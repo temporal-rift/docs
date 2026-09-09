@@ -37,9 +37,6 @@ Receive-only per-player stream. All game actions go through REST. On connect the
 | `ExposeBehaviorChanged` | All players: changed-behaviour result only, never the Round-3 signature |
 | `ProbabilityStateCalculated` | Nobody |
 | `ProbabilityStateRevealed` | Scanning player only |
-| `InfluenceTraced` | Tracing player only |
-| `HandCardIntercepted` | Intercepting player only |
-| `PlayerJammed` | Jammed player only |
 | `BandedProbabilityPublished` | All players in the game |
 | `ParadoxResolutionCardPlayed` | Nobody |
 | `EraResolutionCompleted` | Nobody — private service-coordination barrier |
@@ -52,15 +49,15 @@ There is no fallback that broadcasts an unclassified event.
 
 ## Private reveals
 
-The four reveal events above are how Information cards pay out. Each names a single **viewer** — the player the
-message is for — and goes to that player's session alone.
+`ProbabilityStateRevealed` is how `SCAN` pays out in real time — it names a single **viewer**, the scanning player,
+and goes to their session alone. It is re-sent at the close of every round for the rest of the era, so the scanning
+player's values stay current.
 
-They never identify who caused them. A player who is traced or intercepted is told nothing at all. A jammed player is
-told they are suppressed, so their client can disable faction specials rather than let a submission fail, but is never
-told who jammed them.
-
-Scan is the one reveal that repeats: `ProbabilityStateRevealed` is re-sent at the close of every round for the rest of
-the era, so the scanning player's values stay current.
+`TRACE` and `INTERCEPT` payouts are delivered through `read-service`'s game-state response, in the
+`myRevealedIntel` array (`kind: INFLUENCE` / `kind: HAND_CARD`) — see
+[Read Service API](/api/read-service#revealed-intel). Jam status is delivered the same way, via the
+`myJammedUntilRound` field in that same response. In all three cases the client learns of its own reveal or
+suppression without ever being told who caused it.
 
 ## Reconnection
 

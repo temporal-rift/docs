@@ -135,7 +135,9 @@ ordinary action-round card.
 }
 ```
 
-`targetPlayerId` is `null` for event-targeting specials. Required for player-targeting specials: `CORRUPT`, `UNRAVEL`, `JAM`, `EXPOSE`.
+`targetPlayerId` is `null` for event-targeting specials. Required for player-targeting specials: `CORRUPT`, `EXPOSE`.
+`JAM` is a card, not a special action, and never appears in this request; `UNRAVEL` is event-targeting like
+`ANNIHILATE` and uses `targetEventId`/`targetOutcomeId` instead.
 
 `RALLY` and `MOMENTUM` are accepted only by the declaration endpoint. `EXPOSE` is valid only in Action Round 2 against
 a player whose Round-1 action has a qualifying Push, Suppress, or Swing signature. The generic action request still
@@ -165,6 +167,7 @@ only `targetPlayerId`.
 | `422` | `422-02` | Player is Jammed |
 | `422` | `422-03` | Invalid target |
 | `422` | `422-04` | Faction required for special action |
+| `422` | `422-05` | Faction does not own the submitted special action |
 | `422` | `422-10` | Card type is not eligible during an action round |
 
 ## Submit paradox-resolution card

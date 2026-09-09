@@ -3,8 +3,10 @@ title: "Resolution Events"
 description: "Events exchanged during outcome and paradox resolution"
 ---
 
-Resolution lifecycle events are produced by `timeline-service` except `ParadoxResolutionCardPlayed`, which is the
-private player-submission fact produced by `game-service` on `game.events` and consumed by timeline-service.
+Resolution lifecycle events are produced by `timeline-service`, with two exceptions: `ParadoxResolutionCardPlayed`
+is the private player-submission fact produced by `game-service` on `game.events` and consumed by timeline-service,
+and `ScoresUpdated` (documented at the end of this page) is published by `game-service`'s scoring module on
+`game.events`, not by timeline-service.
 
 ## ResolutionStarted 🌐
 

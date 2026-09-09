@@ -6,11 +6,17 @@ description: "Card effect ordering, paradox detection, and score calculation"
 **Trigger:** `ResolutionStarted` (fired by game-service after round 3 closes)  
 **Service:** `timeline-service`
 
+Card effects are applied per round, not when `ResolutionStarted` arrives: each round's `ActionRoundClosed` replays
+that round's card effects against the `FutureEvent` aggregates in the fixed priority order below. By the time
+`ResolutionStarted` fires, all three rounds' effects are already applied — this saga only determines the winning
+outcome from that final probability state and detects paradoxes.
+
 ## Steps
 
 ```mermaid
 flowchart TD
-  A[ResolutionStarted] --> B[Apply all card effects — to FutureEvent aggregates — in fixed priority order, submission timestamp order only breaks ties within the remaining-cards tier]
+  R[Each round's ActionRoundClosed replays that round's card effects — fixed priority order] --> A
+  A[ResolutionStarted — fired after round 3's effects are already applied] --> B[Determine winning outcome per event from the now-final probability state]
   B --> C[emit ProbabilityStateCalculated 📢]
   C --> D{Terminal path}
   D -->|No paradox| E[emit OutcomeApplied]
@@ -43,8 +49,9 @@ Effects are applied in this fixed order within each round — not submission tim
 | 2 | `SEAL` | Locks outcomes before other effects can modify them |
 | 3 | `ANNIHILATE` | Removes outcomes before probability shifts |
 | 4 | `CORRUPT` | Inverts other cards before they apply |
-| 5 | `AMPLIFY` | Multiplies the named player's eligible card effect |
-| 6+ | All remaining cards, including `COLLIDE` | In submission timestamp order |
+| 5 | `MIMIC` | Copies another card's already-resolved effect, so it must run after that card's tier |
+| 6 | `AMPLIFY` | Multiplies the named player's eligible card effect |
+| 7+ | All remaining cards, including `COLLIDE` | In submission timestamp order |
 
 `NULLIFY`, `REDIRECT` and `AMPLIFY` each target a named player, never an action's submission position. Each is a
 clean no-op when its target skipped, has no eligible action, or was already cancelled.
