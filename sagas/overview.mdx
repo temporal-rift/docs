@@ -29,7 +29,7 @@ State is persisted in the same transaction as the aggregate mutation or event th
 | `ResolutionSaga` | timeline-service | `ResolutionStarted` | Action ordering, paradox branching |
 | `ParadoxResolutionSaga` | timeline-service | `ParadoxDetected` | Nested within ResolutionSaga |
 | `EndGameSaga` | game-service / session | Win / collapse / stabilize | Resource cleanup |
-| `WeaverChainSaga` | timeline-service | `THREAD` special action | Only saga spanning multiple eras |
+| `WeaverChainSaga` *(planned — [details](/sagas/special#weaverchainsaga))* | timeline-service | `THREAD` special action | Only saga spanning multiple eras |
 | `PlayerReconnectSaga` | game-service / session | WebSocket disconnect | Grace timer, state restoration |
 
 ## Nesting map
@@ -46,7 +46,7 @@ graph TD
   E1 -->|no winner| E2[EraSaga era N+1]
   E2 -->|no winner| EN[...]
 
-  WCS[WeaverChainSaga — spans era boundaries]
+  WCS[WeaverChainSaga — planned, spans era boundaries]
   PRS[PlayerReconnectSaga — infrastructure-triggered]
 ```
 

@@ -50,7 +50,7 @@ Full per-player view — no raw probabilities, no other players' factions.
     }
   ],
   "players": [
-    { "playerId": "uuid", "playerName": "string", "score": 8, "isConnected": true, "faction": null }
+    { "playerId": "uuid", "playerName": null, "score": 8, "isConnected": true, "faction": null }
   ],
   "lastRoundSummary": {
     "roundNumber": 1,
@@ -61,7 +61,8 @@ Full per-player view — no raw probabilities, no other players' factions.
 }
 ```
 
-Every active event has required `carryOverState`: `FRESH`, `CASCADED`, or `STALLED`.
+Every active event has required `carryOverState`: `FRESH`, `CASCADED`, or `STALLED`. `playerName` is reserved for a
+later slice and is currently `null`.
 
 <Note title="Faction visibility">
 `faction` on other players is `null` until `FactionRevealed` fires at game end. Your own faction is always visible in `myFaction`.
@@ -147,31 +148,3 @@ current era's hand.
 Every field on this endpoint except `myHand` is shared across all players in the game. `myHand` only ever contains
 cards dealt to you — never another player's hand, past or present.
 </Note>
-
-## Timeline service endpoints
-
-### Get Weaver chain
-
-```http
-GET /api/v1/games/{gameId}/chains
-```
-
-<Warning title="Restricted">
-Only accessible to the player assigned the Weavers faction.
-</Warning>
-
-
-**Response `200`:**
-```json
-{
-  "chainId": "uuid",
-  "status": "ACTIVE",
-  "chainLength": 2,
-  "links": [
-    { "eventId": "uuid", "outcomeId": "uuid", "eraNumber": 1 },
-    { "eventId": "uuid", "outcomeId": "uuid", "eraNumber": 2 }
-  ]
-}
-```
-
-`status`: `ACTIVE`, `COMPLETED`, or `BROKEN`

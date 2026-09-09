@@ -28,6 +28,7 @@ become healthy only when their `/actuator/health` endpoint is healthy.
 | Read service | 8082 | |
 | Kafka UI | 8083 | Inspect topics, consumer groups, messages |
 | Zipkin | 9411 | Search and visualize traces |
+| VictoriaLogs | 9428 | Centralized logs UI/query — see below |
 | PostgreSQL | 5432 | |
 | Kafka | 9092 | |
 
@@ -36,3 +37,30 @@ Kafka UI at [http://localhost:8083](http://localhost:8083) lets you inspect topi
 [http://localhost:9411](http://localhost:9411) shows distributed traces. Supply a reachable `JWT_ISSUER_URI` before
 calling authenticated game-service or read-service endpoints.
 </Tip>
+
+## Centralized logs with VictoriaLogs
+
+The three application containers emit Spring Boot's native Logstash JSON to stdout. Docker forwards each line
+through its `syslog` logging driver, over TCP, directly to the `victorialogs` container's syslog listener on port
+`514` — no separate collector container, and no VictoriaLogs client or appender installed in the service images.
+
+Every log line carries a stable `app_name` field (from Docker's `tag` log option) identifying its source:
+`app_name:="game-service"`, `app_name:="timeline-service"`, or `app_name:="read-service"`.
+
+Query these with [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/) at the VictoriaLogs UI
+([http://localhost:9428/select/vmui](http://localhost:9428/select/vmui)) or via
+`GET http://localhost:9428/select/logsql/query?query=<expression>`. The JSON body isn't parsed into structured
+fields automatically — pipe the query through `| unpack_json` first to reach fields like `level`, `logger_name`,
+`traceId`, and `spanId`:
+
+```text
+app_name:="game-service" | unpack_json | traceId:"0123456789abcdef0123456789abcdef"
+```
+
+Copy a matching trace ID into Zipkin to inspect the corresponding span tree.
+
+<Warning>
+This topology is intentionally development/showcase only. VictoriaLogs starts without authentication. Do not expose
+ports `9428` or `514` from a shared or production host without designing authentication, TLS, retention, and access
+control.
+</Warning>

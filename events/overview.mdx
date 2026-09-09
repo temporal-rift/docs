@@ -7,12 +7,15 @@ All cross-service communication flows through Kafka. There are four topics in to
 
 ## Topics
 
-| Topic | Producer | Consumers | Partition key | Retention |
-|---|---|---|---|---|
-| `game.events` | game-service | timeline-service, read-service | `gameId` | 7 days |
-| `timeline.events` | timeline-service | game-service, read-service | `gameId` | 7 days |
-| `game.commands` | API gateway | game-service | `lobbyId` or `gameId` | 1 day |
-| `timeline.commands` | game-service | timeline-service | `gameId` | 1 day |
+| Topic | Producer | Consumers | Partition key |
+|---|---|---|---|
+| `game.events` | game-service | timeline-service, read-service | `gameId` |
+| `timeline.events` | timeline-service | game-service, read-service | `gameId` |
+| `game.commands` | *(no in-workspace producer)* | game-service (`PlayerReconnectKafkaConsumer`) | `lobbyId` or `gameId` |
+| `game.dlq` | game-service (`KafkaErrorHandlingConfig` dead-letter target after retries are exhausted) | — | `gameId` |
+
+All four topics are created with three partitions and no explicit `retention.ms` override, so retention follows the
+broker default rather than a differentiated per-topic policy.
 
 <Note>
 There is **no `outbox.events` Kafka topic**. The transactional outbox is the Spring Modulith `event_publication` database table — a background relay reads it and publishes directly to the domain topics above. See [Outbox Pattern](/architecture/outbox).

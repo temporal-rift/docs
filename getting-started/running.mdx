@@ -1,27 +1,39 @@
 ---
-title: "Running game-service"
-description: "Start game-service locally with the dev profile"
+title: "Running the services"
+description: "Start game-service, timeline-service, and read-service locally with the dev profile"
 ---
 
-`game-service` is the only service with runnable code right now.
+All three services — `game-service`, `timeline-service`, and `read-service` — have runnable code and can be started
+individually outside Docker Compose with the `dev` profile.
 
 ## Environment variables
 
 | Variable | Default (dev profile) | Required in prod |
 |---|---|---|
-| `DB_HOST` | `localhost` | ✔ |
-| `DB_PORT` | `5432` | ✔ |
-| `DB_NAME` | `temporal_rift` | ✔ |
-| `DB_USER` | `temporal_rift` | ✔ |
-| `DB_PASSWORD` | `temporal_rift` | ✔ |
+| `SPRING_DATASOURCE_HOST` | `localhost` (baked into the JDBC URL) | ✔ |
+| `SPRING_DATASOURCE_PORT` | `5432` (baked into the JDBC URL) | ✔ |
+| `SPRING_DATASOURCE_NAME` | `temporal_rift` (baked into the JDBC URL) | ✔ |
+| `SPRING_DATASOURCE_USERNAME` | `temporal_rift` | ✔ |
+| `SPRING_DATASOURCE_PASSWORD` | `temporal_rift` | ✔ |
 | `KAFKA_BOOTSTRAP_SERVERS` | `localhost:9092` | ✔ |
+| `KAFKA_SECURITY_PROTOCOL` | `PLAINTEXT` | ✔ |
+| `JWT_ISSUER_URI` | `http://localhost:9000` for `game-service`; **not defaulted** for `read-service` — must be supplied even in dev | ✔ (game-service, read-service only) |
+| `PORT` | `8080` | — |
+
+`timeline-service` has no REST surface and no OAuth2 resource server, so it needs neither `JWT_ISSUER_URI` nor any
+auth configuration.
 
 ## Start with dev defaults
 
-The `dev` profile fills in all environment variables — nothing to configure locally.
+The `dev` profile fills in database and Kafka connection details for all three services — for `game-service` it
+also fills in `JWT_ISSUER_URI`. `read-service` still requires `JWT_ISSUER_URI` to be set even under `dev`.
 
 ```bash
 mvn -f game-service/pom.xml spring-boot:run -Dspring-boot.run.profiles=dev
+
+mvn -f timeline-service/pom.xml spring-boot:run -Dspring-boot.run.profiles=dev
+
+JWT_ISSUER_URI=http://localhost:9000 mvn -f read-service/pom.xml spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
 ## Artifact publication order

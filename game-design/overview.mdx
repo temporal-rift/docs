@@ -27,4 +27,4 @@ Every core mechanic is intentionally modelled after **event-driven microservices
 | `ActionRound` | game-service / action | One action per player; round closes on all-submitted or timer |
 | `FutureEvent` | timeline-service | Probabilities sum to 100%; ceiling 90%, floor 0%; annihilated outcome cannot win |
 | `PlayerState` | game-service (split) | Dealt 7, keeps 5 each era; score ≥ 0; faction immutable once assigned |
-| `WeaverChain` | timeline-service | Links reference real past outcomes; one active chain per Weaver |
+| `WeaverChain` *(planned — [details](/sagas/special#weaverchainsaga))* | timeline-service | Links reference real past outcomes; one active chain per Weaver |

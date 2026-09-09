@@ -5,18 +5,22 @@ description: "Running tests, code quality gates, and publishing the shared libra
 
 ## Running tests
 
+Each service builds independently — swap the `-f` path to target `game-service`, `timeline-service`, or
+`read-service`. `mvn test` runs unit tests only; integration tests (`*IT`) run under Failsafe via `mvn verify`.
+
 ```bash
-# All tests (unit + integration via Testcontainers)
+# All unit tests for one service
 mvn -f game-service/pom.xml test
 
 # Single test class
 mvn -f game-service/pom.xml test -Dtest="LobbyTest"
 
 # Architecture tests only
-mvn -f game-service/pom.xml test -Dtest="*ArchitectureTest"
+mvn -f timeline-service/pom.xml test -Dtest="ArchitectureTest"
 
-# Integration test (Testcontainers PostgreSQL + Kafka + Modulith verify)
-mvn -f game-service/pom.xml test -Dtest="GameServiceApplicationIT"
+# Integration tests, including Modulith/architecture verification (Testcontainers PostgreSQL + Kafka)
+mvn -f game-service/pom.xml verify -Dit.test="GameServiceApplicationIT"
+mvn -f read-service/pom.xml verify -Dit.test="ReadServiceApplicationIT"
 ```
 
 ## Test categories
@@ -25,14 +29,18 @@ mvn -f game-service/pom.xml test -Dtest="GameServiceApplicationIT"
 |---|---|---|---|
 | Unit tests | `{Subject}Test` | None | None |
 | Slice tests | `{Module}ModuleTest` | `@ApplicationModuleTest` | None |
-| Integration test | `GameServiceApplicationIT` | Full | Testcontainers |
-| Architecture tests | `*ArchitectureTest` | None | None |
+| Modulith integration test | `GameServiceApplicationIT` (game-service), `ReadServiceApplicationIT` (read-service) | Full | Testcontainers |
+| Architecture tests | `ArchitectureTest` | None | None |
 
-`GameServiceApplicationIT` starts real PostgreSQL and Kafka via Testcontainers and runs `ApplicationModules.verify()` to assert Spring Modulith module boundaries.
+`game-service` and `read-service` are Spring Modulith applications — their `*ApplicationIT` starts real PostgreSQL
+and Kafka via Testcontainers and runs `ApplicationModules.verify()` to assert module boundaries. `timeline-service`
+is a plain Spring Boot app (single bounded context, not a Modulith), so its layering is enforced instead by
+ArchUnit's `ArchitectureTest` — the same pattern `read-service` also uses alongside its Modulith verification.
 
 ## Code quality gates
 
-Both run automatically on every build via the `validate` phase:
+Both run automatically on every build via the `validate` phase (shown here for `game-service`; the same targets
+apply to any service by swapping the `-f` path):
 
 <CodeGroup>
 ```bash Check formatting
