@@ -49,7 +49,7 @@ Effects are applied in this fixed order within each round — not submission tim
 | 2 | `SEAL` | Locks outcomes before other effects can modify them |
 | 3 | `ANNIHILATE` | Removes outcomes before probability shifts |
 | 4 | `CORRUPT` | Inverts other cards before they apply |
-| 5 | `MIMIC` | Copies another card's already-resolved effect, so it must run after that card's tier |
+| 5 | `MIMIC` | Runs after `SEAL`/`ANNIHILATE` so those can still affect its target; computes an independent fresh shift at its own base magnitude rather than copying its source card's already-applied (possibly amplified or corrupted) result |
 | 6 | `AMPLIFY` | Multiplies the named player's eligible card effect |
 | 7+ | All remaining cards, including `COLLIDE` | In submission timestamp order |
 
