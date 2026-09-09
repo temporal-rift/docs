@@ -55,12 +55,17 @@ flowchart TD
   A[WebSocket disconnect] --> B[Mark player DISCONNECTED — emit PlayerDisconnected 🌐]
   B --> C[Start grace timer — default 30s, configurable via GameRulesPort]
   C --> D{Player reconnects?}
-  D -->|Yes — within grace period| E[Mark player reconnected — client re-fetches state from read-service]
+  D -->|Yes — within grace period| E[Mark player reconnected]
   D -->|No — timer expires| F[Mark player ABANDONED — emit PlayerAbandoned 🌐 — auto-skip remaining rounds]
   F --> G{Last remaining player?}
   G -->|Yes| H[Trigger EndGameSaga — GameEndedAbnormally]
   G -->|No| I[Continue game with remaining players]
 ```
+
+This saga only tracks `game-service`'s connection bookkeeping. State restoration itself isn't one of its steps: a
+reconnecting client opens a new `read-service` WebSocket connection, and `read-service` pushes a fresh game-state
+snapshot on every connection it accepts — see [Reconnection](/api/websocket#reconnection) — independently of
+whether this saga's grace period is still open.
 
 ### Compensation
 

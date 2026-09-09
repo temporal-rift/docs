@@ -19,23 +19,18 @@ flowchart TD
   C --> G[emit ActionRoundClosed — ALL_SUBMITTED or TIMER_EXPIRED]
   F --> G
   G --> H[emit RoundSummaryPublished]
-  H --> I[emit private reveals — one per viewer]
 ```
 
-## Private reveals at round close
+## After the round closes
 
-After the public round summary, the saga emits the Information-card results earned this round. Each goes to exactly
-one player.
+`ActionRoundSaga`'s own job ends at `RoundSummaryPublished`. Separately, `timeline-service` consumes
+`ActionRoundClosed` to replay that round's card effects (see [ResolutionSaga](/sagas/resolution)), and for every
+player with a live Scan entitlement this era, publishes `ProbabilityStateRevealed` — re-sent each round until the
+era ends. That reveal never names the player who triggered it.
 
-| Reveal | For |
-|---|---|
-| `ProbabilityStateRevealed` | every player with an active Scan this era — re-sent each round until the era ends |
-| `InfluenceTraced` | each player who played Trace this round |
-| `HandCardIntercepted` | each player who played Intercept this round |
-| `PlayerJammed` | each player targeted by a Jam this round |
-
-Reveals come after the summary so a player never sees private detail before the public fact it refines. None of them
-names the player who triggered it.
+`TRACE` and `INTERCEPT` payouts, and jam status, are not published as events at all — they're delivered through
+`read-service`'s game-state response (`myRevealedIntel` and `myJammedUntilRound`) instead — see
+[Read Service API](/api/read-service#revealed-intel).
 
 ## Race condition handling
 

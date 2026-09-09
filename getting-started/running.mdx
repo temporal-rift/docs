@@ -23,6 +23,13 @@ individually outside Docker Compose with the `dev` profile.
 `timeline-service` has no REST surface and no OAuth2 resource server, so it needs neither `JWT_ISSUER_URI` nor any
 auth configuration.
 
+<Warning>
+All three services default to `PORT` `8080`. Docker Compose maps them to distinct host ports (8080/8081/8082 — see
+[Local Infrastructure](/getting-started/local-infrastructure)), but running them standalone with `mvn
+spring-boot:run` does not: start more than one without setting `PORT` explicitly and the second and third will fail
+to bind.
+</Warning>
+
 ## Start with dev defaults
 
 The `dev` profile fills in database and Kafka connection details for all three services — for `game-service` it
@@ -31,9 +38,9 @@ also fills in `JWT_ISSUER_URI`. `read-service` still requires `JWT_ISSUER_URI` t
 ```bash
 mvn -f game-service/pom.xml spring-boot:run -Dspring-boot.run.profiles=dev
 
-mvn -f timeline-service/pom.xml spring-boot:run -Dspring-boot.run.profiles=dev
+PORT=8081 mvn -f timeline-service/pom.xml spring-boot:run -Dspring-boot.run.profiles=dev
 
-JWT_ISSUER_URI=http://localhost:9000 mvn -f read-service/pom.xml spring-boot:run -Dspring-boot.run.profiles=dev
+PORT=8082 JWT_ISSUER_URI=http://localhost:9000 mvn -f read-service/pom.xml spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
 ## Artifact publication order
