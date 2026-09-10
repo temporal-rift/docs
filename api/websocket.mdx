@@ -38,7 +38,7 @@ Receive-only per-player stream. All game actions go through REST. On connect the
 | `ProbabilityStateCalculated` | Nobody |
 | `ProbabilityStateRevealed` | Scanning player only |
 | `InfluenceTraced` | Nobody until the Trace viewer-facing slice enables its private path |
-| `PlayerJammed` | Nobody until the Jam viewer-facing slice enables its private path |
+| `PlayerJammed` | Suppressed player only |
 | `BandedProbabilityPublished` | All players in the game |
 | `ParadoxResolutionCardPlayed` | Nobody |
 | `EraResolutionCompleted` | Nobody — private service-coordination barrier |
@@ -55,12 +55,12 @@ There is no fallback that broadcasts an unclassified event.
 and goes to their session alone. It is re-sent at the close of every round for the rest of the era, so the scanning
 player's values stay current.
 
-`InfluenceTraced` and `PlayerJammed` are private action-event contracts addressed by payload `playerId`. Their
-real-time forwarding remains deny-by-default until each complete viewer-facing slice enables its private route;
-neither can fall back to broadcast. Reconnect-safe Trace results and Jam status are represented in the
-`myRevealedIntel` array and `myJammedUntilRound` field respectively. `INTERCEPT` results use the same private
-projection principle. In all three cases the client can learn only its own reveal or suppression and is never told
-who caused it.
+`InfluenceTraced` and `PlayerJammed` are private action-event contracts addressed by payload `playerId`. `PlayerJammed`
+is delivered to the suppressed player's session alone and never falls back to broadcast; `InfluenceTraced`'s real-time
+forwarding remains deny-by-default until its viewer-facing slice enables its private route. Reconnect-safe Trace
+results and Jam status are represented in the `myRevealedIntel` array and `myJammedUntilRound` field respectively.
+`INTERCEPT` results use the same private projection principle. In all three cases the client can learn only its own
+reveal or suppression and is never told who caused it.
 
 ## Reconnection
 
