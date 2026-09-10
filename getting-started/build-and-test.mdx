@@ -29,13 +29,30 @@ mvn -f read-service/pom.xml verify -Dit.test="ReadServiceApplicationIT"
 |---|---|---|---|
 | Unit tests | `{Subject}Test` | None | None |
 | Slice tests | `{Module}ModuleTest` | `@ApplicationModuleTest` | None |
-| Modulith integration test | `GameServiceApplicationIT` (game-service), `ReadServiceApplicationIT` (read-service) | Full | Testcontainers |
+| Persistence integration tests | `{Subject}PersistenceIT` | `@PersistenceIntegrationTest` (game-service) | Testcontainers PostgreSQL |
+| Application integration tests | `{Subject}IT`, including `GameServiceApplicationIT` and `ReadServiceApplicationIT` | `@GameServiceIntegrationTest`, `@TimelineServiceIntegrationTest`, `@ReadServiceIntegrationTest` | Testcontainers PostgreSQL + Kafka |
 | Architecture tests | `ArchitectureTest` | None | None |
 
 `game-service` and `read-service` are Spring Modulith applications — their `*ApplicationIT` starts real PostgreSQL
 and Kafka via Testcontainers and runs `ApplicationModules.verify()` to assert module boundaries. `timeline-service`
 is a plain Spring Boot app (single bounded context, not a Modulith), so its layering is enforced instead by
 ArchUnit's `ArchitectureTest` — the same pattern `read-service` also uses alongside its Modulith verification.
+
+### Integration test annotations
+
+Annotate every integration test with its service's composed annotation from the table above. Do not write
+`@SpringBootTest` plus an inline `@Import` list: Spring caches one context per distinct combination of test
+annotations, and every new combination boots the application and its containers from scratch. A test needing a bean
+the annotation does not already provide belongs in that annotation's shared configuration, not in a local import.
+
+<Warning>
+**Never hold Testcontainers containers in `static` fields to share them between contexts.** A cached context stays
+open for the rest of the JVM with its listeners and schedulers running, so two application contexts sharing one
+broker become two members of every consumer group — Kafka gives each partition to exactly one member, so a test's
+own events can be delivered to the other context's listeners — and two sharing one database run two schedulers over
+the same outbox rows. Only a context with no listeners and no schedulers may share, which is why `game-service`'s
+persistence slice can and its application contexts cannot.
+</Warning>
 
 ## Code quality gates
 
