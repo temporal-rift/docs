@@ -12,7 +12,7 @@ description: "Freezing state, calculating final results, and releasing resources
 ```mermaid
 flowchart TD
   A[Trigger received] --> B[Freeze game state — reject all further commands]
-  B --> C[Calculate final results — per ending type]
+  B --> C[Apply end-game awards and capture final score snapshot]
   C --> D[emit GameEnded 🌐]
   D --> E[emit FactionRevealed 🌐 — all factions now public]
   E --> F[Persist final game record]

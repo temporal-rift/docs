@@ -17,7 +17,7 @@ All values provisional — balance determined through playtesting.
 | | Fulfillment declared and succeeds | +8 |
 | | Event resolves differently than written | −2 |
 | 🔄 Revisionists | Secret preferred outcome wins this era | +4 |
-| | No player correctly identified their faction this era | +6 |
+| | Faction remained unidentified until the final reveal (once per game) | +6 |
 | | Successful Mimic contributed to outcome winning | +2 |
 | 🧵 Weavers | Event added to an active chain | +2 |
 | | Completed chain of 3 connected events | +10 |
@@ -28,6 +28,9 @@ All values provisional — balance determined through playtesting.
 
 A cascaded declaration has no winning outcome and earns no declaration score. Each fact is recorded and consumed at
 most once for its game, era, player, and reason.
+
+The `FACTION_UNIDENTIFIED` Revisionist bonus is awarded only at game end when no earlier identification was recorded.
+It is included in that player's `GameEnded.finalScores` result with all other final score decisions.
 
 ### Cross-faction rules
 
