@@ -31,6 +31,9 @@ the exact delta applied to each entry.
 A cascaded declaration has no winning outcome and earns no declaration score. Each fact is recorded and consumed at
 most once for its game, era, player, and reason.
 
+The `FACTION_UNIDENTIFIED` Revisionist bonus is awarded only at game end when no earlier identification was recorded.
+It is included in that player's `GameEnded.finalScores` result with all other final score decisions.
+
 ### Cross-faction rules
 
 Some rules apply to every player, regardless of faction:
