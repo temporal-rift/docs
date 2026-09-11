@@ -98,8 +98,10 @@ influenced `targetEventId` in the preceding round; it cannot carry card type, di
 ```
 
 Private reveal for the intercepting player. `playerId` is the sole viewer; `targetPlayerId` is the observed player.
-`revealedCards` holds 0–2 sampled cards (grade I = 1, grade II = 2) and is `[]` when the target hand was empty. The
-target is never told they were intercepted.
+`revealedCards` holds 0–2 cards sampled from the target's hand. How many is controlled by the played `INTERCEPT`
+card's grade (I = 1, II = 2 — `INTERCEPT` has no grade III), capped by the number of cards in the target's hand, and
+each entry's `grade` is that sampled card's own grade. It is `[]` when the target hand was empty. The target is never
+told they were intercepted.
 
 ## SpecialActionPlayed 🔒
 
