@@ -41,8 +41,8 @@ one to three distinct UUIDs and cannot carry scalar, player, or outcome targets.
 producer resolves card type and grade to enforce SCAN's grade-specific list size and current-era membership.
 
 <Note>
-Playing `JAM`, `TRACE`, or `INTERCEPT` is captured in `CardPlayed` like any other card. Jam and Trace have dedicated
-private result contracts below; `read-service` projects those results into `myJammedUntilRound` and
+Playing `JAM`, `TRACE`, or `INTERCEPT` is captured in `CardPlayed` like any other card. Jam, Trace, and Intercept have
+dedicated private result contracts below; `read-service` projects those results into `myJammedUntilRound` and
 `myRevealedIntel` for reconnect-safe state.
 </Note>
 
@@ -77,6 +77,29 @@ block cards and never crosses an era boundary.
 Private reveal for the tracing player. `playerId` is the sole viewer. The message names only the players who
 influenced `targetEventId` in the preceding round; it cannot carry card type, direction, outcome, or magnitude.
 `influencerPlayerIds: []` is valid when nobody influenced the event.
+
+## HandCardIntercepted 🔒
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "roundNumber": 1,
+  "playerId": "uuid",
+  "targetPlayerId": "uuid",
+  "revealedCards": [
+    {
+      "cardInstanceId": "uuid",
+      "cardType": "SWING",
+      "grade": "III"
+    }
+  ]
+}
+```
+
+Private reveal for the intercepting player. `playerId` is the sole viewer; `targetPlayerId` is the observed player.
+`revealedCards` holds 0–2 sampled cards (grade I = 1, grade II = 2) and is `[]` when the target hand was empty. The
+target is never told they were intercepted.
 
 ## SpecialActionPlayed 🔒
 
