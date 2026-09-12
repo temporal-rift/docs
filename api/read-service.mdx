@@ -122,6 +122,12 @@ Full era-by-era history of resolved outcomes and paradoxes, plus your own dealt 
 catching up after a disconnect that spans an era transition, since the live `/state` endpoint only ever shows the
 current era's hand.
 
+**Request:**
+
+`gameId` is a UUID path parameter identifying the game. The request must carry `Authorization: Bearer <jwt>`; the
+player identity is derived from the validated token (see the API reference overview). A missing, invalid, or expired
+token returns `401`.
+
 **Response `200`:**
 ```json
 {
@@ -134,7 +140,7 @@ current era's hand.
       ],
       "paradoxesCascaded": 0,
       "myHand": [
-        { "cardInstanceId": "uuid", "cardType": "PUSH", "grade": "II" }
+        { "cardInstanceId": "uuid", "cardType": "PUSH", "grade": "II", "dealSlot": 1 }
       ]
     },
     {
@@ -150,7 +156,31 @@ current era's hand.
 }
 ```
 
+`eras` is ordered by ascending `eraNumber`. Each era's `outcomes` holds one entry per resolved event — `eventId`,
+`title`, `winningOutcomeId`, and `winningOutcomeDescription` — in the order the events were revealed.
+`paradoxesCascaded` counts the paradoxes that cascaded in that era. `cascadedEvents` lists the affected events
+(`eventId` plus `title`) in reveal order; it is omitted when `paradoxesCascaded` is `0` and present otherwise.
+
+`myHand` holds the cards dealt to the authenticated caller for that era. It is always present and `[]` when the
+caller has no recorded hand for the era. Each card carries `cardInstanceId`, `cardType`, `grade` (always present —
+single-grade cards carry `I`), and `dealSlot` (`1`–`7`, the original deal position).
+
 <Note title="myHand is private to you">
 Every field on this endpoint except `myHand` is shared across all players in the game. `myHand` only ever contains
 cards dealt to you — never another player's hand, past or present.
 </Note>
+
+| Error | Condition |
+|---|---|
+| `401` | Missing, invalid, or expired bearer token |
+| `404` | No history exists for this game — unknown game or no era has been recorded yet |
+
+**Response `404` (`application/problem+json`):**
+```json
+{
+  "type": "about:blank",
+  "title": "Not Found",
+  "status": 404,
+  "detail": "Game history not found for game 3fa85f64-5717-4562-b3fc-2c963f66afa6"
+}
+```
