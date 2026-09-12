@@ -57,7 +57,8 @@ Full per-player view — no raw probabilities, no other players' factions.
     "actionSummaries": [
       { "playerId": "uuid", "actionCategory": "PROBABILITY_SHIFTER", "actionFamily": "CARD", "skipped": false }
     ]
-  }
+  },
+  "chain": { "status": "ACTIVE", "length": 2 }
 }
 ```
 
@@ -66,6 +67,12 @@ later slice and is currently `null`.
 
 <Note title="Faction visibility">
 `faction` on other players is `null` until `FactionRevealed` fires at game end. Your own faction is always visible in `myFaction`.
+</Note>
+
+<Note title="Weaver chain visibility">
+`chain` shows the current Weaver chain's `status` (`ACTIVE`/`COMPLETED`/`BROKEN`) and `length` identically to every
+player. It is `null` until a chain exists and clears once the game ends. It never identifies which player owns or
+broke the chain, before or after `FactionRevealed`.
 </Note>
 
 ### Hand fields
