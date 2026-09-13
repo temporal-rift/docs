@@ -1,0 +1,36 @@
+---
+title: "Chains API"
+description: "Gated Weaver chain read served by timeline-service"
+---
+
+
+Restricted chain query served by `timeline-service` — its only REST endpoint. A player can read their own
+Weaver chain's progress; nothing about the chain is exposed to any other player.
+
+## Get own chain
+
+```http
+GET /api/v1/games/{gameId}/chains
+```
+
+**Response `200`:**
+```json
+{
+  "chainId": "uuid",
+  "status": "ACTIVE",
+  "chainLength": 2,
+  "links": [
+    { "eventId": "uuid", "outcomeId": "uuid", "eraNumber": 1 },
+    { "eventId": "uuid", "outcomeId": "uuid", "eraNumber": 2 }
+  ]
+}
+```
+
+`status` is `ACTIVE`, `COMPLETED`, or `BROKEN`. When a Weaver rebuilds after a break, the open chain is
+returned; with no open chain, the longest terminal one.
+
+| Error | Code | Condition |
+|---|---|---|
+| `403` | `403-01` | Requesting player is not the Weavers faction |
+| `404` | `404-01` | Game not found, or requesting player is not a participant (indistinguishable) |
+| `404` | `404-02` | Requesting Weaver has no chain yet |
