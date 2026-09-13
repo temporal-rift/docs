@@ -79,6 +79,7 @@
         "api/session",
         "api/action",
         "api/scoring",
+        "api/chains",
         "api/read-service",
         "api/websocket"
       ]
