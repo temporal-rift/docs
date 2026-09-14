@@ -40,6 +40,7 @@ Receive-only per-player stream. All game actions go through REST. On connect the
 | `InfluenceTraced` | Nobody until the Trace viewer-facing slice enables its private path |
 | `PlayerJammed` | Suppressed player only |
 | `BandedProbabilityPublished` | All players in the game |
+| `AdjustedBandsPublished` | All players in the game — supersedes `BandedProbabilityPublished` |
 | `ParadoxResolutionCardPlayed` | Nobody |
 | `EraResolutionCompleted` | Nobody — private service-coordination barrier |
 | `ParadoxCascaded` | All players in the game |

@@ -3,10 +3,11 @@ title: "Resolution Events"
 description: "Events exchanged during outcome and paradox resolution"
 ---
 
-Resolution lifecycle events are produced by `timeline-service`, with two exceptions: `ParadoxResolutionCardPlayed`
+Resolution lifecycle events are produced by `timeline-service`, with three exceptions: `ParadoxResolutionCardPlayed`
 is the private player-submission fact produced by `game-service` on `game.events` and consumed by timeline-service,
-and `ScoresUpdated` (documented at the end of this page) is published by `game-service`'s scoring module on
-`game.events`, not by timeline-service.
+`ScoresUpdated` (documented at the end of this page) is published by `game-service`'s scoring module on
+`game.events`, not by timeline-service, and `BandedProbabilityPublished` below is `game-service`'s preview on
+`game.events` — its timeline-owned correction, `AdjustedBandsPublished`, is a normal timeline-service publication.
 
 ## ResolutionStarted 🌐
 
@@ -75,7 +76,32 @@ values were observed. Scans do not carry into the next era.
 }
 ```
 
-Published to all players after Action Round 2 closes. Bands (`LOW` 0–30%, `MEDIUM` 31–60%, `HIGH` 61–90%) are derived from cumulative probability state of Rounds 1 and 2. Exact values remain private to players who used `SCAN`, and reach them through `ProbabilityStateRevealed`.
+Published by `game-service` to `game.events` immediately after Action Round 2 closes — a fast, deliberately
+approximate preview. Bands (`LOW` 0–30%, `MEDIUM` 31–60%, `HIGH` 61–90%) are derived from cumulative probability
+state of Rounds 1 and 2 only. Exact values remain private to players who used `SCAN`, and reach them through
+`ProbabilityStateRevealed`. Superseded for the game and era by `AdjustedBandsPublished` once resolution replay
+completes.
+
+## AdjustedBandsPublished 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "eventStates": [{
+    "eventId": "uuid",
+    "outcomes": [
+      { "outcomeId": "uuid", "band": "HIGH" },
+      { "outcomeId": "uuid", "band": "MEDIUM" },
+      { "outcomeId": "uuid", "band": "LOW" }
+    ]
+  }]
+}
+```
+
+Published by `timeline-service` to `timeline.events` once Round 2's resolution replay completes — the same bands,
+recomputed from the fully-applied replayed state. Supersedes the `BandedProbabilityPublished` preview for that game
+and era; notification and clients replace (not duplicate) the preview on receipt.
 
 ## ParadoxDetected 🌐
 
