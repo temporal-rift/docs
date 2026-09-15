@@ -39,8 +39,8 @@ Receive-only per-player stream. All game actions go through REST. On connect the
 | `ProbabilityStateRevealed` | Scanning player only |
 | `InfluenceTraced` | Nobody until the Trace viewer-facing slice enables its private path |
 | `PlayerJammed` | Suppressed player only |
-| `BandedProbabilityPublished` | All players in the game |
-| `AdjustedBandsPublished` | All players in the game — supersedes `BandedProbabilityPublished` |
+| `BandedProbabilityPublished` | All players in the game — superseded by `AdjustedBandsPublished` for the same game and era; a client that already applied the correction ignores a late preview |
+| `AdjustedBandsPublished` | All players in the game — supersedes `BandedProbabilityPublished`; clients keep the correction for the game and era |
 | `ParadoxResolutionCardPlayed` | Nobody |
 | `EraResolutionCompleted` | Nobody — private service-coordination barrier |
 | `ParadoxCascaded` | All players in the game |

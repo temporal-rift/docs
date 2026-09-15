@@ -99,9 +99,12 @@ completes.
 }
 ```
 
-Published by `timeline-service` to `timeline.events` once Round 2's resolution replay completes — the same bands,
-recomputed from the fully-applied replayed state. Supersedes the `BandedProbabilityPublished` preview for that game
-and era; notification and clients replace (not duplicate) the preview on receipt.
+Published by `timeline-service` to `timeline.events` once Round 2's priority-ordered replay completes — the same
+band vocabulary, recomputed from the fully-applied replayed state, so assignments may differ from the preview.
+Supersedes the `BandedProbabilityPublished` preview for that game and era; clients replace (not duplicate) the
+preview on receipt. The preview and the correction travel on different topics (`game.events` vs `timeline.events`)
+with no cross-topic ordering guarantee, so a client that has already applied the correction for a game and era
+ignores a late-arriving preview for that game and era.
 
 ## ParadoxDetected 🌐
 
