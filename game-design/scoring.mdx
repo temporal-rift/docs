@@ -4,7 +4,9 @@ description: "Per-faction scoring triggers and special ending outcomes"
 ---
 
 
-All values provisional — balance determined through playtesting.
+All values are provisional — balance is determined through playtesting. The table shows the default values from the
+complete `game.rules.scoring.score-deltas` configuration. Deployments can override those values; score history retains
+the exact delta applied to each entry.
 
 ## Scoring table
 
@@ -17,7 +19,7 @@ All values provisional — balance determined through playtesting.
 | | Fulfillment declared and succeeds | +8 |
 | | Event resolves differently than written | −2 |
 | 🔄 Revisionists | Secret preferred outcome wins this era | +4 |
-| | No player correctly identified their faction this era | +6 |
+| | Faction remained unidentified until the final reveal (once per game) | +6 |
 | | Successful Mimic contributed to outcome winning | +2 |
 | 🧵 Weavers | Event added to an active chain | +2 |
 | | Completed chain of 3 connected events | +10 |
