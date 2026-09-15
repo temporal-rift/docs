@@ -15,10 +15,11 @@ One PostgreSQL container is used for local convenience, but each service connect
 
 Each service owns its own repository-root Dockerfile. The infrastructure repository's `compose.yml` is only the local
 orchestrator.
-Before services start, its `kafka-topics` job creates `game.events`, `timeline.events`, `game.commands`, and one
-dead-letter topic per source topic (`game.events.dlq`, `timeline.events.dlq`, `game.commands.dlq`) with three
-partitions each; broker auto-creation is disabled to prevent mismatched topic layouts. Service containers become
-healthy only when their `/actuator/health` endpoint is healthy.
+Before services start, its `kafka-topics` job runs `provision-kafka-topics.sh` to create `game.events`,
+`timeline.events`, `game.commands`, and one dead-letter topic per source topic (`game.events.dlq`,
+`timeline.events.dlq`, `game.commands.dlq`) with three partitions and an explicit `retention.ms` each (see
+[Kafka Design](/architecture/kafka)); broker auto-creation is disabled to prevent mismatched topic layouts. Service
+containers become healthy only when their `/actuator/health` endpoint is healthy.
 
 ## Default ports
 

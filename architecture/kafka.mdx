@@ -10,16 +10,15 @@ description: "Topics, partitioning strategy, and consumer idempotency"
 | `game.events` | game-service | timeline-service, read-service | `gameId` |
 | `timeline.events` | timeline-service | game-service, read-service | `gameId` |
 | `game.commands` | *(no in-workspace producer)* | game-service (`PlayerReconnectKafkaConsumer`) | `lobbyId` or `gameId` |
-| `game.events.dlq` | timeline-service, read-service (dead-letter target for their `game.events` consumers after retries are exhausted) | — | `gameId` |
+| `game.events.dlq` | read-service (dead-letter target for its `game.events` consumers after retries are exhausted); `timeline-service` migration pending (temporal-rift/timeline-service#99) | — | `gameId` |
 | `timeline.events.dlq` | game-service, read-service (dead-letter target for their `timeline.events` consumers after retries are exhausted) | — | `gameId` |
 | `game.commands.dlq` | game-service (dead-letter target for `PlayerReconnectKafkaConsumer` after retries are exhausted) | — | `lobbyId` or `gameId` |
 
 There is one dead-letter topic per source topic, not one shared dead-letter topic — this keeps a parked record on
 the same partition number as its source, so an operator can replay one game's parked records in order. All six
-topics are created with three partitions, and each has an explicit `retention.ms` (`infrastructure`'s
-`provision-kafka-topics.sh`): 7 days for `game.events`/`timeline.events`, 1 day for `game.commands`, and 30 days for
-every `.dlq` topic — long enough to investigate a parked poison message. `game-service` and `read-service` consumers
-already route to this per-source naming; `timeline-service` is being migrated onto it separately.
+topics are created with three partitions and an explicit `retention.ms`, set by `infrastructure`'s `kafka-topics`
+Compose job, which runs `provision-kafka-topics.sh`: 7 days for `game.events`/`timeline.events`, 1 day for
+`game.commands`, and 30 days for every `.dlq` topic — long enough to investigate a parked poison message.
 
 <Note>
 The transactional outbox is **not** a Kafka topic — it is the Spring Modulith `event_publication` table, read by a relay that publishes directly to the domain topics above. See [Outbox Pattern](/architecture/outbox).
