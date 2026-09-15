@@ -3,7 +3,9 @@ title: "Events & Kafka"
 description: "Topics, envelope schema, privacy rules, and schema evolution"
 ---
 
-All cross-service communication flows through Kafka. There are four topics in total, each scoped to a bounded context and partitioned by `gameId` to guarantee in-order delivery for every game.
+All cross-service communication flows through Kafka. There are three live domain/command topics plus one dead-letter
+topic per source topic, each partitioned by `gameId` (or `lobbyId`/`gameId` for commands) to guarantee in-order
+delivery for every game.
 
 ## Topics
 
@@ -12,10 +14,14 @@ All cross-service communication flows through Kafka. There are four topics in to
 | `game.events` | game-service | timeline-service, read-service | `gameId` |
 | `timeline.events` | timeline-service | game-service, read-service | `gameId` |
 | `game.commands` | *(no in-workspace producer)* | game-service (`PlayerReconnectKafkaConsumer`) | `lobbyId` or `gameId` |
-| `game.dlq` | game-service (`KafkaErrorHandlingConfig` dead-letter target after retries are exhausted) | — | `gameId` |
+| `game.events.dlq` | timeline-service, read-service (dead-letter target for their `game.events` consumers after retries are exhausted) | — | `gameId` |
+| `timeline.events.dlq` | game-service, read-service (dead-letter target for their `timeline.events` consumers after retries are exhausted) | — | `gameId` |
+| `game.commands.dlq` | game-service (dead-letter target for `PlayerReconnectKafkaConsumer` after retries are exhausted) | — | `lobbyId` or `gameId` |
 
-All four topics are created with three partitions and no explicit `retention.ms` override, so retention follows the
-broker default rather than a differentiated per-topic policy.
+There is one dead-letter topic per source topic, not one shared dead-letter topic, so a parked record keeps the same
+partition number as its source and can be replayed in order. All six topics are created with three partitions and
+an explicit `retention.ms` (`infrastructure`'s `provision-kafka-topics.sh`): 7 days for `game.events`/
+`timeline.events`, 1 day for `game.commands`, and 30 days for every `.dlq` topic.
 
 <Note>
 There is **no `outbox.events` Kafka topic**. The transactional outbox is the Spring Modulith `event_publication` database table — a background relay reads it and publishes directly to the domain topics above. See [Outbox Pattern](/architecture/outbox).
