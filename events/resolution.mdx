@@ -203,6 +203,20 @@ every other player is applied by scoring, not carried in this event.
 Service-coordination data, not a standalone player notification. Confirms whether a round's `CORRUPT` actually
 inverted its target card's effect, or was blocked by a same-round `SEAL` (`tookEffect: false`).
 
+## CascadeCarriedForward 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 2,
+  "targetEventId": "uuid",
+  "targetOutcomeId": "uuid"
+}
+```
+
+A `CASCADE` armed in the previous era re-erased this outcome at the start of this era — the only automatic,
+cross-era faction effect. Applies at most once per `CASCADE`.
+
 ## ResolutionFailed 🔒
 
 ```json
