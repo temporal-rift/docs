@@ -226,12 +226,46 @@ Shows who has submitted. **Never reveals what was submitted.**
   "timerRemainingSeconds": 42,
   "submittedCount": 2,
   "totalPlayers": 3,
-  "pendingPlayerIds": ["uuid"]
+  "pendingPlayerIds": ["uuid"],
+  "mySubmission": { "submitted": true, "actionType": "CARD" }
 }
 ```
 
 `status`: `OPEN` or `CLOSED`
 
+`mySubmission` recovers your own accepted round decision after reload — `submitted` plus your own accepted family
+when true. It never carries another player's choice.
+
 | Error | Code | Condition |
 |---|---|---|
 | `404` | `404-01` | Round not found, or the requesting player is not a participant of the game |
+
+
+## Get paradox-resolution status
+
+```http
+GET /api/v1/games/{gameId}/eras/{eraNumber}/paradox-resolution/status
+```
+
+Recovers the current paradox-resolution phase for your era: whether reactive offers are open, the authoritative
+deadline, aggregate progress, and your own submission flag. Phase-scoped to the era, so there is no `roundNumber`;
+the explicit `eraNumber` is a stale-state guard.
+
+**Response `200`:**
+```json
+{
+  "eraNumber": 1,
+  "phaseOpen": true,
+  "timerRemainingSeconds": 42,
+  "submittedCount": 1,
+  "totalPlayers": 3,
+  "pendingPlayerIds": ["uuid"],
+  "mySubmitted": false
+}
+```
+
+`pendingPlayerIds` lists who has yet to submit while the phase is open and never reveals submitted card details.
+
+| Error | Code | Condition |
+|---|---|---|
+| `404` | `404-01` | Game or paradox-resolution phase not found, or the requesting player is not a participant of the game |
