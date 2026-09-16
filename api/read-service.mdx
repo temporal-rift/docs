@@ -87,7 +87,7 @@ Full per-player view — no raw probabilities, no other players' factions.
       "activistPlayerId": "uuid",
       "targetPlayerId": "uuid",
       "roundNumber": 2,
-      "signature": { "type": "SWING", "targetEventId": "uuid", "targetOutcomeId": "uuid" },
+      "signature": { "type": "SWING", "targetEventId": "uuid", "sourceOutcomeId": "uuid", "targetOutcomeId": "uuid" },
       "behaviorChanged": false
     }
   ],
@@ -187,7 +187,7 @@ never duplicates, it.
 
 `declarations` lists the current era's public Rally/Momentum declarations of record, and `exposeFacts` lists the
 public Expose outcomes: the exposed Round-1 signature plus whether the target's behavior changed in Round 3. No
-Round-3 signature is ever included.
+Round-3 signature is ever included. `signature.sourceOutcomeId` is populated only for `SWING` signatures.
 
 ### Your submissions, budgets, and objective progress
 
