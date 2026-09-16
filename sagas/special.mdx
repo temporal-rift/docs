@@ -30,8 +30,6 @@ flowchart TD
 
 | Event | Outcome |
 |---|---|
-| `ANNIHILATE` removes a linked outcome, no protection armed this era | Chain length decremented — emit `ChainLinkInvalidated` |
-| `ANNIHILATE` removes a linked outcome, Tapestry protection armed this era | Absorbed — emit `ChainProtectionConsumed`, link survives |
 | `TAPESTRY` played (chain ≥ 2, not yet used this era) | Arm protection for the newest link — emit `ChainProtectionArmed` |
 | `REWEAVE` played (once per era) | Discard newest link, re-anchor to a different resolved past outcome — emit `ChainReAnchored`, length unchanged |
 | `GameEnded` with chain < 3 | Incomplete chain, no bonus |
@@ -39,6 +37,10 @@ flowchart TD
 
 `ChainBroken` and its only historical trigger, Unravel (breaking another player's chain), are retired: at most one
 Weaver chain can exist per game, so no reachable action ever produces it.
+
+`ChainLinkInvalidated` — an Annihilate or Cascade erasing a linked outcome — is intended but currently unreachable:
+a chain link only ever references an already-resolved outcome, and every erasure path refuses to act on one.
+Tracked separately.
 
 ---
 
