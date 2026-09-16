@@ -105,6 +105,37 @@ validation passes does the remaining game setup continue asynchronously via `Sta
 | `422` | `422-02` | Fewer than 3 players in lobby |
 
 
+## Get lobby
+
+```http
+GET /api/v1/lobbies/{lobbyId}
+```
+
+Recovers lobby membership, host, readiness/start state, and game identity for a member — the read to use after
+reload or reconnect before deciding to join, leave, or start. The pre-assigned `gameId` is present from creation,
+before any game exists.
+
+**Response `200`:**
+```json
+{
+  "lobbyId": "uuid",
+  "gameId": "uuid",
+  "hostPlayerId": "uuid",
+  "status": "WAITING",
+  "members": [
+    { "playerId": "uuid", "playerName": "string", "isHost": true }
+  ]
+}
+```
+
+`status`: `WAITING` (accepts joins and leaves), `STARTED` (the host started the game), or `CLOSED` (disbanded).
+
+| Error | Code | Condition |
+|---|---|---|
+| `403` | `403-01` | Authenticated player is not a member of this lobby — no membership or game identity is disclosed beyond the denial |
+| `404` | `404-01` | Lobby not found |
+
+
 ## Get game summary
 
 ```http

@@ -18,7 +18,19 @@ Full per-player view — no raw probabilities, no other players' factions.
 {
   "gameId": "uuid",
   "eraNumber": 2,
+  "revision": 41,
+  "lastUpdatedAt": "2026-09-16T00:00:00Z",
   "phase": "ACTION_ROUND_2",
+  "roundNumber": 2,
+  "deadlines": {
+    "handSelectionExpiresAt": null,
+    "actionRoundExpiresAt": "2026-09-16T00:01:00Z",
+    "paradoxResolutionExpiresAt": null
+  },
+  "phaseContext": {
+    "declarationOpen": false,
+    "paradoxOpen": false
+  },
   "myFaction": "ERASERS",
   "myHand": [
     { "cardInstanceId": "uuid", "cardType": "PUSH", "grade": "II", "isPlayableThisRound": true },
@@ -58,12 +70,41 @@ Full per-player view — no raw probabilities, no other players' factions.
       { "playerId": "uuid", "actionCategory": "PROBABILITY_SHIFTER", "actionFamily": "CARD", "skipped": false }
     ]
   },
+  "publicBands": [
+    {
+      "eventId": "uuid",
+      "observedInRound": 2,
+      "outcomes": [
+        { "outcomeId": "uuid", "band": "HIGH" }
+      ]
+    }
+  ],
+  "declarations": [
+    { "playerId": "uuid", "mode": "RALLY", "targetEventId": "uuid", "targetOutcomeId": "uuid", "eraNumber": 2 }
+  ],
+  "exposeFacts": [
+    { "activistPlayerId": "uuid", "targetPlayerId": "uuid", "roundNumber": 2, "behaviorChanged": false }
+  ],
+  "mySubmissions": [
+    { "eraNumber": 2, "roundNumber": 1, "kind": "ACTION", "status": "ACCEPTED", "actionType": "CARD" }
+  ],
+  "mySpecialBudgets": [
+    { "specialAction": "SEAL", "remainingUsesThisEra": 1, "remainingUsesThisGame": 2 }
+  ],
+  "myObjectiveProgress": {
+    "faction": "ERASERS",
+    "progressCount": 2,
+    "threshold": 4,
+    "objectiveMet": false
+  },
   "chain": { "status": "ACTIVE", "length": 2 }
 }
 ```
 
 Every active event has required `carryOverState`: `FRESH`, `CASCADED`, or `STALLED`. `playerName` is reserved for a
-later slice and is currently `null`.
+later slice and is currently `null`. Every field after `players` except `lastRoundSummary` and `chain` is optional:
+absent means not yet computed by the owner, while an empty array means known-none. Refresh this view after reload or
+a rejected submission and retry at most once against the fresh era/round/deadline coordinates.
 
 <Note title="Faction visibility">
 `faction` on other players is `null` until `FactionRevealed` fires at game end. Your own faction is always visible in `myFaction`.
@@ -118,6 +159,45 @@ how fresh it is.
 Scan results reach you here and over the WebSocket — there is no probability endpoint. Every other player sees only
 Low/Medium/High bands after Action Round 2.
 </Note>
+
+### Freshness, deadlines, and retry
+
+`revision` is a monotonic freshness marker for one game's projection: a larger value means a newer view. It orders
+polls of the same game and never promises cross-game or cross-topic event order. `roundNumber` names the current
+round while an action round or paradox resolution is open and is `null` otherwise. `deadlines` carries the
+authoritative expiry timestamps owned by `game-service`, and `phaseContext` tells you which windows currently accept
+input (`declarationOpen` for Rally/Momentum before Round 1, `paradoxOpen` with `paradoxIds` for reactive cards).
+
+After reload, a delayed response, or a rejected submission, refresh this view and retry at most once against the fresh
+coordinates instead of retrying blindly.
+
+### Public bands, declarations, and Expose facts
+
+`publicBands` holds the approximate Low/Medium/High bands published after Action Round 2, each entry carrying the
+round it was observed in so the client can show its age. Exact probabilities never appear here — only in your own
+`myRevealedIntel`. The adjusted publication supersedes the preview for the same game and era; the field replaces,
+never duplicates, it.
+
+`declarations` lists the current era's public Rally/Momentum declarations of record, and `exposeFacts` lists the
+public Expose outcomes: the exposed Round-1 signature plus whether the target's behavior changed in Round 3. No
+Round-3 signature is ever included.
+
+### Your submissions, budgets, and objective progress
+
+`mySubmissions` names your own accepted decisions (`HAND_SELECTION`, `DECLARATION`, `ACTION`, `PARADOX_CARD`) so a
+reloaded client can show what was accepted without asking twice. `mySpecialBudgets` lists remaining per-era and
+per-game uses for your own specials, including Seal. Neither field ever carries another player's choices or
+availability.
+
+`myObjectiveProgress` is your own cumulative progress toward your faction objective: `progressCount` against an
+owner-populated `threshold`, plus `objectiveMet`. Use the transmitted threshold rather than a hard-coded constant.
+For Weavers the count mirrors the public chain length; every other faction's count is private to you.
+
+### Terminal result
+
+Once `phase` is `GAME_ENDED`, `result` carries the authoritative terminal facts: `endReason`, the `winners` set,
+`finalScores`, and the `revealBoundary` declaring what is now public to participants
+(`FACTIONS_AND_SCORES_PUBLIC`). Per-round private hands and intel stay caller-scoped even after the game ends.
 
 ## Get full game history
 
