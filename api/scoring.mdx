@@ -4,7 +4,8 @@ description: "Score query endpoints served by game-service"
 ---
 
 
-Score querying endpoints served by `game-service`.
+Score querying endpoints served by `game-service`. Both endpoints require authenticated game participation. A
+nonparticipant receives the same `404-01` response as an unknown game, without receiving game data.
 
 ## Get current scores
 
@@ -28,7 +29,7 @@ Factions are hidden (`null`) until `FactionRevealed` fires at game end.
 
 | Error | Code | Condition |
 |---|---|---|
-| `404` | `404-01` | Game not found |
+| `404` | `404-01` | Game not found or requester is not a participant |
 
 ## Get score history
 
@@ -36,8 +37,9 @@ Factions are hidden (`null`) until `FactionRevealed` fires at game end.
 GET /api/v1/games/{gameId}/scores/history
 ```
 
-Full era-by-era log of score deltas — every scoring event that contributed to the current totals, in the order it
-was applied.
+Participant-scoped era-by-era log of score deltas. Before final faction reveal, a participant sees their own entitled
+reasons; opponent entries retain the exact signed delta but omit faction-identifying reasons. After final reveal,
+permitted detailed reasons may be present for every participant.
 
 **Response `200`:**
 ```json
@@ -56,5 +58,5 @@ was applied.
 
 | Error | Code | Condition |
 |---|---|---|
-| `404` | `404-01` | Game not found |
+| `404` | `404-01` | Game not found or requester is not a participant |
 
