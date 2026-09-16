@@ -112,8 +112,9 @@ GET /api/v1/lobbies/{lobbyId}
 ```
 
 Recovers lobby membership, host, readiness/start state, and game identity for a member — the read to use after
-reload or reconnect before deciding to join, leave, or start. The pre-assigned `gameId` is present from creation,
-before any game exists.
+reload or reconnect before deciding to leave or start. The pre-assigned `gameId` is present from creation,
+before any game exists. (Joining uses the join-code flow — a non-member gets `403` here, so this endpoint cannot
+inform a join decision.)
 
 **Response `200`:**
 ```json
