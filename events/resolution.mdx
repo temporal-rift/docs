@@ -269,7 +269,7 @@ that every active event appears exactly once in that order. Session uses `CASCAD
 collapsing event, carries both `CASCADED` and `STALLED` entries into the next era, and keeps a stalled event out of
 collapse accounting. Scoring finishes either non-applied state without waiting for an outcome that cannot arrive.
 
-## ScoresUpdated 🌐
+## ScoresUpdated 📢
 
 ```json
 {
@@ -284,3 +284,7 @@ collapse accounting. Scoring finishes either non-applied state without waiting f
   }]
 }
 ```
+
+`read-service` reshapes this per connected viewer before delivery: an `updates` entry keeps `faction` and
+`reason` only for the session belonging to that entry's `playerId`. Every other session receives the same
+entry with both fields removed — `playerId`, `pointsDelta`, and `newTotal` stay visible to everyone.
