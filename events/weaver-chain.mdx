@@ -12,6 +12,8 @@ Events produced by `timeline-service` tracking the Weavers faction's chain mecha
   "gameId": "uuid",
   "chainId": "uuid",
   "playerId": "uuid",
+  "sourceEventId": "uuid",
+  "sourceOutcomeId": "uuid",
   "linkedEventId": "uuid",
   "linkedOutcomeId": "uuid",
   "chainLength": 2,
@@ -19,7 +21,56 @@ Events produced by `timeline-service` tracking the Weavers faction's chain mecha
 }
 ```
 
-Emitted when a valid `THREAD` special action links a new event to the chain.
+Emitted when a valid `THREAD` special action links a new event to the chain. `sourceEventId`/`sourceOutcomeId` name
+the current-era outcome the Thread anchored from — it also receives a favorable probability shift.
+
+## ChainReAnchored 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 2,
+  "chainId": "uuid",
+  "playerId": "uuid",
+  "discardedEventId": "uuid",
+  "discardedOutcomeId": "uuid",
+  "linkedEventId": "uuid",
+  "linkedOutcomeId": "uuid",
+  "chainLength": 2
+}
+```
+
+Emitted when `REWEAVE` discards the chain's newest link and re-anchors it to a different resolved past outcome.
+`chainLength` is unchanged — Reweave replaces the newest link, it never grows the chain.
+
+## ChainProtectionArmed 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 2,
+  "chainId": "uuid",
+  "playerId": "uuid"
+}
+```
+
+Emitted when `TAPESTRY` arms protection for the chain's newest link, for the rest of this era.
+
+## ChainProtectionConsumed 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 2,
+  "chainId": "uuid",
+  "playerId": "uuid",
+  "protectedEventId": "uuid",
+  "protectedOutcomeId": "uuid"
+}
+```
+
+Emitted when armed Tapestry protection absorbs an `ANNIHILATE` against the chain's newest link this era, instead of
+invalidating it.
 
 ## ChainCompleted 🌐
 
@@ -52,4 +103,7 @@ Emitted when `chainLength` reaches 3. Triggers Weaver win-condition scoring (+10
 }
 ```
 
-Emitted when `UNRAVEL` successfully targets the Weaver's chain. The Weaver loses −3 pts and must start a new chain from scratch. Top-level `eraNumber` is the era in which the break happened.
+The Weaver loses −3 pts and must start a new chain from scratch. Top-level `eraNumber` is the era in which the break
+happened. Retained for the terminal state and the gated chains REST contract's status enum only — currently
+unreachable, since at most one Weaver chain can exist per game and its only historical trigger (Unravel) targeted
+another player's chain.

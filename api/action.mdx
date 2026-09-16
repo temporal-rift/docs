@@ -129,6 +129,8 @@ ordinary action-round card.
 {
   "actionType": "SPECIAL",
   "specialAction": "ANNIHILATE",
+  "sourceEventId": null,
+  "sourceOutcomeId": null,
   "targetEventId": "uuid",
   "targetOutcomeId": "uuid",
   "targetPlayerId": null
@@ -136,8 +138,12 @@ ordinary action-round card.
 ```
 
 `targetPlayerId` is `null` for event-targeting specials. Required for player-targeting specials: `CORRUPT`, `EXPOSE`.
-`JAM` is a card, not a special action, and never appears in this request; `UNRAVEL` is event-targeting like
-`ANNIHILATE` and uses `targetEventId`/`targetOutcomeId` instead.
+`JAM` is a card, not a special action, and never appears in this request. `sourceEventId`/`sourceOutcomeId` are
+required only for `THREAD` — the current-era, not-yet-resolved outcome it anchors from — and rejected for every
+other special. `CASCADE` requires `targetEventId`/`targetOutcomeId`. `TAPESTRY` and `REWEAVE` have no target
+requirement enforced at submission — `game-service` accepts the request and `timeline-service`'s chain saga, which
+alone knows chain and resolution state, validates and privately rejects it (a `REWEAVE` omitting the resolved past
+outcome to re-anchor to will always be rejected there).
 
 `RALLY` and `MOMENTUM` are accepted only by the declaration endpoint. `EXPOSE` is valid only in Action Round 2 against
 a player whose Round-1 action has a qualifying Push, Suppress, or Swing signature. The generic action request still

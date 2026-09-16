@@ -6,12 +6,6 @@ description: "WeaverChainSaga and PlayerReconnectSaga"
 
 ## WeaverChainSaga
 
-<Info title="Planned">
-`timeline-event` already defines the `ChainLinkAdded`, `ChainCompleted`, and `ChainBroken` messages this saga
-produces. Implementation in `timeline-service` — the `WeaverChain` aggregate and this saga's causal-link
-validation — is on the roadmap.
-</Info>
-
 **Trigger:** `SpecialActionPlayed` where `specialAction = THREAD`  
 **Service:** `timeline-service`
 
@@ -22,22 +16,29 @@ ends.
 
 ```mermaid
 flowchart TD
-  A[THREAD special played] --> B{Validate causal link — past outcome actually resolved?}
-  B -->|Invalid| C[reject submission]
-  B -->|Valid| D[emit ChainLinkAdded — chainLength++]
-  D --> E{chainLength == 3?}
-  E -->|Yes| F[emit ChainCompleted — saga ends]
-  E -->|No| G[Saga stays open — wait for next THREAD]
+  A[THREAD special played] --> B{Source: current-era, not-yet-resolved outcome?}
+  B -->|Invalid| C[reject — emit SpecialRejected]
+  B -->|Valid| D{Target: past outcome actually resolved?}
+  D -->|Invalid| C
+  D -->|Valid| E[emit ChainLinkAdded — chainLength++ — shift source outcome favorably]
+  E --> F{chainLength == 3?}
+  F -->|Yes| G[emit ChainCompleted — saga ends]
+  F -->|No| H[Saga stays open — wait for next THREAD]
 ```
 
 ### Era boundary handling
 
 | Event | Outcome |
 |---|---|
-| `UNRAVEL` targets this chain | Emit `ChainBroken`, saga ends |
-| `ANNIHILATE` removes a linked outcome | Chain length decremented |
+| `ANNIHILATE` removes a linked outcome, no protection armed this era | Chain length decremented — emit `ChainLinkInvalidated` |
+| `ANNIHILATE` removes a linked outcome, Tapestry protection armed this era | Absorbed — emit `ChainProtectionConsumed`, link survives |
+| `TAPESTRY` played (chain ≥ 2, not yet used this era) | Arm protection for the newest link — emit `ChainProtectionArmed` |
+| `REWEAVE` played (once per era) | Discard newest link, re-anchor to a different resolved past outcome — emit `ChainReAnchored`, length unchanged |
 | `GameEnded` with chain < 3 | Incomplete chain, no bonus |
 | `GameEnded` with chain ≥ 3 | `ChainCompleted` already fired before `GameEnded` |
+
+`ChainBroken` and its only historical trigger, Unravel (breaking another player's chain), are retired: at most one
+Weaver chain can exist per game, so no reachable action ever produces it.
 
 ---
 
