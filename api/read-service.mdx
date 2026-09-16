@@ -83,7 +83,13 @@ Full per-player view — no raw probabilities, no other players' factions.
     { "playerId": "uuid", "mode": "RALLY", "targetEventId": "uuid", "targetOutcomeId": "uuid", "eraNumber": 2 }
   ],
   "exposeFacts": [
-    { "activistPlayerId": "uuid", "targetPlayerId": "uuid", "roundNumber": 2, "behaviorChanged": false }
+    {
+      "activistPlayerId": "uuid",
+      "targetPlayerId": "uuid",
+      "roundNumber": 2,
+      "signature": { "type": "SWING", "targetEventId": "uuid", "targetOutcomeId": "uuid" },
+      "behaviorChanged": false
+    }
   ],
   "mySubmissions": [
     { "eraNumber": 2, "roundNumber": 1, "kind": "ACTION", "status": "ACCEPTED", "actionType": "CARD" }
@@ -166,7 +172,8 @@ Low/Medium/High bands after Action Round 2.
 polls of the same game and never promises cross-game or cross-topic event order. `roundNumber` names the current
 round while an action round or paradox resolution is open and is `null` otherwise. `deadlines` carries the
 authoritative expiry timestamps owned by `game-service`, and `phaseContext` tells you which windows currently accept
-input (`declarationOpen` for Rally/Momentum before Round 1, `paradoxOpen` with `paradoxIds` for reactive cards).
+input (`declarationOpen` for Rally/Momentum before Round 1, `paradoxOpen` for reactive cards, with `paradoxIds`
+listing the open paradoxes — present only while `paradoxOpen` is true, absent otherwise).
 
 After reload, a delayed response, or a rejected submission, refresh this view and retry at most once against the fresh
 coordinates instead of retrying blindly.
