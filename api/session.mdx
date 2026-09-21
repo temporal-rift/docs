@@ -122,12 +122,16 @@ inform a join decision.)
   "lobbyId": "uuid",
   "gameId": "uuid",
   "hostPlayerId": "uuid",
+  "currentPlayerId": "uuid",
   "status": "WAITING",
   "members": [
     { "playerId": "uuid", "playerName": "string", "isHost": true }
   ]
 }
 ```
+
+`currentPlayerId` identifies the authenticated member for this authorized response and always matches one returned
+member. It is not included in a non-member denial.
 
 `status`: `WAITING` (accepts joins and leaves), `STARTED` (the host started the game), or `CLOSED` (disbanded).
 
