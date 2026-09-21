@@ -130,8 +130,9 @@ inform a join decision.)
 }
 ```
 
-`currentPlayerId` identifies the authenticated member for this authorized response and always matches one returned
-member. It is not included in a non-member denial.
+`currentPlayerId` is optional: an authorized `200` may omit it until its service adopts this compatible contract.
+When present, it identifies the authenticated member and always matches one returned member. It is not included in a
+non-member denial.
 
 `status`: `WAITING` (accepts joins and leaves), `STARTED` (the host started the game), or `CLOSED` (disbanded).
 
