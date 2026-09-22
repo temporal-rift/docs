@@ -122,8 +122,8 @@ told they were intercepted.
 ```
 
 `targetPlayerId` is non-null for player-targeting specials (`CORRUPT`, `EXPOSE`). `JAM` is a `CardType`, not a
-`SpecialAction`, so it never appears here. `sourceEventId`/`sourceOutcomeId` are populated only for `THREAD` — the
-current-era, not-yet-resolved outcome it anchors from — and null for every other special.
+`SpecialAction`, so it never appears here; `THREAD` is event-targeting, so it uses `targetEventId`/`targetOutcomeId`
+instead — `sourceEventId`/`sourceOutcomeId` stay null for every special.
 
 ## SpecialRejected 🔒
 

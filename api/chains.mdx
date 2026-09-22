@@ -22,18 +22,19 @@ GET /api/v1/games/{gameId}/chains
   "status": "ACTIVE",
   "chainLength": 2,
   "links": [
-    { "eventId": "uuid", "outcomeId": "uuid", "eraNumber": 1, "sourceEventId": "uuid", "sourceOutcomeId": "uuid" },
-    { "eventId": "uuid", "outcomeId": "uuid", "eraNumber": 2, "sourceEventId": "uuid", "sourceOutcomeId": "uuid" }
+    { "eventId": "uuid", "outcomeId": "uuid", "eraNumber": 1 },
+    { "eventId": "uuid", "outcomeId": "uuid", "eraNumber": 2 }
   ],
+  "pendingLink": { "eventId": "uuid", "outcomeId": "uuid" },
   "protectionArmed": false
 }
 ```
 
-`status` is `ACTIVE`, `COMPLETED`, or `BROKEN` (`BROKEN` currently has no reachable trigger). When a Weaver rebuilds
-after a break, the open chain is returned; with no open chain, the longest terminal one. Each link's
-`sourceEventId`/`sourceOutcomeId` is the current-era outcome the Thread or Reweave that established it anchored
-from. `protectionArmed` reflects whether Tapestry protection is armed for the chain's newest link *in the current
-era* — an unconsumed arming from an earlier era reads `false`.
+`status` is `ACTIVE`, `COMPLETED`, or `BROKEN`. `chainLength` and `links` reflect confirmed links only.
+`pendingLink` names the not-yet-resolved current-era outcome the chain's open `THREAD` prediction targets; it is
+absent when there is no open pending link. `protectionArmed` reflects whether `TAPESTRY` protection is currently
+armed for the pending link. When a Weaver rebuilds after a break, the open chain is returned; with no open chain,
+the longest terminal one.
 
 | Error | Code | Condition |
 |---|---|---|

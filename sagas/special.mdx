@@ -10,37 +10,37 @@ description: "WeaverChainSaga and PlayerReconnectSaga"
 **Service:** `timeline-service`
 
 The only saga spanning multiple eras — remains open across era boundaries until completed, broken, or the game
-ends.
+ends. A `THREAD` play names one not-yet-resolved current-era outcome as the chain's newest link. That link is
+**pending** until it resolves — see [Weaver Chain Events](/events/weaver-chain) for the full event set.
 
 ### Steps
 
 ```mermaid
 flowchart TD
-  A[THREAD special played] --> B{Source: current-era, not-yet-resolved outcome?}
-  B -->|Invalid| C[reject — emit SpecialRejected]
-  B -->|Valid| D{Target: past outcome actually resolved?}
-  D -->|Invalid| C
-  D -->|Valid| E[emit ChainLinkAdded — chainLength++ — shift source outcome favorably]
-  E --> F{chainLength == 3?}
-  F -->|Yes| G[emit ChainCompleted — saga ends]
-  F -->|No| H[Saga stays open — wait for next THREAD]
+  A[THREAD special played] --> B{Valid current-era, not-yet-resolved coordinate; no pending link already open?}
+  B -->|Invalid| C[reject submission — emit ThreadRejected]
+  B -->|Valid| D[emit ChainLinkThreaded — pending link created, favorable push applied]
+  D --> E{Pending link resolves}
+  E -->|As predicted| F[emit ChainLinkAdded — chainLength++]
+  E -->|Different outcome, not annihilated| G[emit ChainLinkInvalidated — no penalty]
+  E -->|Annihilated, Tapestry armed| H[emit ChainProtectionConsumed, then ChainLinkAdded]
+  E -->|Annihilated, unprotected| I[raise CHAIN_CONFLICT paradox]
+  I -->|Resolved| F
+  I -->|Cascaded| J[emit ChainBroken — saga ends]
+  F --> K{chainLength == 3?}
+  K -->|Yes| L[emit ChainCompleted — saga ends]
+  K -->|No| M[Saga stays open — wait for next THREAD]
 ```
 
 ### Era boundary handling
 
 | Event | Outcome |
 |---|---|
-| `TAPESTRY` played (chain ≥ 2, not yet used this era) | Arm protection for the newest link — emit `ChainProtectionArmed` |
-| `REWEAVE` played (once per era) | Discard newest link, re-anchor to a different resolved past outcome — emit `ChainReAnchored`, length unchanged |
+| `TAPESTRY` played (chain ≥ 2, not yet used this era) | Arm protection for the pending link, for the rest of this era — emit `ChainProtectionArmed` |
+| `REWEAVE` played (once per era) | Discard the newest link — pending or confirmed — re-anchor to a different resolved past outcome — emit `ChainReAnchored`, length unchanged |
+| Unresolved `CHAIN_CONFLICT` paradox | Emit `ChainBroken`, saga ends — the chain's only reachable break trigger |
 | `GameEnded` with chain < 3 | Incomplete chain, no bonus |
 | `GameEnded` with chain ≥ 3 | `ChainCompleted` already fired before `GameEnded` |
-
-`ChainBroken` and its only historical trigger, Unravel (breaking another player's chain), are retired: at most one
-Weaver chain can exist per game, so no reachable action ever produces it.
-
-`ChainLinkInvalidated` — an Annihilate or Cascade erasing a linked outcome — is intended but currently unreachable:
-a chain link only ever references an already-resolved outcome, and every erasure path refuses to act on one.
-Tracked separately.
 
 ---
 

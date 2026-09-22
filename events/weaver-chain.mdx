@@ -3,7 +3,44 @@ title: "Weaver Chain Events"
 description: "Events tracking the Weavers faction chain mechanic"
 ---
 
-Events produced by `timeline-service` tracking the Weavers faction's chain mechanic.
+Events produced by `timeline-service` tracking the Weavers faction's chain mechanic. A `THREAD` play names one
+not-yet-resolved current-era outcome as the chain's newest link. That link is **pending** until it resolves: it
+either confirms, clears, or — if annihilated without Tapestry protection — enters paradox resolution.
+
+## ChainLinkThreaded 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 2,
+  "chainId": "uuid",
+  "playerId": "uuid",
+  "eventId": "uuid",
+  "outcomeId": "uuid"
+}
+```
+
+Emitted when an accepted `THREAD` creates a pending link naming a not-yet-resolved current-era outcome. The
+favorable probability push applies immediately. The link does not count toward `chainLength` until it confirms.
+Only one pending link can be open per chain at a time.
+
+## ThreadRejected 🔒
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 2,
+  "chainId": "uuid",
+  "playerId": "uuid",
+  "eventId": "uuid",
+  "outcomeId": "uuid",
+  "reason": "ALREADY_LINKED"
+}
+```
+
+Private rejection of one `THREAD` play: the named coordinate is not a not-yet-resolved current-era outcome, the
+chain already has an open pending link, or the coordinate is missing. `eventId`/`outcomeId` are absent when the
+submission itself was missing a coordinate. Chain length does not change and the message is never broadcast.
 
 ## ChainLinkAdded 🌐
 
@@ -12,8 +49,6 @@ Events produced by `timeline-service` tracking the Weavers faction's chain mecha
   "gameId": "uuid",
   "chainId": "uuid",
   "playerId": "uuid",
-  "sourceEventId": "uuid",
-  "sourceOutcomeId": "uuid",
   "linkedEventId": "uuid",
   "linkedOutcomeId": "uuid",
   "chainLength": 2,
@@ -21,10 +56,10 @@ Events produced by `timeline-service` tracking the Weavers faction's chain mecha
 }
 ```
 
-Emitted when a valid `THREAD` special action links a new event to the chain. `sourceEventId`/`sourceOutcomeId` name
-the current-era outcome the Thread anchored from — it also receives a favorable probability shift.
+Emitted when a chain's pending link confirms — its named outcome resolved as predicted, an armed Tapestry
+protection absorbed an Annihilate against it, or its chain-conflict paradox resolved in the Weaver's favor.
 
-## ChainReAnchored 🌐
+## ChainLinkInvalidated 🌐
 
 ```json
 {
@@ -32,45 +67,14 @@ the current-era outcome the Thread anchored from — it also receives a favorabl
   "eraNumber": 2,
   "chainId": "uuid",
   "playerId": "uuid",
-  "discardedEventId": "uuid",
-  "discardedOutcomeId": "uuid",
-  "linkedEventId": "uuid",
-  "linkedOutcomeId": "uuid",
+  "invalidatedEventId": "uuid",
+  "invalidatedOutcomeId": "uuid",
   "chainLength": 2
 }
 ```
 
-Emitted when `REWEAVE` discards the chain's newest link and re-anchors it to a different resolved past outcome.
-`chainLength` is unchanged — Reweave replaces the newest link, it never grows the chain.
-
-## ChainProtectionArmed 🌐
-
-```json
-{
-  "gameId": "uuid",
-  "eraNumber": 2,
-  "chainId": "uuid",
-  "playerId": "uuid"
-}
-```
-
-Emitted when `TAPESTRY` arms protection for the chain's newest link, for the rest of this era.
-
-## ChainProtectionConsumed 🌐
-
-```json
-{
-  "gameId": "uuid",
-  "eraNumber": 2,
-  "chainId": "uuid",
-  "playerId": "uuid",
-  "protectedEventId": "uuid",
-  "protectedOutcomeId": "uuid"
-}
-```
-
-Emitted when armed Tapestry protection absorbs an `ANNIHILATE` against the chain's newest link this era, instead of
-invalidating it.
+Emitted when a chain's pending link resolves to a different, non-annihilated outcome than predicted. The pending
+link clears without penalty — chain length is unchanged and the Weaver may `THREAD` again whenever next eligible.
 
 ## ChainCompleted 🌐
 
@@ -88,7 +92,59 @@ invalidating it.
 }
 ```
 
-Emitted when `chainLength` reaches 3. Triggers Weaver win-condition scoring (+10 pts). Top-level `eraNumber` is the era of the completing link (the last entry in `links`).
+Emitted when `chainLength` reaches 3 confirmed links. Triggers Weaver win-condition scoring (+10 pts). Top-level
+`eraNumber` is the era of the completing link (the last entry in `links`).
+
+## ChainReAnchored 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 2,
+  "chainId": "uuid",
+  "playerId": "uuid",
+  "discardedEventId": "uuid",
+  "discardedOutcomeId": "uuid",
+  "linkedEventId": "uuid",
+  "linkedOutcomeId": "uuid",
+  "chainLength": 2
+}
+```
+
+Emitted when a `REWEAVE` discards the chain's newest link — pending or confirmed — and replaces it with a
+different, already-resolved past outcome not already linked. `chainLength` is unchanged; Reweave replaces, it
+never grows the chain.
+
+## ChainProtectionArmed 🔒
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 2,
+  "chainId": "uuid",
+  "playerId": "uuid"
+}
+```
+
+Private confirmation that an accepted `TAPESTRY` armed protection for the chain's pending link for the rest of the
+current era. Delivered only to the acting Weaver.
+
+## ChainProtectionConsumed 🔒
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 2,
+  "chainId": "uuid",
+  "playerId": "uuid",
+  "protectedEventId": "uuid",
+  "protectedOutcomeId": "uuid"
+}
+```
+
+Private confirmation that armed Tapestry protection absorbed an Annihilate against the chain's pending link, which
+confirms anyway (`ChainLinkAdded`) instead of raising a chain-conflict paradox. Delivered only to the acting
+Weaver.
 
 ## ChainBroken 🌐
 
@@ -97,13 +153,13 @@ Emitted when `chainLength` reaches 3. Triggers Weaver win-condition scoring (+10
   "gameId": "uuid",
   "eraNumber": 2,
   "chainId": "uuid",
-  "brokenByPlayerId": "uuid",
-  "targetPlayerId": "uuid",
+  "playerId": "uuid",
+  "paradoxId": "uuid",
   "chainLengthAtBreak": 2
 }
 ```
 
-The Weaver loses −3 pts and must start a new chain from scratch. Top-level `eraNumber` is the era in which the break
-happened. Retained for the terminal state and the gated chains REST contract's status enum only — currently
-unreachable, since at most one Weaver chain can exist per game and its only historical trigger (Unravel) targeted
-another player's chain.
+The Weaver loses −3 pts and must start a new chain from scratch. Emitted when a chain's pending link is annihilated
+without Tapestry protection and the resulting chain-conflict paradox cascades unresolved — the chain's only
+reachable break trigger. The chain transitions to `BROKEN` and its saga ends. Top-level `eraNumber` is the era in
+which the break happened; `paradoxId` correlates to the triggering paradox.

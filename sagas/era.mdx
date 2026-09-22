@@ -14,7 +14,8 @@ flowchart TD
   A[EraStarted] --> B[Draw 3 events — emit EventsDrawn 🌐]
   B --> C[Deal 7 per player by category weight — emit HandDealt × N 🔒]
   C --> D[Wait for each player to keep 5 — emit HandSelected × N 🔒]
-  D --> E[ActionRoundSaga round 1 — wait for ActionRoundClosed]
+  D --> DW[Declaration window — one timed phase, Rally/Momentum, then Round 1]
+  DW --> E[ActionRoundSaga round 1 — wait for ActionRoundClosed]
   E --> F[ActionRoundSaga round 2 — wait for ActionRoundClosed]
   F --> G[ActionRoundSaga round 3 — wait for ActionRoundClosed]
   G --> H[ResolutionSaga — wait for ScoresUpdated]
@@ -29,6 +30,11 @@ Each player selects exactly five cards during the configured hand-selection wind
 time receives a uniformly random five-card subset of their seven cards (`HandSelected: TIMEOUT_RANDOM`); this does not
 favor deal slots, categories, grades, or perceived card usefulness. A reconnect before the persisted deadline can
 still select; after it, the player sees the completed selection.
+
+The last terminal selection opens one timed declaration window for the era; the window cannot be skipped by the last
+keep. An Activist may record one Rally or eligible Momentum declaration while it is open, consuming their Round-1
+special-action slot. When the window expires, it closes and Action Round 1 starts exactly once, with no declaration
+required.
 
 On a continuing game, session drains the reveal-ordered carry-over set into `EraStarted.carryOverEventIds`. It counts
 only `CASCADED` terminal entries toward timeline collapse, but retains both `CASCADED` and `STALLED` entries. The
