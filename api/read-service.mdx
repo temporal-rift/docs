@@ -129,6 +129,8 @@ out; it changes as rounds advance without a new hand being dealt.
 
 While the current-era hand choice is open, the response additionally contains a private `pendingHandSelection`:
 
+The authoritative `phase` is `HAND_SELECTION` throughout this window; the server, not the browser, decides when the deadline expires and which five cards remain after a timeout.
+
 ```json
 {
   "cards": [
