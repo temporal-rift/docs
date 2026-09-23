@@ -43,12 +43,16 @@ Receive-only per-player stream. All game actions go through REST. On connect the
 | `AdjustedBandsPublished` | All players in the game — supersedes `BandedProbabilityPublished`; clients keep the correction for the game and era |
 | `ParadoxResolutionCardPlayed` | Nobody |
 | `EraResolutionCompleted` | Nobody — private service-coordination barrier |
-| `ParadoxCascaded` | All players in the game |
+| `ParadoxCascaded` | All players in the game — identifies the carried event but never includes its exact carry-forward weights |
 | `FactionRevealed` | All players |
 | Unknown or unsupported events | Nobody |
 
 All other player-visible events are forwarded only when they are explicitly listed as public in the event contract.
 There is no fallback that broadcasts an unclassified event.
+
+When a carried event appears in the next era, its public event-draw notification identifies the event and its carry
+state but omits exact outcome weights. Public bands remain the only shared probability view; exact state remains
+limited to the scanning player's private reveal.
 
 ## Private reveals
 
