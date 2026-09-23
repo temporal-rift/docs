@@ -112,6 +112,9 @@ later slice and is currently `null`. Every field after `players` except `lastRou
 absent means not yet computed by the owner, while an empty array means known-none. Refresh this view after reload or
 a rejected submission and retry at most once against the fresh era/round/deadline coordinates.
 
+Active events never expose exact outcome weights, including a carried event's retained state. Exact values appear only
+in the authenticated player's own `myRevealedIntel` after Scan; `publicBands` remains the shared probability view.
+
 <Note title="Faction visibility">
 `faction` on other players is `null` until `FactionRevealed` fires at game end. Your own faction is always visible in `myFaction`.
 </Note>
