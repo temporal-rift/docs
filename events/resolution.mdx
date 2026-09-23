@@ -171,7 +171,11 @@ and `DETONATE`; the phase-scoped event has no `roundNumber`. `grade` is always p
 {
   "gameId": "uuid",
   "eraNumber": 1,
-  "paradoxId": "uuid",
+  "paradoxId": "11111111-1111-4111-8111-111111111111",
+  "paradoxIds": [
+    "11111111-1111-4111-8111-111111111111",
+    "22222222-2222-4222-8222-222222222222"
+  ],
   "affectedEventId": "uuid",
   "carryForwardProbabilityState": [
     { "outcomeId": "uuid", "probability": 50 },
@@ -182,9 +186,15 @@ and `DETONATE`; the phase-scoped event has no `roundNumber`. `grade` is always p
 }
 ```
 
-`detonatedByPlayerIds` lists every player, if any, whose `DETONATE` card targeted this cascade — empty when none
-did. Multiple `DETONATE`s on the same cascade don't stack. This is a fact only; the doubled score penalty for
-every other player is applied by scoring, not carried in this event.
+One `ParadoxCascaded` is published per affected event, even when several paradox findings remain. `paradoxIds`
+lists every finding still present; `paradoxId` is its first member for consumers of older facts. The array is
+absent on older facts. A finding that clears receives `ParadoxResolved`; a finding first detected during the
+resolution phase is announced by `ParadoxDetected` before it appears in this array. The era terminal barrier
+lists that event once as `CASCADED`.
+
+`detonatedByPlayerIds` lists every player, if any, whose `DETONATE` card targeted this event-level cascade —
+empty when none did. Multiple `DETONATE`s on the same event don't stack. This is a fact only; the doubled score
+penalty for every other player is applied by scoring, once per cascaded event.
 
 ## CorruptInversionConfirmed 🔒
 
