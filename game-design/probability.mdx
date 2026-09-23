@@ -40,6 +40,16 @@ Player plays `PUSH` targeting outcome A (+20%):
 - B and C lose proportionally: B → 35 - 20×(35/60) ≈ 23%, C → 25 - 20×(25/60) ≈ 17%
 - Result: A=60%, B=23%, C=17% (sums to 100%)
 
+## How the winning outcome is chosen
+
+At resolution, each event's winning outcome is drawn at random, weighted by its final probability. An outcome at
+60% is more likely to win than one at 40% — but it isn't guaranteed. This is why the ceiling matters: a probability
+can climb as high as 90%, but the outcome it favours can still lose.
+
+If two or more outcomes are tied for the highest probability, that's a **Dead Heat** — a paradox that must be
+resolved before the event can produce a winner. Annihilated outcomes never win and never affect other outcomes'
+relative odds.
+
 ## Scan card
 
 `SCAN` reveals the exact probability state of one event to the player who played it, and **keeps it current for the
