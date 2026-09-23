@@ -124,6 +124,11 @@ and validates that SCAN uses one event at grade I, two at grade II, or the compl
 `STABILIZE` and `DETONATE` are rejected here because they are reactive paradox-resolution cards. `COLLIDE` remains an
 ordinary action-round card.
 
+`TRACE` requires a `targetEventId` that was active in the preceding action round. It cannot be played in Era 1
+Round 1. In the first round of a later era, only an event carried from the previous era is a legal target; a freshly
+drawn event is rejected without spending the card. Grade II still reveals the prior-round history of every event
+active in that preceding round after a legal submission.
+
 **Special action:**
 ```json
 {
@@ -172,10 +177,11 @@ only `targetPlayerId`.
 | `409` | `409-10` | A once-per-era-budgeted special action was already used this era |
 | `422` | `422-01` | Card not in hand |
 | `422` | `422-02` | Player is Jammed |
-| `422` | `422-03` | Invalid target |
+| `422` | `422-03` | Invalid target, including a Trace event absent from the preceding round |
 | `422` | `422-04` | Faction required for special action |
 | `422` | `422-05` | Faction does not own the submitted special action |
 | `422` | `422-10` | Card type is not eligible during an action round |
+| `422` | `422-12` | Card cannot be played in this round, including Trace in Era 1 Round 1 |
 
 ## Submit paradox-resolution card
 
