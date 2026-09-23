@@ -39,15 +39,16 @@ GET /api/v1/games/{gameId}/scores/history
 
 Participant-scoped era-by-era log of score deltas. Before final faction reveal, a participant sees their own entitled
 reasons; each opponent's rows within an era are combined into a single per-player net entry that retains the summed
-signed delta but omits faction-identifying reasons, so no per-reason magnitude, reason count, or ordering for that
-opponent in that era is disclosed. After final reveal, permitted detailed reasons may be present for every
-participant, including the reserved era-`0` end-game entry.
+signed delta but carries no `reason` key, so the response neither identifies any reason nor exposes a per-reason
+magnitude, reason count, or ordering for that opponent in that era. After final reveal, permitted detailed reasons may
+be present for every participant, including the reserved era-`0` end-game entry.
 
-Total scores and per-era net changes stay public before reveal as intended clues for win-condition tracking: a
-single-reason era's net amount may equal that reason's magnitude, but that is the same total-score-difference
-information already visible through current scores, not a reason-level disclosure.
+Total scores and per-era net changes stay public before reveal as intended clues for win-condition tracking: when a
+single reason contributes to an opponent's era, the net amount can coincide with that reason's magnitude, but that is
+the same total-score-difference information already visible through current scores — the response still names no
+reason and exposes no per-reason field.
 
-**Response `200`:**
+**Response `200`** (caller's own detailed entry; opponent net entries omit `reason`):
 ```json
 {
   "gameId": "uuid",
