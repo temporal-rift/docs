@@ -32,11 +32,14 @@ flowchart TD
 
 ## Cascade rules
 
-If a paradox cannot be resolved in the resolution phase, it **cascades**:
+If one or more paradox findings remain on an event after the resolution phase, that **event cascades once**:
 - The event produces no outcome for this era
 - Score is zeroed for it this era
 - The event carries forward to the next era with its probability state intact (not reset to 33/33/34)
 
-**3 cascaded paradoxes → `TimelineCollapsed`**. The collapsing event is the reveal-ordered cascade that raises the
+Each remaining finding is identified in the event's one cascade fact. Cleared findings are recorded separately.
+Detonate's exemption and doubled penalty apply once per cascaded event, even if several findings remain.
+
+**3 cascaded events → `TimelineCollapsed`**. The collapsing event is the reveal-ordered cascade that raises the
 global count from two to three. Only current-era Activists whose declaration targets that event win; every other
 player loses this special ending.
