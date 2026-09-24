@@ -163,6 +163,8 @@ event carries into the next era through Stall or a paradox cascade.
 ```
 
 The public projection of a Rally or Momentum declaration of record. The raw `SpecialActionPlayed` remains private.
+The declaration is scoped to its `eraNumber`; a `STALLED` terminal result fails it, and a later declaration on the
+carried event is independent.
 
 ## ExposeSignatureRevealed 🌐
 

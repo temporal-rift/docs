@@ -60,7 +60,8 @@ not a free declaration action.
 ```
 
 `specialAction` is `RALLY` or `MOMENTUM`. The target must be an active current-era event and outcome. Momentum requires
-the same player's successful declaration in the immediately preceding era.
+the same player's successful declaration in the immediately preceding era. A stalled target fails that era's
+declaration, breaks the streak, and grants no Momentum eligibility. A later declaration on the carried event is new.
 
 **Response `202`:**
 

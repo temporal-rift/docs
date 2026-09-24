@@ -73,8 +73,9 @@ protection absorbed an Annihilate against it, or its chain-conflict paradox reso
 }
 ```
 
-Emitted when a chain's pending link resolves to a different, non-annihilated outcome than predicted. The pending
-link clears without penalty — chain length is unchanged and the Weaver may `THREAD` again whenever next eligible.
+Emitted when a chain's pending link resolves to a different, non-annihilated outcome than predicted, its event
+Stalls, or the game ends with it unconfirmed. The pending link clears without penalty — chain length is unchanged.
+The Weaver may `THREAD` again only while the chain and game remain active.
 
 ## ChainCompleted 🌐
 

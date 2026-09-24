@@ -46,9 +46,9 @@ without it, a faction with a strong repeatable special would rarely need to play
 
 | Special         | Effect                                                                       |
 |-----------------|------------------------------------------------------------------------------|
-| **Foresight**   | See next era's future events before anyone else                              |
+| **Foresight**   | See next era's future events and write a current-era outcome; that writing expires without score if the event Stalls |
 | **Seal**        | Lock one outcome's probability through the end of the era — later shifts against it are blocked with weights unchanged and no paradox; shifts that leave sealed weights unchanged reroute normally |
-| **Fulfillment** | Publicly declare: if written outcome wins, your score doubles for that event |
+| **Fulfillment** | Declare a current-era event; score +8 if its written outcome wins this era. A Stall expires the declaration |
 
 ### 🔄 Revisionists
 
@@ -62,7 +62,7 @@ without it, a faction with a strong repeatable special would rarely need to play
 
 | Special      | Effect                                                                      |
 |--------------|-----------------------------------------------------------------------------|
-| **Thread**   | Name a current-era, not-yet-resolved outcome as the chain's newest link — a pending prediction, accepted only while that outcome is still live; the named outcome shifts in the Weaver's favor |
+| **Thread**   | Name a current-era, not-yet-resolved outcome as a pending link; it shifts in your favor, but a Stall clears the link without penalty |
 | **Tapestry** | Arm protection for the chain's pending link for the rest of this era (requires chain of 2+); absorbs one Annihilate against it |
 | **Reweave**  | Once per era, discard the chain's newest link — pending or confirmed — and re-anchor it to a different resolved past outcome |
 
@@ -76,3 +76,5 @@ without it, a faction with a strong repeatable special would rarely need to play
 
 An Activist has at most one Rally- or Momentum-mode declaration per era. The raw action remains private; its
 declaration of record and Expose's approved disclosures are public. An Expose response signature is never revealed.
+A stalled target makes the declaration fail in that era, breaks the consecutive-era streak, and does not grant
+Momentum next era. The carried event may be declared again as a new bet.

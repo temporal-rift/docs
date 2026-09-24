@@ -190,8 +190,9 @@ round it was observed in so the client can show its age. Exact probabilities nev
 `myRevealedIntel`. The adjusted publication supersedes the preview for the same game and era; the field replaces,
 never duplicates, it.
 
-`declarations` lists the current era's public Rally/Momentum declarations of record, and `exposeFacts` lists the
-public Expose outcomes: the exposed Round-1 signature plus whether the target's behavior changed in Round 3. No
+`declarations` lists the current era's public Rally/Momentum declarations of record. A stalled declaration fails in
+its era and cannot score if the event returns. `exposeFacts` lists the public Expose outcomes: the exposed Round-1
+signature plus whether the target's behavior changed in Round 3. No
 Round-3 signature is ever included. `signature.sourceOutcomeId` is populated only for `SWING` signatures.
 
 ### Your submissions, budgets, and objective progress
@@ -203,7 +204,8 @@ availability.
 
 `myObjectiveProgress` is your own cumulative progress toward your faction objective: `progressCount` against an
 owner-populated `threshold`, plus `objectiveMet`. Use the transmitted threshold rather than a hard-coded constant.
-For Weavers the count mirrors the public chain length; every other faction's count is private to you.
+For Weavers the count mirrors the public chain length. For Activists a stalled declaration breaks the consecutive-era
+streak. Every other faction's count is private to you.
 
 ### Terminal result
 
