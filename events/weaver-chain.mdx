@@ -114,7 +114,8 @@ Emitted when `chainLength` reaches 3 confirmed links. Triggers Weaver win-condit
 
 Emitted when a `REWEAVE` discards the chain's newest link — pending or confirmed — and replaces it with a
 different, already-resolved past outcome not already linked. `chainLength` is unchanged; Reweave replaces, it
-never grows the chain.
+never grows the chain. If the replacement confirms the third link, `ChainCompleted` follows and triggers the
+Weaver victory score.
 
 ## ChainProtectionArmed 🔒
 
