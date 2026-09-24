@@ -80,9 +80,13 @@ the same player's successful declaration in the immediately preceding era.
 |---|---|---|
 | `409` | `409-03` | Declaration window closed |
 | `409` | `409-04` | Round-1 special slot or declaration already used |
-| `422` | `422-07` | Faction/special mismatch |
+| `422` | `422-02` | Player is Jammed |
+| `422` | `422-04` | Faction required |
+| `422` | `422-05` | Player is not an Activist |
+| `422` | `422-06` | Target event or outcome does not belong to the current game/era |
 | `422` | `422-08` | Momentum not eligible |
-| `422` | `422-09` | Target event or outcome is not active in this era |
+
+Error codes are shared by every action endpoint: each code keeps one meaning wherever it appears.
 
 ## Submit action
 
