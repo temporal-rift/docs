@@ -125,7 +125,8 @@ of the completing link (the last entry in `links`).
 Emitted when a `REWEAVE` discards the chain's newest link — pending or confirmed — and replaces it with a
 different past outcome that won its event and is not already linked. The replacement keeps the era its outcome
 resolved in, which must be later than the era of the link before it. `chainLength` is unchanged; Reweave replaces,
-it never grows the chain.
+it never grows the chain. If the replacement confirms the third link, `ChainCompleted` follows and triggers the
+Weaver victory score.
 
 ## ChainProtectionArmed 🔒
 
