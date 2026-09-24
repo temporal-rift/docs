@@ -34,6 +34,8 @@ and a pending Weaver Thread clears without changing confirmed chain length. A la
 carried event is independent. Each fact is recorded and consumed at most once for its game, era, player, and reason.
 
 The `FACTION_UNIDENTIFIED` Revisionist bonus is awarded only at game end when no earlier identification was recorded.
+A player is identified when, while not obscured, they are the target of an Intercept, are listed in a Trace result, or
+have their Expose signature revealed. The final faction reveal never counts as an identification.
 It is included in that player's `GameEnded.finalScores` result with all other final score decisions.
 
 ### Cross-faction rules
