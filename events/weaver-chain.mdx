@@ -7,6 +7,9 @@ Events produced by `timeline-service` tracking the Weavers faction's chain mecha
 not-yet-resolved current-era outcome as the chain's newest link. That link is **pending** until it resolves: it
 either confirms, clears, or — if annihilated without Tapestry protection — enters paradox resolution.
 
+Links are **connected by era succession**: every link comes from a strictly later era than the link before it, so a
+chain holds at most one link per era. The events themselves need no other relationship.
+
 ## ChainLinkThreaded 🌐
 
 ```json
@@ -34,13 +37,19 @@ Only one pending link can be open per chain at a time.
   "playerId": "uuid",
   "eventId": "uuid",
   "outcomeId": "uuid",
-  "reason": "ALREADY_LINKED"
+  "reason": "EVENT_ALREADY_LINKED"
 }
 ```
 
-Private rejection of one `THREAD` play: the named coordinate is not a not-yet-resolved current-era outcome, the
-chain already has an open pending link, or the coordinate is missing. `eventId`/`outcomeId` are absent when the
-submission itself was missing a coordinate. Chain length does not change and the message is never broadcast.
+Private rejection of one `THREAD` play. Chain length does not change and the message is never broadcast.
+
+| `reason`                  | Cause                                                                          |
+|---------------------------|--------------------------------------------------------------------------------|
+| `MISSING_COORDINATE`      | The submission named no event or outcome; `eventId`/`outcomeId` are absent     |
+| `INVALID_COORDINATE`      | The coordinate is not a live, not-yet-resolved current-era outcome             |
+| `ALREADY_PENDING`         | The chain already has an open pending link                                     |
+| `EVENT_ALREADY_LINKED`    | The event is already a link in the chain                                       |
+| `LINK_ERA_NOT_SUCCESSIVE` | The chain already confirmed a link this era (e.g. Tapestry absorbed an Annihilate) |
 
 ## ChainLinkAdded 🌐
 
@@ -93,8 +102,9 @@ The Weaver may `THREAD` again only while the chain and game remain active.
 }
 ```
 
-Emitted when `chainLength` reaches 3 confirmed links. Triggers Weaver win-condition scoring (+10 pts). Top-level
-`eraNumber` is the era of the completing link (the last entry in `links`).
+Emitted when `chainLength` reaches 3 confirmed links. Triggers Weaver win-condition scoring (+10 pts). Each entry's
+`eraNumber` is the era its outcome resolved in, strictly increasing across `links`. Top-level `eraNumber` is the era
+of the completing link (the last entry in `links`).
 
 ## ChainReAnchored 🌐
 
@@ -113,8 +123,9 @@ Emitted when `chainLength` reaches 3 confirmed links. Triggers Weaver win-condit
 ```
 
 Emitted when a `REWEAVE` discards the chain's newest link — pending or confirmed — and replaces it with a
-different, already-resolved past outcome not already linked. `chainLength` is unchanged; Reweave replaces, it
-never grows the chain.
+different past outcome that won its event and is not already linked. The replacement keeps the era its outcome
+resolved in, which must be later than the era of the link before it. `chainLength` is unchanged; Reweave replaces,
+it never grows the chain.
 
 ## ChainProtectionArmed 🔒
 
