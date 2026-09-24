@@ -38,7 +38,7 @@ flowchart TD
 | Event | Outcome |
 |---|---|
 | `TAPESTRY` played (chain ≥ 2, not yet used this era) | Arm protection for the pending link, for the rest of this era — emit `ChainProtectionArmed` |
-| `REWEAVE` played (once per era) | Discard the newest link — pending or confirmed — re-anchor to a different resolved past outcome — emit `ChainReAnchored`, length unchanged |
+| `REWEAVE` played (once per era) | Discard the newest link — pending or confirmed — re-anchor to a different resolved past outcome — emit `ChainReAnchored`, length unchanged; when this confirms link 3, emit `ChainCompleted` and end the saga successfully |
 | Pending link's event Stalls | Emit `ChainLinkInvalidated`; confirmed links stay and a later Thread is a new prediction |
 | Unresolved `CHAIN_CONFLICT` paradox | Emit `ChainBroken`, saga ends — the chain's only reachable break trigger |
 | `GameEnded` with chain < 3 | Invalidate any pending link and end the incomplete chain without a bonus |
