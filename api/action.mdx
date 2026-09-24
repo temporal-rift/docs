@@ -80,9 +80,13 @@ the same player's successful declaration in the immediately preceding era.
 |---|---|---|
 | `409` | `409-03` | Declaration window closed |
 | `409` | `409-04` | Round-1 special slot or declaration already used |
-| `422` | `422-07` | Faction/special mismatch |
+| `422` | `422-02` | Player is Jammed |
+| `422` | `422-04` | Faction required |
+| `422` | `422-05` | Player is not an Activist |
+| `422` | `422-06` | Target event or outcome does not belong to the current game/era |
 | `422` | `422-08` | Momentum not eligible |
-| `422` | `422-09` | Target event or outcome is not active in this era |
+
+Error codes are shared by every action endpoint: each code keeps one meaning wherever it appears.
 
 ## Submit action
 
@@ -180,8 +184,11 @@ only `targetPlayerId`.
 | `422` | `422-03` | Invalid target, including a Trace event absent from the preceding round |
 | `422` | `422-04` | Faction required for special action |
 | `422` | `422-05` | Faction does not own the submitted special action |
+| `422` | `422-06` | Target event or outcome does not belong to the current game/era |
+| `422` | `422-07` | Rally or Momentum submitted here instead of the declaration endpoint |
+| `422` | `422-09` | Expose unavailable this round or its target player is not eligible |
 | `422` | `422-10` | Card type is not eligible during an action round |
-| `422` | `422-12` | Card cannot be played in this round, including Trace in Era 1 Round 1 |
+| `422` | `422-12` | Card or special cannot be played in this era or round, including Trace in Era 1 Round 1 and Stall or Cascade in the final era |
 
 ## Submit paradox-resolution card
 

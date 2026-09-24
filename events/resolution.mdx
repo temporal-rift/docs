@@ -165,6 +165,9 @@ and `DETONATE`; the phase-scoped event has no `roundNumber`. `grade` is always p
 }
 ```
 
+`resolvedByPlayerId` is the last player whose `PUSH`, `SUPPRESS`, or `STABILIZE` targeted the event, in submission
+order. A Stabilize-cleared event resolves by the ordinary weighted draw over its unchanged weights.
+
 ## ParadoxCascaded 🌐
 
 ```json
@@ -225,7 +228,8 @@ inverted its target card's effect, or was blocked by a same-round `SEAL` (`tookE
 ```
 
 A `CASCADE` armed in the previous era re-erased this outcome at the start of this era — the only automatic,
-cross-era faction effect. Applies at most once per `CASCADE`.
+cross-era faction effect. Published only for an event that carried into this era through Stall or a paradox
+cascade. Applies at most once per `CASCADE`.
 
 ## ResolutionFailed 🔒
 

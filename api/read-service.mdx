@@ -128,7 +128,7 @@ broke the chain, before or after `FactionRevealed`.
 ### Hand fields
 
 `grade` is always present — single-grade cards carry `I`. `isPlayableThisRound` tells the client which cards to grey
-out; it changes as rounds advance without a new hand being dealt.
+out; it changes as rounds advance without a new hand being dealt. `STALL` is unavailable in the configured final era.
 
 While the current-era hand choice is open, the response additionally contains a private `pendingHandSelection`:
 

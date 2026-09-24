@@ -143,6 +143,11 @@ instead — `sourceEventId`/`sourceOutcomeId` stay null for every special.
 Private rejection of a `TAPESTRY`, `REWEAVE`, or `CASCADE` play whose prerequisites weren't met. `chainId` is
 populated only for a Weaver chain special; `CASCADE` leaves it null.
 
+A `CASCADE` is decided in its own era, once its event is resolved. The first matching reason applies:
+`TARGET_NOT_IN_ERA` when the target event is not part of that era, `TARGET_NOT_ERASED` when the named outcome was
+never erased, and `EVENT_NOT_CARRIED` when the event resolved with a winning outcome. It only stays pending when the
+event carries into the next era through Stall or a paradox cascade.
+
 ## ActivistDeclarationRecorded 🌐
 
 ```json
