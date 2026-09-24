@@ -296,6 +296,8 @@ carried-over events.
 that every active event appears exactly once in that order. Session uses `CASCADED` entries to determine the
 collapsing event, carries both `CASCADED` and `STALLED` entries into the next era, and keeps a stalled event out of
 collapse accounting. Scoring finishes either non-applied state without waiting for an outcome that cannot arrive.
+`STALLED` expires origin-era Activist and Prophet predictions without a score. A matching pending Weaver Thread is
+invalidated without penalty; a later bet on the carried event has a new era origin.
 
 ## ScoresUpdated 📢
 

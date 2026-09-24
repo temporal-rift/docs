@@ -28,8 +28,10 @@ the exact delta applied to each entry.
 | | Momentum-mode declaration's exact outcome wins | +4 |
 | | Expose target's qualifying Round-3 signature differs from the exposed Round-1 signature | +2 |
 
-A cascaded declaration has no winning outcome and earns no declaration score. Each fact is recorded and consumed at
-most once for its game, era, player, and reason.
+A cascaded or stalled declaration has no winning outcome in that era and earns no declaration score. A Stall breaks
+the Activist's consecutive-era streak. Prophet writing and Fulfillment on that event expire without score or penalty,
+and a pending Weaver Thread clears without changing confirmed chain length. A later declaration or Thread on the
+carried event is independent. Each fact is recorded and consumed at most once for its game, era, player, and reason.
 
 The `FACTION_UNIDENTIFIED` Revisionist bonus is awarded only at game end when no earlier identification was recorded.
 It is included in that player's `GameEnded.finalScores` result with all other final score decisions.

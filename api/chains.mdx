@@ -31,9 +31,11 @@ GET /api/v1/games/{gameId}/chains
 ```
 
 `status` is `ACTIVE`, `COMPLETED`, or `BROKEN`. `chainLength` and `links` reflect confirmed links only.
-`pendingLink` names the not-yet-resolved current-era outcome the chain's open `THREAD` prediction targets; it is
-absent when there is no open pending link. `protectionArmed` reflects whether `TAPESTRY` protection is currently
-armed for the pending link. When a Weaver rebuilds after a break, the open chain is returned; with no open chain,
+`pendingLink` names the not-yet-resolved current-era outcome the chain's open `THREAD` prediction targets. It clears
+without penalty if that event Stalls or the game ends before confirmation. The carried event may be Threaded again as
+a new prediction in a later era while the game remains active. It is absent when there is no open pending link.
+`protectionArmed` reflects whether `TAPESTRY` protection is currently armed for the pending link. When a Weaver
+rebuilds after a break, the open chain is returned; with no open chain,
 the longest terminal one.
 
 | Error | Code | Condition |
