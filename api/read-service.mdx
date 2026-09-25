@@ -62,7 +62,7 @@ Full per-player view — no raw probabilities, no other players' factions.
     }
   ],
   "players": [
-    { "playerId": "uuid", "playerName": null, "score": 8, "isConnected": true, "faction": null }
+    { "playerId": "uuid", "playerName": "Ada", "score": 8, "isConnected": true, "faction": null }
   ],
   "lastRoundSummary": {
     "roundNumber": 1,
@@ -107,8 +107,8 @@ Full per-player view — no raw probabilities, no other players' factions.
 }
 ```
 
-Every active event has required `carryOverState`: `FRESH`, `CASCADED`, or `STALLED`. `playerName` is reserved for a
-later slice and is currently `null`. Every field after `players` except `lastRoundSummary` and `chain` is optional:
+Every active event has required `carryOverState`: `FRESH`, `CASCADED`, or `STALLED`. `playerName` is the name each player
+joined the lobby with; it is `null` only if that join has not been recorded. Every field after `players` except `lastRoundSummary` and `chain` is optional:
 absent means not yet computed by the owner, while an empty array means known-none. Refresh this view after reload or
 a rejected submission and retry at most once against the fresh era/round/deadline coordinates.
 
