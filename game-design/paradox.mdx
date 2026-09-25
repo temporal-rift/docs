@@ -10,10 +10,15 @@ Paradoxes occur when contradictory conditions exist simultaneously on the same e
 
 | Type | Trigger | `paradoxType` |
 |---|---|---|
-| **Dead Heat** | Two outcomes reach equal probability | `DEAD_HEAT` |
-| **Impossible Erasure** | Annihilated outcome has highest probability | `IMPOSSIBLE_ERASURE` |
+| **Dead Heat** | Two outcomes a Collide equalized this era are still tied for the highest eligible probability | `DEAD_HEAT` |
+| **Impossible Erasure** | Erasure leaves no eligible outcome with any probability, or no eligible outcome at all | `IMPOSSIBLE_ERASURE` |
 | **Chain Conflict** | A Weaver chain's pending link is Annihilated without Tapestry protection | `CHAIN_CONFLICT` |
 | **Seal Breach** | A Sealed outcome's probability was modified — blocked shifts fail without paradox; only an actual change breaches | `SEAL_BREACH` |
+
+An ordinary tie is not a paradox. If outcomes tie for the lead without a Collide — after a Suppress, for example — the
+weighted draw makes them equally likely. Erasing the leading outcome is not a paradox either: annihilated outcomes are
+left out of the draw, and the remaining outcomes are drawn by their own probabilities. A Collide only counts for the
+era it was played, so a tie carried into the next era needs a new Collide to raise a Dead Heat.
 
 ## Resolution flow
 

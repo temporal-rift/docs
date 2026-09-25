@@ -53,7 +53,7 @@ A jammed player can still play cards — only faction specials are blocked, and 
 
 | Card | Effect | `cardType` |
 |---|---|---|
-| **Collide** | Equalize two outcomes; creates a Dead Heat only if they are tied highest among eligible outcomes | `COLLIDE` |
+| **Collide** | Equalize two outcomes; creates a Dead Heat if they are still tied highest among eligible outcomes when the era resolves | `COLLIDE` |
 | **Stabilize** | Clear every paradox on one event without changing its weights; it resolves by the ordinary weighted draw | `STABILIZE` |
 | **Detonate** | If a paradox exists, double its negative score effect on all players except you | `DETONATE` |
 
@@ -117,6 +117,6 @@ Stabilize and Detonate are never in your action hand — they are dealt only if 
 
 Stabilize does not break a tie. If a Dead Heat remains, the winner is drawn by weight like any other event: at
 `24/38/38` the two leaders each win 38% of the time and the third outcome 24%. Stabilize has no effect on an event
-whose every outcome is annihilated; that event still cascades.
+with no eligible probability left to draw; that event still cascades.
 
 The `RoundSummaryPublished` event exposes only category and family — never the specific card — to preserve information asymmetry for all players.
