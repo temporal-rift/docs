@@ -52,12 +52,14 @@ submission itself was missing a coordinate. Chain length does not change and the
   "linkedEventId": "uuid",
   "linkedOutcomeId": "uuid",
   "chainLength": 2,
-  "previousLinkEventId": "uuid"
+  "previousLinkEventId": "uuid",
+  "eraNumber": 2
 }
 ```
 
 Emitted when a chain's pending link confirms — its named outcome resolved as predicted, an armed Tapestry
 protection absorbed an Annihilate against it, or its chain-conflict paradox resolved in the Weaver's favor.
+`eraNumber` is the confirmed link's era, in which the Weaver scores +2 for the link. Reweave never emits this event.
 
 ## ChainLinkInvalidated 🌐
 
@@ -112,10 +114,10 @@ Emitted when `chainLength` reaches 3 confirmed links. Triggers Weaver win-condit
 }
 ```
 
-Emitted when a `REWEAVE` discards the chain's newest link — pending or confirmed — and replaces it with a
-different, already-resolved past outcome not already linked. Replacing a confirmed link leaves `chainLength`
-unchanged. Replacing a pending link increases the confirmed length by one, because the pending link did not count.
-If the replacement confirms the third link, `ChainCompleted` follows and triggers the Weaver victory score.
+Emitted when a `REWEAVE` moves the chain's pending link to a different live outcome of the current era — its event
+not yet resolved, the outcome not annihilated, and the event not already a confirmed link. The link stays pending
+and confirms only if its new outcome wins. `chainLength` is the unchanged confirmed length; Reweave never adds a
+confirmed link or completes the chain.
 
 ## ChainProtectionArmed 🔒
 
