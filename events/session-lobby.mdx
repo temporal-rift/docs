@@ -62,11 +62,17 @@ Produced once per player. The `notification` module delivers each copy only to t
 {
   "gameId": "uuid",
   "lobbyId": "uuid",
-  "playerIds": ["uuid", "uuid", "uuid"],
+  "players": [
+    { "playerId": "uuid", "playerName": "Ada" },
+    { "playerId": "uuid", "playerName": "Ben" },
+    { "playerId": "uuid", "playerName": "Cy" }
+  ],
   "totalFactions": 3,
   "deckSize": 30
 }
 ```
+
+`players` is the game's roster in seat order, with the name each player chose in the lobby. Players who left the lobby before the start are not on it.
 
 ## GameStartFailed 🌐
 
@@ -179,3 +185,30 @@ separately if a Paradox Resolution phase opens.
 The selected five cards become the player's action hand. `selectionOrigin` is `PLAYER` for an accepted choice or
 `TIMEOUT_RANDOM` if the window expired. A timeout uniformly chooses one of the 21 possible five-card subsets; it
 never ranks cards or favors a deal slot, category, or grade.
+
+## ForesightRevealed 🔒
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 2,
+  "playerId": "uuid",
+  "nextEraNumber": 3,
+  "revealedEvents": [
+    {
+      "catalogEventId": "uuid",
+      "title": "string",
+      "outcomes": [
+        { "catalogOutcomeId": "uuid", "description": "string" }
+      ]
+    }
+  ],
+  "emptyReason": null
+}
+```
+
+Private reveal for the foretelling Prophet. `playerId` is the sole viewer, not the player who caused anything —
+the message never identifies any other player. `revealedEvents` previews the next era's freshly-drawn deck slice
+in deck order: catalog identities with titles and outcome descriptions, never probabilities or bands. In the final
+era there is no next draw, so `revealedEvents` is `[]` with `emptyReason` set. The preview expires at the era
+boundary and is never broadcast.
