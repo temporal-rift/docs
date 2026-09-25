@@ -37,8 +37,10 @@ Receive-only per-player stream. All game actions go through REST. On connect the
 | `ExposeBehaviorChanged` | All players: changed-behaviour result only, never the Round-3 signature |
 | `ProbabilityStateCalculated` | Nobody |
 | `ProbabilityStateRevealed` | Scanning player only |
-| `InfluenceTraced` | Nobody until the Trace viewer-facing slice enables its private path |
+| `InfluenceTraced` | Tracing player only |
+| `HandCardIntercepted` | Intercepting player only |
 | `PlayerJammed` | Suppressed player only |
+| `ForesightRevealed` | Foretelling player only |
 | `BandedProbabilityPublished` | All players in the game — superseded by `AdjustedBandsPublished` for the same game and era; a client that already applied the correction ignores a late preview |
 | `AdjustedBandsPublished` | All players in the game — supersedes `BandedProbabilityPublished`; clients keep the correction for the game and era |
 | `ParadoxResolutionCardPlayed` | Nobody |
@@ -60,12 +62,11 @@ limited to the scanning player's private reveal.
 and goes to their session alone. It is re-sent at the close of every round for the rest of the era, so the scanning
 player's values stay current.
 
-`InfluenceTraced` and `PlayerJammed` are private action-event contracts addressed by payload `playerId`. `PlayerJammed`
-is delivered to the suppressed player's session alone and never falls back to broadcast; `InfluenceTraced`'s real-time
-forwarding remains deny-by-default until its viewer-facing slice enables its private route. Reconnect-safe Trace
-results and Jam status are represented in the `myRevealedIntel` array and `myJammedUntilRound` field respectively.
-`INTERCEPT` results use the same private projection principle. In all three cases the client can learn only its own
-reveal or suppression and is never told who caused it.
+`InfluenceTraced`, `HandCardIntercepted`, `PlayerJammed` and `ForesightRevealed` are also addressed by payload
+`playerId` — the tracing, intercepting, suppressed and foretelling player respectively — and are delivered to that
+player's session alone, never falling back to broadcast. Reconnect-safe Trace and Intercept results are represented in
+the `myRevealedIntel` array, Jam status in `myJammedUntilRound`, and the Foresight preview in `myForesightPreview` until
+its era ends. In every case the client learns only its own reveal or suppression and is never told who caused it.
 
 ## Reconnection
 
