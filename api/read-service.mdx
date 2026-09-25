@@ -49,6 +49,19 @@ Full per-player view — no raw probabilities, no other players' factions.
       ]
     }
   ],
+  "myForesightPreview": {
+    "nextEraNumber": 3,
+    "revealedEvents": [
+      {
+        "catalogEventId": "uuid",
+        "title": "string",
+        "outcomes": [
+          { "catalogOutcomeId": "uuid", "description": "string" }
+        ]
+      }
+    ],
+    "emptyReason": null
+  },
   "activeEvents": [
     {
       "eventId": "uuid",
@@ -170,6 +183,14 @@ how fresh it is.
 Scan results reach you here and over the WebSocket — there is no probability endpoint. Every other player sees only
 Low/Medium/High bands after Action Round 2.
 </Note>
+
+### Foresight preview
+
+`myForesightPreview` carries your own Prophet `FORESIGHT` preview of the next era's freshly-drawn events in deck
+order: `nextEraNumber`, `revealedEvents` (catalog event identity, title, and outcome identities with descriptions),
+and `emptyReason` for the defined final-era empty result. It is `null` when you have no Foresight preview in the
+current era, never carries another player's preview, and expires at the era boundary — reload while the era is still
+active to recover it. It carries no probabilities, bands, or deck state beyond the previewed slice.
 
 ### Freshness, deadlines, and retry
 
