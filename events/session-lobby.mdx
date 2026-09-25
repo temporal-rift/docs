@@ -62,11 +62,17 @@ Produced once per player. The `notification` module delivers each copy only to t
 {
   "gameId": "uuid",
   "lobbyId": "uuid",
-  "playerIds": ["uuid", "uuid", "uuid"],
+  "players": [
+    { "playerId": "uuid", "playerName": "Ada" },
+    { "playerId": "uuid", "playerName": "Ben" },
+    { "playerId": "uuid", "playerName": "Cy" }
+  ],
   "totalFactions": 3,
   "deckSize": 30
 }
 ```
+
+`players` is the game's roster in seat order, with the name each player chose in the lobby. Players who left the lobby before the start are not on it.
 
 ## GameStartFailed 🌐
 
