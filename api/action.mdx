@@ -151,10 +151,9 @@ active in that preceding round after a legal submission.
 `JAM` is a card, not a special action, and never appears in this request; `THREAD` is event-targeting like
 `ANNIHILATE` and uses `targetEventId`/`targetOutcomeId` — the current-era, not-yet-resolved outcome it anchors to —
 instead of `sourceEventId`/`sourceOutcomeId`, which stay null for every special. `CASCADE` requires
-`targetEventId`/`targetOutcomeId`. `TAPESTRY` and `REWEAVE` have no target requirement enforced at submission —
-`game-service` accepts the request and `timeline-service`'s chain saga, which alone knows chain and resolution
-state, validates and privately rejects it (a `REWEAVE` omitting the resolved past outcome to re-anchor to will
-always be rejected there).
+`targetEventId`/`targetOutcomeId`. `REWEAVE` also requires `targetEventId`/`targetOutcomeId`: the current-era,
+not-yet-resolved outcome the Weaver's pending link moves to. `TAPESTRY` has no target; `timeline-service`'s chain
+saga, which alone knows chain state, validates its prerequisites and privately rejects an ineligible play.
 
 `RALLY` and `MOMENTUM` are accepted only by the declaration endpoint. `EXPOSE` is valid only in Action Round 2 against
 a player whose Round-1 action has a qualifying Push, Suppress, or Swing signature. The generic action request still
