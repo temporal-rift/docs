@@ -18,6 +18,8 @@ Events produced by `game-service` session module.
 { "lobbyId": "uuid", "playerId": "uuid", "playerName": "string" }
 ```
 
+`playerName` is the player-chosen display name, 1 to 32 characters.
+
 ## PlayerLeftLobby 🌐
 
 ```json
@@ -72,7 +74,7 @@ Produced once per player. The `notification` module delivers each copy only to t
 }
 ```
 
-`players` is the game's roster in seat order, with the name each player chose in the lobby. Players who left the lobby before the start are not on it.
+`players` is the game's roster in seat order, with the name each player chose in the lobby. Each `playerName` is 1 to 32 characters. Players who left the lobby before the start are not on it.
 
 ## GameStartFailed 🌐
 
