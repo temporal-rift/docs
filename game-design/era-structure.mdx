@@ -37,6 +37,10 @@ flowchart TD
 | **Outcome** | Final probabilities determine winning outcomes. Scores updated per faction rules. |
 | **Era End** | Check win conditions. Advance to next era or trigger game end. |
 
+Cards within a round resolve simultaneously: each card is measured against the probabilities at the start of the
+resolution and the effects are added together, so submitting last gives no advantage. See
+[Resolution](/sagas/resolution) for the exact order.
+
 ## Timers
 
 Default timer: **60 seconds per action round** (configurable via `game.rules.action-round-timer-seconds`).

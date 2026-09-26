@@ -257,7 +257,8 @@ Internal-only: signals an invalid probability state after resolution. Not expect
 }
 ```
 
-Internal-only: logs a non-fatal ordering ambiguity that was resolved deterministically. No player-visible effect.
+Internal-only and no longer emitted: round resolution no longer depends on submission order, so there is no
+ordering ambiguity to report. No player-visible effect.
 
 ## OutcomeApplied 🌐
 

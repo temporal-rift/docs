@@ -43,7 +43,7 @@ findings once; it does not produce `STALLED`.
 
 ## Card effect application order
 
-Effects are applied in this fixed order within each round — not submission timestamp order:
+Effects are applied in this fixed order within each round. Submission time never affects the result:
 
 | Priority | Card / Effect | Reason |
 |---|---|---|
@@ -51,12 +51,20 @@ Effects are applied in this fixed order within each round — not submission tim
 | 2 | `SEAL` | Locks outcomes before other effects can modify them |
 | 3 | `ANNIHILATE` | Removes outcomes before probability shifts |
 | 4 | `CORRUPT` | Inverts other cards before they apply |
-| 5 | `MIMIC` | Runs after `SEAL`/`ANNIHILATE` so those can still affect its target; computes an independent fresh shift at its own base magnitude rather than copying its source card's already-applied (possibly amplified or corrupted) result |
+| 5 | `MIMIC` | Picks the strongest qualifying card (largest base magnitude, then a card raising the outcome over `SUPPRESS`) and adds an independent copy at its base magnitude to the simultaneous tier |
 | 6 | `AMPLIFY` | Multiplies the named player's eligible card effect |
-| 7+ | All remaining cards, including `COLLIDE` | In submission timestamp order |
+| 7 | All remaining cards, including `COLLIDE`, plus `MIMIC` copies | Simultaneously |
 
 `NULLIFY`, `REDIRECT` and `AMPLIFY` each target a named player, never an action's submission position. Each is a
 clean no-op when its target skipped, has no eligible action, or was already cancelled.
+
+In tier 7, each card on an event is evaluated alone against that event's probabilities at the start of the tier,
+using the ordinary single-card rules (cap, redistribution, sealed outcomes, Collide's midpoint). Their changes are added
+together, and the sum is fitted once into the configured floor and ceiling. Sealed outcomes stay fixed, the total stays
+100, and any overflow is shared equally by the outcomes that still have room. A single card resolves exactly as it
+would alone. Identical Collides count once. A Collide pair counts toward a Dead Heat only if it is still equal after
+the combined result. `STALL` is unaffected by order. `PUSH` and `SUPPRESS` submitted during Paradox Resolution combine
+the same way.
 
 `STABILIZE` and `DETONATE` (the other two Group 4 "Paradox" cards) never go through this ordering — during
 `ParadoxResolutionSaga`, a player submits exactly one card, chosen from `PUSH`, `SUPPRESS`, `STABILIZE`, or
@@ -68,4 +76,3 @@ clean no-op when its target skipped, has no eligible action, or was already canc
 |---|---|
 | `ParadoxResolutionSaga` times out | Force one cascade per event with unresolved paradox findings |
 | Probability state doesn't sum to 100 | `timeline-service` emits `ResolutionFailed`; game-service's `EraSaga` consumes it, emits `EraFailed`, and triggers `GameEndedAbnormally` |
-| Conflicting effects produce impossible state | Log, apply last-write-wins, emit `ResolutionWarning` |
