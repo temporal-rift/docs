@@ -35,8 +35,9 @@ Events produced during action rounds by `game-service` action module.
 
 Stored in full for resolution. **Never forwarded to other players.**
 
-Exactly one target mode is set: scalar `targetEventId`, list `targetEventIds`, scalar `targetPlayerId`, or list
-`targetPlayerIds`. The event list contains
+Except for `DECOY`, exactly one target mode is set: scalar `targetEventId`, list `targetEventIds`, scalar
+`targetPlayerId`, or list `targetPlayerIds`. A `DECOY` carries no target and populates only `disguiseCategory`, the
+category the round summary shows for it; `disguiseCategory` is absent for every other card type. The event list contains
 one to three distinct UUIDs and cannot carry scalar, player, or outcome targets. The player-target list contains
 one to two distinct player UUIDs and cannot carry any other target mode or outcome targets. `NULLIFY` populates the
 player-target list (one entry at grade I, two at grade II); `REDIRECT`, `AMPLIFY`,
@@ -264,3 +265,7 @@ Round-3 signature or its target.
 ```
 
 Deliberately minimal — **no targets, no specific card types**. Only category and family visible to all. This preserves the information asymmetry that makes the game interesting.
+
+`actionCategory` is one of `PROBABILITY_SHIFTER`, `INFORMATION`, `DISRUPTION`, `PARADOX`, and is absent for faction
+specials and skips. `actionFamily` is `CARD` or `SPECIAL`, and is absent for skips. A Decoy play shows the category
+its player declared as a disguise, indistinguishable from a real card of that category.

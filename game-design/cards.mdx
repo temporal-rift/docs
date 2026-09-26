@@ -32,7 +32,11 @@ not optimize or systematically bias the resulting hand by category, grade, or de
 | **Intercept** | See a random card from a named player's hand secretly | `INTERCEPT` |
 | **Scan** | See live exact probabilities for one event for the rest of the era | `SCAN` |
 | **Trace** | See which players influenced a specific event last round | `TRACE` |
-| **Decoy** | Play a fake action visible to others but with no effect | `DECOY` |
+| **Decoy** | Declare a card category; others see that category played, with no effect | `DECOY` |
+
+A Decoy names no target. Its declared disguise can be any category (Probability Shifter, Information, Disruption or
+Paradox), and the round summary shows that category instead of Decoy's own. It never shifts probability, never shows
+up in a Trace, and reveals nothing.
 
 Information cards reveal to you and nobody else. Intercept selects its revealed card uniformly at random from the target
 hand; the player you trace or intercept is never told.
@@ -124,4 +128,4 @@ Stabilize does not break a tie. If a Dead Heat remains, the winner is drawn by w
 `24/38/38` the two leaders each win 38% of the time and the third outcome 24%. Stabilize has no effect on an event
 with no eligible probability left to draw; that event still cascades.
 
-The `RoundSummaryPublished` event exposes only category and family — never the specific card — to preserve information asymmetry for all players.
+The `RoundSummaryPublished` event exposes only category and family — never the specific card — to preserve information asymmetry for all players. Faction specials show only their family, and a Decoy shows its declared category.
