@@ -19,6 +19,8 @@ Creates a new lobby. The requesting player becomes host.
 { "playerName": "string" }
 ```
 
+`playerName` is the player-chosen display name, 1 to 32 characters.
+
 **Response `201`:**
 ```json
 {
@@ -42,6 +44,8 @@ Join an existing lobby.
 { "playerName": "string" }
 ```
 
+`playerName` is the player-chosen display name, 1 to 32 characters.
+
 **Response `200`:**
 ```json
 {
@@ -52,6 +56,8 @@ Join an existing lobby.
   ]
 }
 ```
+
+Each `currentPlayers[].playerName` is the player-chosen display name, 1 to 32 characters.
 
 | Error | Code | Condition |
 |---|---|---|
@@ -129,6 +135,8 @@ inform a join decision.)
   ]
 }
 ```
+
+Each `members[].playerName` is the player-chosen display name, 1 to 32 characters.
 
 `currentPlayerId` is optional: an authorized `200` may omit it until its service adopts this compatible contract.
 When present, it identifies the authenticated member and always matches one returned member. It is not included in a
