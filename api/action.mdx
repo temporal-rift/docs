@@ -121,10 +121,13 @@ Submit a card or faction special for the current action round. **One submission 
 }
 ```
 
-Every card action has exactly one target mode: scalar `targetEventId`, list `targetEventIds`, or `targetPlayerId`.
-The list holds one to three distinct UUIDs and cannot be combined with scalar event, player, source-outcome, or
-target-outcome fields. The request does not contain `cardType` or `grade`; `game-service` resolves `cardInstanceId`
-and validates that SCAN uses one event at grade I, two at grade II, or the complete current-era set at grade III.
+Every card action has exactly one target mode: scalar `targetEventId`, list `targetEventIds`, scalar
+`targetPlayerId`, or list `targetPlayerIds`. The event list holds one to three distinct UUIDs and cannot be
+combined with scalar event, player, source-outcome, or target-outcome fields. The player-target list holds one to
+two distinct player UUIDs and cannot be combined with any other target mode or outcome field. The request does not
+contain `cardType` or `grade`; `game-service` resolves `cardInstanceId`
+and validates that SCAN uses one event at grade I, two at grade II, or the complete current-era set at grade III,
+and that NULLIFY uses one player at grade I or two at grade II.
 
 `STABILIZE` and `DETONATE` are rejected here because they are reactive paradox-resolution cards. `COLLIDE` remains an
 ordinary action-round card.

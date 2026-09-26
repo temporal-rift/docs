@@ -35,9 +35,12 @@ Events produced during action rounds by `game-service` action module.
 
 Stored in full for resolution. **Never forwarded to other players.**
 
-Exactly one target mode is set: scalar `targetEventId`, list `targetEventIds`, or `targetPlayerId`. The list contains
-one to three distinct UUIDs and cannot carry scalar, player, or outcome targets. `NULLIFY`, `REDIRECT`, `AMPLIFY`,
-`JAM` and `INTERCEPT` target a player; SCAN uses list mode and other event-targeting cards use scalar mode. The
+Exactly one target mode is set: scalar `targetEventId`, list `targetEventIds`, scalar `targetPlayerId`, or list
+`targetPlayerIds`. The event list contains
+one to three distinct UUIDs and cannot carry scalar, player, or outcome targets. The player-target list contains
+one to two distinct player UUIDs and cannot carry any other target mode or outcome targets. `NULLIFY` populates the
+player-target list (one entry at grade I, two at grade II); `REDIRECT`, `AMPLIFY`,
+`JAM` and `INTERCEPT` target a scalar player; SCAN uses list mode and other event-targeting cards use scalar mode. The
 producer resolves card type and grade to enforce SCAN's grade-specific list size and current-era membership.
 
 <Note>
