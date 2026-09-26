@@ -163,12 +163,14 @@ and `DETONATE`; the phase-scoped event has no `roundNumber`. `grade` is always p
   "gameId": "uuid",
   "eraNumber": 1,
   "paradoxId": "uuid",
-  "resolvedByPlayerId": "uuid"
+  "resolvedByPlayerIds": ["uuid"]
 }
 ```
 
-`resolvedByPlayerId` is the last player whose `PUSH`, `SUPPRESS`, or `STABILIZE` targeted the event, in submission
-order. A Stabilize-cleared event resolves by the ordinary weighted draw over its unchanged weights.
+`resolvedByPlayerIds` lists the players credited with clearing the paradox: everyone whose `STABILIZE` targeted
+the event when any did, otherwise everyone whose `PUSH` or `SUPPRESS` targeted it. Each player appears once, ordered
+by player id, so the list never depends on submission order. A Stabilize-cleared event resolves by the ordinary
+weighted draw over its unchanged weights.
 
 ## ParadoxCascaded 🌐
 
@@ -245,20 +247,6 @@ cascade. Applies at most once per `CASCADE`.
 ```
 
 Internal-only: signals an invalid probability state after resolution. Not expected in normal play.
-
-## ResolutionWarning 🔒
-
-```json
-{
-  "gameId": "uuid",
-  "eraNumber": 1,
-  "roundNumber": 2,
-  "detail": "string"
-}
-```
-
-Internal-only and no longer emitted: round resolution no longer depends on submission order, so there is no
-ordering ambiguity to report. No player-visible effect.
 
 ## OutcomeApplied 🌐
 
