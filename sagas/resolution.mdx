@@ -58,6 +58,12 @@ Effects are applied in this fixed order within each round — not submission tim
 `NULLIFY`, `REDIRECT` and `AMPLIFY` each target a named player, never an action's submission position. Each is a
 clean no-op when its target skipped, has no eligible action, or was already cancelled.
 
+Redirect applies to a live Push, Suppress, or Swing without carrying an outcome coordinate. After Corrupt establishes
+the shift's effective destination, Redirect advances through the event's displayed outcome order, wrapping around and
+skipping the current destination, annihilated outcomes, and a Swing's source. It preserves Amplify's multiplier and
+lets Rally evaluate the redirected destination. Mimic copies the submitted direct transfer before the Redirected
+action resolves; it never inherits Redirect.
+
 `STABILIZE` and `DETONATE` (the other two Group 4 "Paradox" cards) never go through this ordering — during
 `ParadoxResolutionSaga`, a player submits exactly one card, chosen from `PUSH`, `SUPPRESS`, `STABILIZE`, or
 `DETONATE`, once a paradox is already detected, not an ordinary card played during a round.
