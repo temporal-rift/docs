@@ -58,6 +58,12 @@ Effects are applied in this fixed order within each round. Submission time never
 `NULLIFY`, `REDIRECT` and `AMPLIFY` each target a named player, never an action's submission position. Each is a
 clean no-op when its target skipped, has no eligible action, or was already cancelled.
 
+Redirect applies to a live Push, Suppress, or Swing without carrying an outcome coordinate. After Corrupt establishes
+the shift's effective destination, Redirect advances through the event's displayed outcome order, wrapping around and
+skipping the current destination, annihilated outcomes, and a Swing's source. It preserves Amplify's multiplier and
+lets Rally evaluate the redirected destination. Mimic's copy uses the submitted direct transfer; it never
+inherits Redirect.
+
 In tier 7, each card on an event is evaluated alone against that event's probabilities at the start of the tier,
 using the ordinary single-card rules (cap, redistribution, sealed outcomes, Collide's midpoint). Their changes are added
 together, and the sum is fitted once into the configured floor and ceiling. Sealed outcomes stay fixed, the total stays
