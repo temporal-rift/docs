@@ -220,6 +220,27 @@ penalty for every other player and the base penalty for each detonator are appli
 Service-coordination data, not a standalone player notification. Confirms whether a round's `CORRUPT` actually
 inverted its target card's effect, or was blocked by a same-round `SEAL` (`tookEffect: false`).
 
+## AnnihilationResolved 🔒
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "roundNumber": 1,
+  "annihilatingPlayerId": "uuid",
+  "targetEventId": "uuid",
+  "targetOutcomeId": "uuid",
+  "erased": true,
+  "wasLeading": true
+}
+```
+
+Service-coordination data, not a standalone player notification. Reports what one non-cancelled `ANNIHILATE` did
+once its round resolved: `erased` is `true` when the target was still in contention, and `wasLeading` is `true` when
+it held the highest probability among the event's remaining outcomes, ties included. Both are judged before that
+round's Annihilates take effect, so submission order within the round changes neither. Scoring credits the
+Annihilate only when both are `true`.
+
 ## CascadeCarriedForward 🌐
 
 ```json
