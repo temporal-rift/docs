@@ -51,7 +51,7 @@ Effects are applied in this fixed order within each round. Submission time never
 | 2 | `SEAL` | Locks outcomes before other effects can modify them |
 | 3 | `ANNIHILATE` | Removes outcomes before probability shifts |
 | 4 | `CORRUPT` | Inverts other cards before they apply |
-| 5 | `MIMIC` | Picks the strongest qualifying card (largest base magnitude, then a card raising the outcome over `SUPPRESS`) and adds an independent copy at its base magnitude to the simultaneous tier |
+| 5 | `MIMIC` | Picks the strongest inward transfer toward the named outcome (a Push targeting it or a Swing destined for it; largest base magnitude, then lowest player id — never a Suppress or a Swing away from it) and adds an independent copy at its base magnitude to the simultaneous tier |
 | 6 | `AMPLIFY` | Multiplies the named player's eligible card effect |
 | 7 | All remaining cards, including `COLLIDE`, plus `MIMIC` copies | Simultaneously |
 
