@@ -173,9 +173,9 @@ not-yet-resolved outcome the Weaver's pending link moves to. `TAPESTRY` has no t
 saga, which alone knows chain state, validates its prerequisites and privately rejects an ineligible play.
 
 `RALLY` and `MOMENTUM` are accepted only by the declaration endpoint. `EXPOSE` is valid only in Action Round 2 against
-a player whose Round-1 action has a qualifying Push, Suppress, or Swing signature. The generic action request still
-requires `targetEventId` and `targetOutcomeId` for Expose; those values are accepted but ignored because Expose targets
-only `targetPlayerId`.
+another player whose public Round-1 summary shows a Probability Shifter card. It requires `targetPlayerId` and must
+omit `targetEventId`, `sourceOutcomeId`, and `targetOutcomeId`. Amplify and a Decoy disguised as a Probability Shifter
+are accepted targets but have no signature to reveal or score. Rejection depends only on the public summary.
 
 **Response `202`:**
 ```json
@@ -203,7 +203,7 @@ only `targetPlayerId`.
 | `422` | `422-05` | Faction does not own the submitted special action |
 | `422` | `422-06` | Target event or outcome does not belong to the current game/era |
 | `422` | `422-07` | Rally or Momentum submitted here instead of the declaration endpoint |
-| `422` | `422-09` | Expose unavailable this round or its target player is not eligible |
+| `422` | `422-09` | Expose unavailable this round or its target's public Round-1 action is ineligible |
 | `422` | `422-10` | Card type is not eligible during an action round |
 | `422` | `422-12` | Card or special cannot be played in this era or round, including Trace in Era 1 Round 1 and Stall or Cascade in the final era |
 
