@@ -12,9 +12,8 @@ the exact delta applied to each entry.
 
 | Faction | Scoring trigger | Points |
 |---|---|---|
-| ⚡ Erasers | Successfully annihilated outcome | +3 |
+| ⚡ Erasers | Annihilate erased an outcome that was leading its event | +3 |
 | | Corrupted card that inverted an opponent's effect | +2 |
-| | Era ends with fewer outcomes than it started | +5 |
 | 📜 Prophets | Event resolves exactly as written | +4 |
 | | Fulfillment declared and succeeds | +8 |
 | | Event resolves differently than written | −2 |
@@ -27,6 +26,11 @@ the exact delta applied to each entry.
 | 📣 Activists | Rally-mode declaration's exact outcome wins | +8 |
 | | Momentum-mode declaration's exact outcome wins | +4 |
 | | Expose target's qualifying Round-3 signature differs from the exposed Round-1 signature | +2 |
+
+An Annihilate scores only when its target was still in contention and held the highest probability among the
+event's remaining outcomes (a tie for highest counts) before that round's Annihilates took effect. Erasing a trailing
+or already-erased outcome scores nothing. Only these scoring Annihilates count toward the Erasers' four-annihilation
+win condition.
 
 A cascaded or stalled declaration has no winning outcome in that era and earns no declaration score. A Stall breaks
 the Activist's consecutive-era streak. Prophet writing and Fulfillment on that event expire without score or penalty,
