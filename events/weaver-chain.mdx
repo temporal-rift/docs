@@ -5,7 +5,8 @@ description: "Events tracking the Weavers faction chain mechanic"
 
 Events produced by `timeline-service` tracking the Weavers faction's chain mechanic. A `THREAD` play names one
 not-yet-resolved current-era outcome as the chain's newest link. That link is **pending** until it resolves: it
-either confirms, clears, or — if annihilated without Tapestry protection — enters paradox resolution.
+confirms only if its outcome is drawn as the event's winner, otherwise it clears — and if annihilated without
+Tapestry protection it first enters paradox resolution, where the chain itself is at stake.
 
 ## ChainLinkThreaded 🌐
 
@@ -57,9 +58,8 @@ submission itself was missing a coordinate. Chain length does not change and the
 }
 ```
 
-Emitted when a chain's pending link confirms — its named outcome resolved as predicted, an armed Tapestry
-protection absorbed an Annihilate against it, or its chain-conflict paradox resolved in the Weaver's favor.
-`eraNumber` is the confirmed link's era, in which the Weaver scores +2 for the link. Reweave never emits this event.
+Emitted when a chain's pending link confirms because its named outcome was drawn as its event's winner —
+`linkedOutcomeId` is always that winner. `eraNumber` is the confirmed link's era, in which the Weaver scores +2 for the link. Reweave never emits this event.
 
 ## ChainLinkInvalidated 🌐
 
@@ -75,8 +75,10 @@ protection absorbed an Annihilate against it, or its chain-conflict paradox reso
 }
 ```
 
-Emitted when a chain's pending link resolves to a different, non-annihilated outcome than predicted, its event
-Stalls, or the game ends with it unconfirmed. The pending link clears without penalty — chain length is unchanged.
+Emitted when a chain's pending link does not confirm: another outcome wins its event (including after a cleared
+chain-conflict paradox, since an annihilated outcome can't win), Tapestry absorbs an Annihilate against it, its event
+Stalls or cascades, or the game ends with it unconfirmed. The pending link clears without penalty — chain length is
+unchanged.
 The Weaver may `THREAD` again only while the chain and game remain active.
 
 ## ChainCompleted 🌐
@@ -146,9 +148,10 @@ current era. Delivered only to the acting Weaver.
 }
 ```
 
-Private confirmation that armed Tapestry protection absorbed an Annihilate against the chain's pending link, which
-confirms anyway (`ChainLinkAdded`) instead of raising a chain-conflict paradox. Delivered only to the acting
-Weaver.
+Private confirmation that armed Tapestry protection absorbed an Annihilate against the chain's pending link: no
+chain-conflict paradox is raised and the chain can't break, but the annihilated outcome can't win, so the link
+clears without penalty (`ChainLinkInvalidated` follows) and the Weaver may `THREAD` again later that era. Delivered
+only to the acting Weaver.
 
 ## ChainBroken 🌐
 
