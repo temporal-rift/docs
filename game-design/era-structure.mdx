@@ -30,8 +30,8 @@ flowchart TD
 | **Reveal** | 3 future events drawn and shown with their 3 possible outcomes; each player receives a private 7-card deal and selects 5 before Round 1 |
 | **Declaration window** | Before Round 1, an Activist may use Rally or eligible Momentum to publicly declare one current-era event/outcome; Momentum applies its one-time +10 percentage-point bonus here |
 | **Action Round 1** | Players secretly submit 1 card or 1 special. Limited info — act on instinct |
-| **Action Round 2** | Category and type of Round 1 actions visible. An Expose target's qualifying Round-1 signature is revealed at close. |
-| **Action Round 3** | Partial probability shifts from Round 2 visible. A successful Expose announces only changed behaviour, not the response signature. |
+| **Action Round 2** | Category and family of Round 1 actions visible. A live Expose of an actual Round-1 Push, Suppress, or Swing reveals its signature and earns +2 at close. |
+| **Action Round 3** | Partial probability shifts from Round 2 visible. A different qualifying Expose response produces a filtered behavior-change notice without changing the reveal score. |
 | **Paradox Check** | System detects paradoxes. None: skip to Outcome. Found: open Paradox Resolution. |
 | **Paradox Resolution** | Stabilize and Detonate are dealt now — they are never in the action hand. All players play one card (no specials). Paradox resolves or cascades. |
 | **Outcome** | Final probabilities determine winning outcomes. Scores updated per faction rules. |
@@ -60,7 +60,8 @@ Timer is player-count-dependent by configuration — never hard-code it:
 | Category + family of each action | ✔ | ✔ | ✔ |
 | Probability band (LOW/MED/HIGH) | — | ✔ | ✔ |
 | Exact probability (Scan only) | — | — | ✔ (to Scan player) |
-| Which player played which | — | — | — (never public) |
+| Which player played each public category and family | ✔ | ✔ | ✔ |
+| Exact card type or target of a round action | — | — | — (never in round summaries) |
 | Activist declaration of record | ✔ | ✔ | ✔ |
 | Exposed Round-1 signature | — | ✔ | ✔ |
 | Expose Round-3 response signature | — | — | — (never public) |
