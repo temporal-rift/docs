@@ -27,12 +27,16 @@ description: "Events emitted at era end and game conclusion"
 }
 ```
 
+One event per winner. `winType` is `SCORE_THRESHOLD` or `FACTION_OBJECTIVE` for a normal victory at the end of an
+era, or `LAST_PLAYER_STANDING` when every other player has abandoned; then `finalScore` is that player's current
+total. A player who abandoned never wins.
+
 ## TimelineCollapsed 🌐
 
 Emitted when the 3rd affected event cascades. Multiple persistent paradox findings on one event count once.
 
 `winners` are every player with the highest total score after that era's scoring, including cascade penalties;
-ties share the win. Faction and declarations do not affect the result.
+ties share the win. Faction and declarations do not affect the result. Players who abandoned are always `losers`.
 
 ```json
 {
@@ -60,14 +64,15 @@ Emitted when 5 eras complete with no winner.
 
 `winners` are the Prophets with enough written outcomes resolved as written and the Weavers with a long enough
 unbroken chain. `activeChainLength` appears only for a qualifying Weaver and gives that chain's confirmed links. If
-nobody qualifies, `winners` are every player with the highest total score.
+nobody qualifies, `winners` are every player with the highest total score. Players who abandoned never qualify and
+are always `losers`.
 
 ## GameEnded 🌐
 
 ```json
 {
   "gameId": "uuid",
-  "endReason": "SCORE_THRESHOLD",
+  "endReason": "WIN_CONDITION_MET",
   "finalScores": [
     { "playerId": "uuid", "faction": "WEAVERS", "score": 20 },
     { "playerId": "uuid", "faction": "ERASERS", "score": 14 }
@@ -75,7 +80,8 @@ nobody qualifies, `winners` are every player with the highest total score.
 }
 ```
 
-`endReason`: `SCORE_THRESHOLD`, `TIMELINE_COLLAPSED`, or `TIMELINE_STABILIZED`
+`endReason`: `WIN_CONDITION_MET` (each winner's `WinConditionMet.winType` says how), `TIMELINE_COLLAPSED`, or
+`TIMELINE_STABILIZED`
 
 `finalScores` is the complete game-end score snapshot: the totals after the last scored era. Finalizing the game
 awards no further score.

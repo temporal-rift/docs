@@ -84,3 +84,13 @@ survived:
 Both thresholds are configurable and sit below the matching faction objective, since completing the objective
 already wins the game. A Prophet and a Weaver who both qualify share the win. If nobody qualifies, including games
 without a Prophet or a Weaver, the highest total score wins, shared on ties.
+
+## Leaving the game
+
+A player who disconnects and does not reconnect before the grace period ends abandons the game. Abandoning forfeits:
+the player is skipped for every remaining round and can no longer win. That includes normal victory with points or
+objective progress earned before leaving, and both special endings, where they always lose and are left out of the
+Prophet, Weaver, and highest-score checks. Their score still appears in the final scores.
+
+A player who is disconnected but still inside the grace period has not abandoned. When everyone else has abandoned,
+the game ends immediately and the last player standing wins.

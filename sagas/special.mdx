@@ -65,9 +65,9 @@ flowchart TD
   B --> C[Start grace timer — default 30s, configurable via GameRulesPort]
   C --> D{Player reconnects?}
   D -->|Yes — within grace period| E[Mark player reconnected]
-  D -->|No — timer expires| F[Mark player ABANDONED — emit PlayerAbandoned 🌐 — auto-skip remaining rounds]
-  F --> G{Last remaining player?}
-  G -->|Yes| H[Trigger EndGameSaga — GameEndedAbnormally]
+  D -->|No — timer expires| F[Mark player ABANDONED — emit PlayerAbandoned 🌐 — auto-skip remaining rounds, forfeit]
+  F --> G{Game in progress and one non-abandoned player left?}
+  G -->|Yes| H[That player wins — WinConditionMet 🌐 LAST_PLAYER_STANDING — EndGameSaga]
   G -->|No| I[Continue game with remaining players]
 ```
 
@@ -81,5 +81,6 @@ whether this saga's grace period is still open.
 | Failure | Compensation |
 |---|---|
 | Player reconnects after `ABANDONED` | Reject reconnection — game already adapted |
-| All players disconnect simultaneously | One `PlayerReconnectSaga` per player runs independently; last survivor triggers `EndGameSaga` if also abandoned |
+| All players disconnect simultaneously | One `PlayerReconnectSaga` per player runs independently; the abandonment that leaves one player standing ends the game with that player as the winner |
+| Grace expires after the game ended | The player is marked abandoned; no ending is published |
 | Timer service fails | Fallback: force abandonment after 2× grace period |
