@@ -3,11 +3,8 @@ title: "Resolution Events"
 description: "Events exchanged during outcome and paradox resolution"
 ---
 
-Resolution lifecycle events are produced by `timeline-service`, with three exceptions: `ParadoxResolutionCardPlayed`
-is the private player-submission fact produced by `game-service` on `game.events` and consumed by timeline-service,
-`ScoresUpdated` (documented at the end of this page) is published by `game-service`'s scoring module on
-`game.events`, not by timeline-service, and `BandedProbabilityPublished` below is `game-service`'s preview on
-`game.events` — its timeline-owned correction, `AdjustedBandsPublished`, is a normal timeline-service publication.
+Resolution lifecycle events are produced by `timeline-service`. Player paradox submissions and scoring updates
+are published by `game-service` on `game.events`. Probability bands are published only by timeline-service.
 
 ## ResolutionStarted 🌐
 
@@ -59,29 +56,6 @@ Scan is live for the rest of the era: a reveal is published at the close of the 
 subsequent round close, so the values stay current while other players wait for bands. `roundNumber` stamps when the
 values were observed. Scans do not carry into the next era.
 
-## BandedProbabilityPublished 🌐
-
-```json
-{
-  "gameId": "uuid",
-  "eraNumber": 1,
-  "eventStates": [{
-    "eventId": "uuid",
-    "outcomes": [
-      { "outcomeId": "uuid", "band": "HIGH" },
-      { "outcomeId": "uuid", "band": "MEDIUM" },
-      { "outcomeId": "uuid", "band": "LOW" }
-    ]
-  }]
-}
-```
-
-Published by `game-service` to `game.events` immediately after Action Round 2 closes — a fast, deliberately
-approximate preview. Bands (`LOW` 0–30%, `MEDIUM` 31–60%, `HIGH` 61–90%) are derived from cumulative probability
-state of Rounds 1 and 2 only. Exact values remain private to players who used `SCAN`, and reach them through
-`ProbabilityStateRevealed`. Superseded for the game and era by `AdjustedBandsPublished` once resolution replay
-completes.
-
 ## AdjustedBandsPublished 🌐
 
 ```json
@@ -99,12 +73,14 @@ completes.
 }
 ```
 
-Published by `timeline-service` to `timeline.events` once Round 2's priority-ordered replay completes — the same
-band vocabulary, recomputed from the fully-applied replayed state, so assignments may differ from the preview.
-Supersedes the `BandedProbabilityPublished` preview for that game and era; clients replace (not duplicate) the
-preview on receipt. The preview and the correction travel on different topics (`game.events` vs `timeline.events`)
-with no cross-topic ordering guarantee, so a client that has already applied the correction for a game and era
-ignores a late-arriving preview for that game and era.
+Published exactly once per era by `timeline-service` on `timeline.events` after Round 2's full replay. This is the
+only public band publication: it includes resolved modifiers and carried weights. `LOW` covers 0–30%, `MEDIUM`
+31–60%, and `HIGH` 61–90%, using configured thresholds. Exact values remain private to Scan-entitled players.
+
+Game-service records this fact for the current era before requesting Action Round 3. If it is delayed, Round 3
+and its timer wait. Readiness survives restart and either arrival order relative to the Round 2 close listener;
+duplicate or stale-era facts cannot open another round. The name describes probabilities adjusted by resolved
+effects; no preview precedes it.
 
 ## ParadoxDetected 🌐
 
