@@ -237,6 +237,10 @@ Once `phase` is `GAME_ENDED`, `result` carries the authoritative terminal facts:
 `finalScores`, and the `revealBoundary` declaring what is now public to participants
 (`FACTIONS_AND_SCORES_PUBLIC`). Per-round private hands and intel stay caller-scoped even after the game ends.
 
+`endReason` is how the game ended: `WIN_CONDITION_MET`, `TIMELINE_COLLAPSED`, `TIMELINE_STABILIZED`, or, for an
+abnormal ending with no winners, `DECK_EXHAUSTED` or `RESOLUTION_FAILED`. Every winner of a `WIN_CONDITION_MET`
+ending carries a `winType` saying how they won: `SCORE_THRESHOLD`, `FACTION_OBJECTIVE`, or `LAST_PLAYER_STANDING`.
+
 ## Get full game history
 
 ```http
