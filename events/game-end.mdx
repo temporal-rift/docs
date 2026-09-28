@@ -31,16 +31,15 @@ description: "Events emitted at era end and game conclusion"
 
 Emitted when the 3rd affected event cascades. Multiple persistent paradox findings on one event count once.
 
-For Activists, the collapsing-event predicate is separate from normal scoring: a player is a winner only when that
-player's current-era declaration targets the event whose `EraResolutionCompleted` reveal-order cascade raised the
-game-wide count from two to three. The declared outcome is not evaluated.
+`winners` are every player with the highest total score after that era's scoring, including cascade penalties;
+ties share the win. Faction and declarations do not affect the result.
 
 ```json
 {
   "gameId": "uuid",
   "eraNumber": 3,
-  "winners": [{ "playerId": "uuid", "faction": "ACTIVISTS" }],
-  "losers":  [{ "playerId": "uuid", "faction": "ERASERS" }]
+  "winners": [{ "playerId": "uuid", "faction": "ERASERS" }],
+  "losers":  [{ "playerId": "uuid", "faction": "ACTIVISTS" }]
 }
 ```
 
@@ -53,11 +52,15 @@ Emitted when 5 eras complete with no winner.
   "gameId": "uuid",
   "winners": [
     { "playerId": "uuid", "faction": "PROPHETS" },
-    { "playerId": "uuid", "faction": "WEAVERS", "activeChainLength": 3 }
+    { "playerId": "uuid", "faction": "WEAVERS", "activeChainLength": 2 }
   ],
   "losers": [{ "playerId": "uuid", "faction": "ERASERS" }]
 }
 ```
+
+`winners` are the Prophets with enough written outcomes resolved as written and the Weavers with a long enough
+unbroken chain. `activeChainLength` appears only for a qualifying Weaver and gives that chain's confirmed links. If
+nobody qualifies, `winners` are every player with the highest total score.
 
 ## GameEnded 🌐
 
