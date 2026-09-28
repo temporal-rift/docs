@@ -80,8 +80,8 @@ are always `losers`.
 }
 ```
 
-`endReason`: `WIN_CONDITION_MET` (each winner's `WinConditionMet.winType` says how), `TIMELINE_COLLAPSED`, or
-`TIMELINE_STABILIZED`
+`endReason`: `WIN_CONDITION_MET` (each winner's `WinConditionMet.winType` says how), `TIMELINE_COLLAPSED`,
+`TIMELINE_STABILIZED`, or, for a game that ended abnormally with no winners, `DECK_EXHAUSTED` or `RESOLUTION_FAILED`
 
 `finalScores` is the complete game-end score snapshot: the totals after the last scored era. Finalizing the game
 awards no further score.

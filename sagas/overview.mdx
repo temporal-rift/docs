@@ -28,7 +28,7 @@ State is persisted in the same transaction as the aggregate mutation or event th
 | `ActionRoundSaga` | game-service / action | Round N opened | Timer vs all-submitted race condition |
 | `ResolutionSaga` | timeline-service | `ResolutionStarted` | Action ordering, paradox branching |
 | `ParadoxResolutionSaga` | timeline-service | `ParadoxDetected` | Nested within ResolutionSaga |
-| `EndGameSaga` | game-service / session | Win / collapse / stabilize | Resource cleanup |
+| `EndGameSaga` | game-service / session | Win / collapse / stabilize / abnormal end | Resource cleanup |
 | [`WeaverChainSaga`](/sagas/special#weaverchainsaga) | timeline-service | `THREAD` special action | Only saga spanning multiple eras |
 | `PlayerReconnectSaga` | game-service / session | WebSocket disconnect | Grace timer, state restoration |
 
