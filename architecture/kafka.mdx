@@ -10,7 +10,7 @@ description: "Topics, partitioning strategy, and consumer idempotency"
 | `game.events` | game-service | timeline-service, read-service | `gameId` |
 | `timeline.events` | timeline-service | game-service, read-service | `gameId` |
 | `game.commands` | *(no in-workspace producer)* | game-service (`PlayerReconnectKafkaConsumer`) | `lobbyId` or `gameId` |
-| `game.events.dlq` | read-service (dead-letter target for its `game.events` consumers after retries are exhausted); `timeline-service` migration pending (temporal-rift/timeline-service#99) | — | `gameId` |
+| `game.events.dlq` | timeline-service, read-service (dead-letter target for their `game.events` consumers after retries are exhausted) | — | `gameId` |
 | `timeline.events.dlq` | game-service, read-service (dead-letter target for their `timeline.events` consumers after retries are exhausted) | — | `gameId` |
 | `game.commands.dlq` | game-service (dead-letter target for `PlayerReconnectKafkaConsumer` after retries are exhausted) | — | `lobbyId` or `gameId` |
 
@@ -21,12 +21,25 @@ Compose job, which runs `provision-kafka-topics.sh`: 7 days for `game.events`/`t
 `game.commands`, and 30 days for every `.dlq` topic — long enough to investigate a parked poison message.
 
 <Note>
-The transactional outbox is **not** a Kafka topic — it is the Spring Modulith `event_publication` table, read by a relay that publishes directly to the domain topics above. See [Outbox Pattern](/architecture/outbox).
+The transactional outbox is a service-owned database table, read by a relay that publishes directly to the domain topics above. The Modulith services use `event_publication`; timeline-service uses its own outbox. See [Outbox Pattern](/architecture/outbox).
 </Note>
 
 ## Partitioned by gameId
 
 The partition key is always `gameId`. This guarantees all events for a single game arrive at the same partition **in order** — required for correct event sourcing replay in `timeline-service` and correct read model projection in `read-service`.
+
+Processing order is guaranteed within a consumer group. Independent groups can progress at different speeds, so
+records that mutate causally dependent state must share one logical consumer.
+
+Timeline-service consumes era initialization, event drafting, action submissions, round closure, resolution, and
+lifecycle cleanup through `timeline-service.futureevent.game-events`. Its listener dispatches synchronously to
+focused handlers, each committing its record transaction before the next record is processed. A slow
+`EventsDrawn` transaction therefore delays the following Stall and round closure instead of making replay discard
+their target as unknown. The independent faction-membership projection retains its own group.
+
+Logical idempotency identities are retained when consumer groups change. Replaying retained records under the new
+group suppresses already committed effects through the existing `(event_id, consumer)` claims. Deploy the lifecycle
+listener and handlers together; do not run the previous lifecycle listeners alongside the new group.
 
 ## Design decisions
 
@@ -44,9 +57,10 @@ The partition key is always `gameId`. This guarantees all events for a single ga
 
 Every Kafka consumer must:
 
-1. Atomically claim the message's `eventId` header in `processed_events` before business work
-2. Skip the message when the claim already exists for the same logical consumer
-3. Handle unknown `version` values by **logging and skipping** — never crash or block
+1. Filter unsupported event types and envelope versions before claiming their identities
+2. Atomically claim a supported message's `eventId` header in `processed_events` before business work
+3. Skip the message when the claim already exists for the same logical consumer
+4. Log and skip unknown versions, leaving their identities unclaimed for a compatible replay
 
 Use a service-local `processed_events` table keyed by `(event_id, consumer)`. The claim must be an insert-first
 operation such as `INSERT ... ON CONFLICT DO NOTHING`, not an `exists` check followed by a save. If the consumer mutates
