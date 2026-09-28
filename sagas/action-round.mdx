@@ -4,7 +4,8 @@ description: "How the timer and all-submitted paths converge to a single ActionR
 ---
 
 
-**Trigger:** previous `ActionRoundClosed`, or the declaration window closing (round 1)
+**Trigger:** session requests the round after declaration closure (round 1), previous round closure (round 2),
+or both Round 2 closure and authoritative band publication (round 3)
 **Service:** `game-service` / action module
 
 ## Steps
@@ -61,5 +62,5 @@ Never rely on Kafka ordering alone to solve this race. The race exists before ev
 | Failure | Compensation |
 |---|---|
 | Player submits after round closed | Reject silently, emit `LateSubmissionRejected` (private) |
-| Timer service fails | Fallback close after 2× timeout, skip all remaining players |
+| In-memory timer lost | Database timer sweep closes the round at expiry, skipping remaining players |
 | Player submits duplicate action | Reject, return error to player |

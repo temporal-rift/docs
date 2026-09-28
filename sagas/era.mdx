@@ -17,7 +17,8 @@ flowchart TD
   D --> DW[Declaration window — one timed phase, Rally/Momentum, then Round 1]
   DW --> E[ActionRoundSaga round 1 — wait for ActionRoundClosed]
   E --> F[ActionRoundSaga round 2 — wait for ActionRoundClosed]
-  F --> G[ActionRoundSaga round 3 — wait for ActionRoundClosed]
+  F --> BP[Wait for authoritative AdjustedBandsPublished for this era]
+  BP --> G[ActionRoundSaga round 3 — wait for ActionRoundClosed]
   G --> H[ResolutionSaga — wait for ScoresUpdated]
   H --> I{Win condition?}
   I -->|Winner found| J[Trigger EndGameSaga]
@@ -35,6 +36,11 @@ The last terminal selection opens one timed declaration window for the era; the 
 keep. An Activist may record one Rally or eligible Momentum declaration while it is open, consuming their Round-1
 special-action slot. When the window expires, it closes and Action Round 1 starts exactly once, with no declaration
 required.
+
+Between Round 2 and Round 3, the saga waits for timeline's authoritative band publication. Readiness is persisted
+for the current era under the saga lock, so an early band signal survives until the round-close listener runs.
+Round 3 and its timer open only after both facts exist. Late bands keep the phase closed; restart, duplicates,
+and stale-era records cannot bypass the barrier.
 
 On a continuing game, session drains the reveal-ordered carry-over set into `EraStarted.carryOverEventIds`. It counts
 only `CASCADED` terminal entries toward timeline collapse, but retains both `CASCADED` and `STALLED` entries. The
