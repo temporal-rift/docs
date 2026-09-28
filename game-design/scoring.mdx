@@ -63,14 +63,24 @@ penalty for it.
 
 ## Win conditions
 
-**Normal:** first player to reach **20 points** wins immediately.
+**Normal:** at the end of each era, every player with **20 points** or a completed faction objective wins; several
+players can share the victory.
 
 ## Special endings
 
-| Faction | Timeline Collapse (3 paradoxes) | Timeline Stabilization (5 eras, no winner) |
-|---|---|---|
-| ⚡ Erasers | LOSE | LOSE |
-| 📜 Prophets | LOSE — need stability | WIN |
-| 🔄 Revisionists | LOSE | LOSE |
-| 🧵 Weavers | LOSE — need stability | WIN if active chain of 3+ |
-| 📣 Activists | WIN only if their current-era declaration targets the collapsing event; its outcome is irrelevant | LOSE |
+**Timeline Collapse (3 cascaded events).** Every player with the highest total score after that era's scoring,
+including cascade penalties, wins. Ties share the win. Faction does not matter, so the leader has a reason to let
+the timeline collapse and everyone behind has a reason to stabilize.
+
+**Timeline Stabilization (5 eras, no winner).** The factions that need a stable timeline win if what they built
+survived:
+
+| Faction | Timeline Stabilization |
+|---|---|
+| 📜 Prophets | WIN with at least 3 written outcomes resolved as written |
+| 🧵 Weavers | WIN with an unbroken chain of at least 2 confirmed links |
+| ⚡ Erasers, 🔄 Revisionists, 📣 Activists | No faction claim |
+
+Both thresholds are configurable and sit below the matching faction objective, since completing the objective
+already wins the game. A Prophet and a Weaver who both qualify share the win. If nobody qualifies, including games
+without a Prophet or a Weaver, the highest total score wins, shared on ties.
