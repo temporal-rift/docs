@@ -44,5 +44,5 @@ following `EventsDrawn` labels each entry `FRESH`, `CASCADED`, or `STALLED`.
 
 | Failure | Compensation |
 |---|---|
-| Deck runs out | Emit `GameEndedAbnormally` |
-| ResolutionSaga fails | Emit `EraFailed`, trigger `GameEndedAbnormally` |
+| Deck runs out | End the game, emit `GameEndedAbnormally`; `EndGameSaga` publishes `GameEnded` (`DECK_EXHAUSTED`) |
+| ResolutionSaga fails | Emit `EraFailed`, end the game, emit `GameEndedAbnormally`; `EndGameSaga` publishes `GameEnded` (`RESOLUTION_FAILED`) |
