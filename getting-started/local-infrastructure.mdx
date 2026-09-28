@@ -33,12 +33,30 @@ containers become healthy only when their `/actuator/health` endpoint is healthy
 | VictoriaLogs | 9428 | Centralized logs UI/query — see below |
 | PostgreSQL | 5432 | |
 | Kafka | 9092 | |
+| Local OIDC issuer | 9000 | Interactive test issuer at `http://localhost:9000/default`, accepts any username |
 
 <Tip>
 Kafka UI at [http://localhost:8083](http://localhost:8083) lets you inspect topics and consumer groups. Zipkin at
-[http://localhost:9411](http://localhost:9411) shows distributed traces. Supply a reachable `JWT_ISSUER_URI` before
-calling authenticated game-service or read-service endpoints.
+[http://localhost:9411](http://localhost:9411) shows distributed traces.
 </Tip>
+
+## Signing in locally
+
+The stack runs an interactive OIDC test issuer on port `9000`. Tokens carry the issuer the browser sees,
+`http://localhost:9000/default`, and every service accepts only that issuer while fetching its signing keys over the
+Compose network. The isolated playtest deployment does not run it and requires its own external issuer.
+
+## Running the game client
+
+With the stack up, run `npm run dev` in a sibling `game-client` checkout after copying its `public/config.js.example`
+to `public/config.js`. The client's dev server is its single API origin and forwards each path to the owning
+service, matching the deployed edge:
+
+| Path | Service |
+|---|---|
+| `/api/v1/games/{id}/state`, `/api/v1/games/{id}/history`, `/ws/` | read-service |
+| `/api/v1/games/{id}/chains` | timeline-service |
+| `/actuator/health` and every other `/api/` path | game-service |
 
 ## Centralized logs with VictoriaLogs
 
