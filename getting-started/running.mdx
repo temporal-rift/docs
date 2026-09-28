@@ -17,11 +17,12 @@ individually outside Docker Compose with the `dev` profile.
 | `SPRING_DATASOURCE_PASSWORD` | `temporal_rift` | ✔ |
 | `KAFKA_BOOTSTRAP_SERVERS` | `localhost:9092` | ✔ |
 | `KAFKA_SECURITY_PROTOCOL` | `PLAINTEXT` | ✔ |
-| `JWT_ISSUER_URI` | `http://localhost:9000` for `game-service`; **not defaulted** for `read-service` — must be supplied even in dev | ✔ (game-service, read-service only) |
+| `JWT_ISSUER_URI` | `http://localhost:9000/default` for `game-service`; **not defaulted** for `timeline-service` or `read-service` — must be supplied even in dev | ✔ |
 | `PORT` | `8080` | — |
 
-`timeline-service` has no REST surface and no OAuth2 resource server, so it needs neither `JWT_ISSUER_URI` nor any
-auth configuration.
+All three services are OAuth2 resource servers. `http://localhost:9000/default` is the interactive test issuer the
+local Compose stack runs (see [Local Infrastructure](/getting-started/local-infrastructure)); start at least that
+container before calling authenticated endpoints.
 
 <Warning>
 All three services default to `PORT` `8080`. Docker Compose maps them to distinct host ports (8080/8081/8082 — see
@@ -33,14 +34,15 @@ to bind.
 ## Start with dev defaults
 
 The `dev` profile fills in database and Kafka connection details for all three services — for `game-service` it
-also fills in `JWT_ISSUER_URI`. `read-service` still requires `JWT_ISSUER_URI` to be set even under `dev`.
+also fills in `JWT_ISSUER_URI`. `timeline-service` and `read-service` still require `JWT_ISSUER_URI` to be set even
+under `dev`.
 
 ```bash
 mvn -f game-service/pom.xml spring-boot:run -Dspring-boot.run.profiles=dev
 
-PORT=8081 mvn -f timeline-service/pom.xml spring-boot:run -Dspring-boot.run.profiles=dev
+PORT=8081 JWT_ISSUER_URI=http://localhost:9000/default mvn -f timeline-service/pom.xml spring-boot:run -Dspring-boot.run.profiles=dev
 
-PORT=8082 JWT_ISSUER_URI=http://localhost:9000 mvn -f read-service/pom.xml spring-boot:run -Dspring-boot.run.profiles=dev
+PORT=8082 JWT_ISSUER_URI=http://localhost:9000/default mvn -f read-service/pom.xml spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
 ## Artifact publication order
