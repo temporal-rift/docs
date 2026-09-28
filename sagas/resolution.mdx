@@ -45,6 +45,13 @@ findings once; it does not produce `STALLED`.
 
 Effects are applied in this fixed order within each round. Submission time never affects the result:
 
+Before applying any tier, replay ignores actions targeting an event stalled in an earlier round of the same era.
+Push, Suppress, Swing, Collide, Seal, Annihilate, Mimic copies, and Cascade intents cannot affect that event;
+ignored actions produce no applied-effect confirmation or Weaver chain change. Stall and other actions submitted
+in the same round still resolve together in tier order. A Stall cancelled by Nullify leaves later rounds eligible.
+Scan remains accepted and reveals only active targets, including when its list mixes active and stalled events.
+The lock clears when the event returns in the next era.
+
 | Priority | Card / Effect | Reason |
 |---|---|---|
 | 1 | `NULLIFY` | Cancels each named player's eligible action (one player at grade I, two at grade II) before it has any effect |
