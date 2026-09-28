@@ -21,8 +21,8 @@ Tapestry protection it first enters paradox resolution, where the chain itself i
 }
 ```
 
-Emitted when an accepted `THREAD` creates a pending link naming a not-yet-resolved current-era outcome. The
-favorable probability push applies immediately. The link does not count toward `chainLength` until it confirms.
+Emitted when its round closes and an accepted `THREAD` creates a pending link naming a not-yet-resolved current-era
+outcome. The favorable probability push resolves with that round's other shifts. The link does not count toward `chainLength` until it confirms.
 Only one pending link can be open per chain at a time.
 
 ## ThreadRejected 🔒

@@ -56,11 +56,13 @@ The lock clears when the event returns in the next era.
 |---|---|---|
 | 1 | `NULLIFY` | Cancels each named player's eligible action (one player at grade I, two at grade II) before it has any effect |
 | 2 | `SEAL` | Locks outcomes before other effects can modify them |
-| 3 | `ANNIHILATE` | Removes outcomes before probability shifts |
-| 4 | `CORRUPT` | Inverts other cards before they apply |
-| 5 | `MIMIC` | Picks the strongest inward transfer toward the named outcome (a Push targeting it or a Swing destined for it; largest base magnitude, then lowest player id — never a Suppress or a Swing away from it) and adds an independent copy at its base magnitude to the simultaneous tier |
-| 6 | `AMPLIFY` | Multiplies the named player's eligible card effect |
-| 7 | All remaining cards, including `COLLIDE`, plus `MIMIC` copies | Simultaneously |
+| 3 | `TAPESTRY` | Arms chain protection before a same-round Annihilate can reach the pending link |
+| 4 | `ANNIHILATE` | Removes outcomes before probability shifts |
+| 5 | `REWEAVE`, then `THREAD` | Judged against the post-Annihilate outcomes: a Reweave escapes a same-round Annihilate, and a Thread naming an annihilated outcome is rejected |
+| 6 | `CORRUPT` | Inverts other cards before they apply |
+| 7 | `MIMIC` | Picks the strongest inward transfer toward the named outcome (a Push targeting it or a Swing destined for it; largest base magnitude, then lowest player id — never a Suppress or a Swing away from it) and adds an independent copy at its base magnitude to the simultaneous tier |
+| 8 | `AMPLIFY` | Multiplies the named player's eligible card effect |
+| 9 | All remaining cards, including `COLLIDE`, plus `MIMIC` copies and each accepted `THREAD`'s favorable shift | Simultaneously |
 
 `NULLIFY`, `REDIRECT` and `AMPLIFY` each target named players, never an action's submission position. Each named
 target is independently a clean no-op when that player skipped, has no eligible action, or was already cancelled, so
@@ -68,7 +70,8 @@ a grade II `NULLIFY` still cancels its other target. All `NULLIFY` cancellations
 simultaneously before any later tier.
 
 An Activist's Rally or Momentum declaration is that player's Round 1 action. Momentum's +10 percentage-point bonus
-lands on the declared outcome before any Round 1 tier, so Round 1 actions see the boosted probabilities; a Round 1
+lands on the declared outcome before any Round 1 tier, so Round 1 actions (including a Thread's shift) see the boosted
+probabilities; a Round 1
 `NULLIFY` naming the declarer cancels it, and the bonus never applies.
 
 Redirect applies to a live Push, Suppress, or Swing without carrying an outcome coordinate. After Corrupt establishes
@@ -77,7 +80,7 @@ skipping the current destination, annihilated outcomes, and a Swing's source. It
 lets Rally evaluate the redirected destination. Mimic's copy uses the submitted direct transfer; it never
 inherits Redirect.
 
-In tier 7, each card on an event is evaluated alone against that event's probabilities at the start of the tier,
+In tier 9, each effect on an event is evaluated alone against that event's probabilities at the start of the tier,
 using the ordinary single-card rules (cap, redistribution, sealed outcomes, Collide's midpoint). Their changes are added
 together, and the sum is fitted once into the configured floor and ceiling. Sealed outcomes stay fixed, the total stays
 100, and any overflow is shared equally by the outcomes that still have room. A single card resolves exactly as it

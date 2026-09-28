@@ -6,20 +6,24 @@ description: "WeaverChainSaga and PlayerReconnectSaga"
 
 ## WeaverChainSaga
 
-**Trigger:** `SpecialActionPlayed` where `specialAction = THREAD`  
+**Trigger:** `SpecialActionPlayed` where `specialAction = THREAD`, judged when its round closes  
 **Service:** `timeline-service`
 
 The only saga spanning multiple eras — remains open across era boundaries until completed, broken, or the game
 ends. A `THREAD` play names one not-yet-resolved current-era outcome as the chain's newest link. That link is
 **pending** until it resolves — see [Weaver Chain Events](/events/weaver-chain) for the full event set.
 
+`THREAD`, `TAPESTRY`, and `REWEAVE` resolve with the rest of their round (see the
+[card effect application order](/sagas/resolution#card-effect-application-order)), so a Nullify naming the Weaver in
+that round cancels them outright.
+
 ### Steps
 
 ```mermaid
 flowchart TD
-  A[THREAD special played] --> B{Valid current-era, not-yet-resolved coordinate; no pending link already open?}
+  A[THREAD special played — judged at round close] --> B{Valid current-era, not-yet-resolved coordinate; no pending link already open?}
   B -->|Invalid| C[reject submission — emit ThreadRejected]
-  B -->|Valid| D[emit ChainLinkThreaded — pending link created, favorable push applied]
+  B -->|Valid| D[emit ChainLinkThreaded — pending link created, favorable push joins the round's simultaneous tier]
   D --> E{Pending link resolves}
   E -->|Predicted outcome drawn as winner| F[emit ChainLinkAdded — chainLength++]
   E -->|Another outcome wins| G[emit ChainLinkInvalidated — no penalty]
