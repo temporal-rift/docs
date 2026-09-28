@@ -82,5 +82,5 @@ whether this saga's grace period is still open.
 |---|---|
 | Player reconnects after `ABANDONED` | Reject reconnection — game already adapted |
 | All players disconnect simultaneously | One `PlayerReconnectSaga` per player runs independently; the abandonment that leaves one player standing ends the game with that player as the winner |
-| Grace expires after the game ended | The player is marked abandoned; no ending is published |
+| Grace expires after the game ended | Nothing happens — the player is not marked abandoned and nothing is published |
 | Timer service fails | Fallback: force abandonment after 2× grace period |
