@@ -106,7 +106,7 @@ Emitted when a player's WebSocket disconnects during an active game. Notifies al
 { "gameId": "uuid", "playerId": "uuid" }
 ```
 
-Emitted when the reconnect grace timer expires. The player is auto-skipped for remaining rounds. If this was the last remaining player, `EndGameSaga` is triggered.
+Emitted when the reconnect grace timer expires. Abandoning is final and forfeits: the player is auto-skipped for remaining rounds and can no longer win. If only one player who has not abandoned remains, that player wins immediately (`WinConditionMet` with `winType` `LAST_PLAYER_STANDING`).
 
 ## EraStarted 🌐
 
