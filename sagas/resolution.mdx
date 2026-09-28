@@ -47,7 +47,7 @@ Effects are applied in this fixed order within each round. Submission time never
 
 | Priority | Card / Effect | Reason |
 |---|---|---|
-| 1 | `NULLIFY` | Cancels the named player's eligible action before it has any effect |
+| 1 | `NULLIFY` | Cancels each named player's eligible action (one player at grade I, two at grade II) before it has any effect |
 | 2 | `SEAL` | Locks outcomes before other effects can modify them |
 | 3 | `ANNIHILATE` | Removes outcomes before probability shifts |
 | 4 | `CORRUPT` | Inverts other cards before they apply |
@@ -55,8 +55,10 @@ Effects are applied in this fixed order within each round. Submission time never
 | 6 | `AMPLIFY` | Multiplies the named player's eligible card effect |
 | 7 | All remaining cards, including `COLLIDE`, plus `MIMIC` copies | Simultaneously |
 
-`NULLIFY`, `REDIRECT` and `AMPLIFY` each target a named player, never an action's submission position. Each is a
-clean no-op when its target skipped, has no eligible action, or was already cancelled.
+`NULLIFY`, `REDIRECT` and `AMPLIFY` each target named players, never an action's submission position. Each named
+target is independently a clean no-op when that player skipped, has no eligible action, or was already cancelled, so
+a grade II `NULLIFY` still cancels its other target. All `NULLIFY` cancellations, including mutual ones, are computed
+simultaneously before any later tier.
 
 Redirect applies to a live Push, Suppress, or Swing without carrying an outcome coordinate. After Corrupt establishes
 the shift's effective destination, Redirect advances through the event's displayed outcome order, wrapping around and
