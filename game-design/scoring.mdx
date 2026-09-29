@@ -18,7 +18,7 @@ the exact delta applied to each entry.
 | | Fulfillment declared and succeeds | +8 |
 | | Event resolves differently than written | −2 |
 | 🔄 Revisionists | Secret preferred outcome wins this era | +4 |
-| | Faction still unidentified at final-era scoring (once per game) | +6 |
+| | Mimic never traced by another player (final era, once per game) | +6 |
 | | Successful Mimic contributed to outcome winning | +2 |
 | 🧵 Weavers | Event added to an active chain | +2 |
 | | Completed chain of 3 links, each from a later era than the one before | +10 |
@@ -37,16 +37,14 @@ the Activist's consecutive-era streak. Prophet writing and Fulfillment on that e
 and a pending Weaver Thread clears without changing confirmed chain length. A later declaration or Thread on the
 carried event is independent. Each fact is recorded and consumed at most once for its game, era, player, and reason.
 
-The `FACTION_UNIDENTIFIED` Revisionist bonus is scored with the final era (era 5), together with that era's other
+The `MIMIC_NEVER_TRACED` Revisionist bonus is scored with the final era (era 5), together with that era's other
 scores and before its victory check, so it can carry a Revisionist to the 20-point threshold. A game that ends earlier
 awards no bonus.
 
-Only public facts that name a faction count. A player is disclosed by an Activist's declaration of record, by an Expose
-they played being revealed, or by a Weaver's public pending chain link. Intercept, Trace and Scan results, being the
-target of an Expose, round summaries and score changes never disclose anyone. A Revisionist is identified when
-disclosed, or by elimination: the factions in play are public, so once all but one of the other players are
-disclosed, that last player can work out the Revisionist from their own faction. With three players one disclosure is
-enough, with four it takes two, and with five the Revisionist can never be eliminated.
+A Revisionist loses the bonus only when another player's Trace reports their Mimic. Your own Trace never costs it, and
+a Mimic played in a round your Obscure covers cannot be traced. Nothing else counts: Activist declarations, Exposes,
+Weaver chain links, working out who is left from the factions in play, and reading score totals never cost the bonus.
+Mimic can earn +2 when it contributes to a win, but each uncovered Mimic risks the +6.
 
 ### Cross-faction rules
 
