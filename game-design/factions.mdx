@@ -38,16 +38,16 @@ without it, a faction with a strong repeatable special would rarely need to play
 
 | Special        | Effect                                                              |
 |----------------|---------------------------------------------------------------------|
-| **Annihilate** | Remove one outcome from an event entirely this era                  |
+| **Annihilate** | Remove one outcome from an event this era: it drops to 0% and its probability moves to the other outcomes. Rejected, at no cost, if the survivors can't hold it within 0–90% — so an event always keeps at least two outcomes in contention |
 | **Corrupt**    | Invert the probability effect of another player's card this round   |
-| **Cascade**    | If the erased outcome's event carries into next era (Stall or paradox cascade), erase it again there automatically; not playable in the final era |
+| **Cascade**    | If the erased outcome's event carries into next era (Stall or paradox cascade), erase it again there automatically so it can't be pushed back up; not playable in the final era |
 
 ### 📜 Prophets
 
 | Special         | Effect                                                                       |
 |-----------------|------------------------------------------------------------------------------|
 | **Foresight**   | See next era's future events and write a current-era outcome; that writing expires without score if the event Stalls |
-| **Seal**        | Lock one outcome's probability through the end of the era — later shifts against it are blocked with weights unchanged and no paradox; shifts that leave sealed weights unchanged reroute normally |
+| **Seal**        | Lock one outcome's probability through the end of the era — later shifts against it are blocked with weights unchanged and no paradox; shifts that leave sealed weights unchanged reroute normally. A sealed outcome never absorbs an erased outcome's probability, and Annihilate can still erase it |
 | **Fulfillment** | Declare a current-era event; score +8 if its written outcome wins this era. A Stall expires the declaration |
 
 ### 🔄 Revisionists
