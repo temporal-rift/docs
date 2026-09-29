@@ -144,8 +144,13 @@ instead — `sourceEventId`/`sourceOutcomeId` stay null for every special.
 }
 ```
 
-Private rejection of a `TAPESTRY`, `REWEAVE`, or `CASCADE` play whose prerequisites weren't met. `chainId` is
-populated only for a Weaver chain special; `CASCADE` leaves it null.
+Private rejection of a `TAPESTRY`, `REWEAVE`, `CASCADE`, or `ANNIHILATE` play whose prerequisites weren't met.
+`chainId` is populated only for a Weaver chain special; `CASCADE` and `ANNIHILATE` leave it null.
+
+An `ANNIHILATE`, or a `CASCADE` erasing its outcome again at the start of the next era, is rejected with
+`ERASURE_OUT_OF_BOUNDS` when the event's other outcomes can't absorb the erased probability within the 0–90% bounds
+without moving a sealed probability. Annihilates on the same event in the same round are judged together, so each is
+rejected when they can't all fit.
 
 A `REWEAVE` is rejected with `NO_ACTIVE_CHAIN`, `ALREADY_USED_THIS_ERA`, `MISSING_COORDINATE`, `NO_PENDING_LINK` (the
 chain has no pending link this era), `INVALID_COORDINATE` (the target is not a live current-era outcome, or is the

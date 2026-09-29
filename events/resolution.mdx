@@ -21,15 +21,16 @@ are published by `game-service` on `game.events`. Probability bands are publishe
   "eventStates": [{
     "eventId": "uuid",
     "outcomes": [
-      { "outcomeId": "uuid", "probability": 45, "isAnnihilated": false, "isSealed": false },
-      { "outcomeId": "uuid", "probability": 35, "isAnnihilated": false, "isSealed": false },
-      { "outcomeId": "uuid", "probability": 20, "isAnnihilated": true,  "isSealed": false }
+      { "outcomeId": "uuid", "probability": 56, "isAnnihilated": false, "isSealed": false },
+      { "outcomeId": "uuid", "probability": 44, "isAnnihilated": false, "isSealed": false },
+      { "outcomeId": "uuid", "probability": 0,  "isAnnihilated": true,  "isSealed": false }
     ]
   }]
 }
 ```
 
-Era-level, emitted once at resolution, and **never delivered to any player**. It exists for downstream resolution and
+Era-level, emitted once at resolution, and **never delivered to any player**. Each probability is the outcome's real
+chance of winning, so an annihilated outcome always reports 0. It exists for downstream resolution and
 history. Exact probabilities reach players only through `ProbabilityStateRevealed`, below.
 
 ## ProbabilityStateRevealed 🔒
@@ -42,9 +43,9 @@ history. Exact probabilities reach players only through `ProbabilityStateReveale
   "playerId": "uuid",
   "eventId": "uuid",
   "outcomes": [
-    { "outcomeId": "uuid", "probability": 45, "isAnnihilated": false, "isSealed": false },
-    { "outcomeId": "uuid", "probability": 35, "isAnnihilated": false, "isSealed": false },
-    { "outcomeId": "uuid", "probability": 20, "isAnnihilated": true,  "isSealed": false }
+    { "outcomeId": "uuid", "probability": 56, "isAnnihilated": false, "isSealed": false },
+    { "outcomeId": "uuid", "probability": 44, "isAnnihilated": false, "isSealed": false },
+    { "outcomeId": "uuid", "probability": 0,  "isAnnihilated": true,  "isSealed": false }
   ]
 }
 ```

@@ -8,8 +8,9 @@ Each event has three possible outcomes. At the start of an era, they are distrib
 
 Three constraints hold throughout:
 
-- The floor is **0%** and the ceiling is **90%** — no outcome can be guaranteed or made impossible
+- The floor is **0%** and the ceiling is **90%** — no outcome can be guaranteed
 - All three outcomes always sum to **100%**; shifting one redistributes the remainder proportionally across the other two
+- Every probability is the outcome's **real chance of winning**, including after an outcome is erased
 - Exact probabilities are **hidden by default** — only a player who played `SCAN` on that event can see them
 
 ## Banded probability reveal
@@ -47,8 +48,24 @@ At resolution, each event's winning outcome is drawn at random, weighted by its 
 can climb as high as 90%, but the outcome it favours can still lose.
 
 Tied outcomes are equally likely to win. A tie is a **Dead Heat** paradox only when a Collide forced it this era.
-Annihilated outcomes never win and never affect other outcomes' relative odds; only an erasure that leaves no eligible
-outcome with any probability is a paradox (**Impossible Erasure**).
+
+## Erasing an outcome
+
+`ANNIHILATE` drops an outcome to **0%** for the rest of the era, and it can't win. Its probability moves to the
+event's other outcomes in proportion to their current values, so they keep their relative odds and together hold the
+full 100%. Starting from A=33%, B=33%, C=34%, erasing C gives A=50%, B=50%, C=0%.
+
+- Redistribution never pushes an outcome past the 90% ceiling. At A=85%, B=5%, C=10%, erasing C gives A=90%, B=10%.
+- A sealed outcome keeps its probability, so only the unsealed survivor takes the erased weight. Erasing a sealed
+  outcome removes its seal.
+- Later shifts never move weight into or out of an erased outcome. A card that targets it, swings from or to it, or
+  collides it has no effect.
+- An erasure is rejected, and costs nothing, when the survivors can't hold the erased weight within 0–90%. Erasing an
+  event's last outcome, or erasing down to a single outcome that would win with certainty, is always rejected.
+- Erasures on the same event in the same round are judged together: if they can't all fit, none of them apply.
+
+A cascaded or stalled event keeps its probabilities, so an outcome erased last era comes back at 0% and can be pushed
+up again. A `CASCADE` erases it again for one more era instead.
 
 ## Scan card
 
