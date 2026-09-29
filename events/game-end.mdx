@@ -28,8 +28,9 @@ description: "Events emitted at era end and game conclusion"
 ```
 
 One event per winner. `winType` is `SCORE_THRESHOLD` or `FACTION_OBJECTIVE` for a normal victory at the end of an
-era, or `LAST_PLAYER_STANDING` when every other player has abandoned; then `finalScore` is that player's current
-total. A player who abandoned never wins.
+era, or `LAST_PLAYER_STANDING` when all other players have abandoned and the remaining player's grace has not
+expired. `finalScore` is the committed total; scoring already in flight completes before the deferred ending is
+chosen. An expired player cannot win by being processed last.
 
 ## TimelineCollapsed 🌐
 
@@ -67,6 +68,12 @@ unbroken chain. `activeChainLength` appears only for a qualifying Weaver and giv
 nobody qualifies, `winners` are every player with the highest total score. Players who abandoned never qualify and
 are always `losers`.
 
+## GameEndedAbnormally 🌐
+
+`reason` is `deck-exhausted`, `resolution-failed`, or `all-players-abandoned`. Each leads to `GameEnded` with
+`DECK_EXHAUSTED`, `RESOLUTION_FAILED`, or `ALL_PLAYERS_ABANDONED`, respectively, and the usual faction reveal.
+No winner fact is emitted for these endings.
+
 ## GameEnded 🌐
 
 ```json
@@ -81,7 +88,8 @@ are always `losers`.
 ```
 
 `endReason`: `WIN_CONDITION_MET` (each winner's `WinConditionMet.winType` says how), `TIMELINE_COLLAPSED`,
-`TIMELINE_STABILIZED`, or, for a game that ended abnormally with no winners, `DECK_EXHAUSTED` or `RESOLUTION_FAILED`
+`TIMELINE_STABILIZED`, or, for a game that ended abnormally with no winners, `DECK_EXHAUSTED`,
+`RESOLUTION_FAILED`, or `ALL_PLAYERS_ABANDONED`.
 
 `finalScores` is the complete game-end score snapshot: the totals after the last scored era. Finalizing the game
 awards no further score.

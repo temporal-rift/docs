@@ -55,7 +55,8 @@ flowchart TD
 **Trigger:** Player WebSocket disconnects during an active game
 **Service:** `game-service` / session module
 
-One saga instance runs per disconnecting player — multiple disconnects run independently in parallel.
+Each player has one active grace period. Duplicate disconnect delivery reuses its deadline; a later disconnect
+after reconnect creates a new period. Reconnect is accepted only strictly before that deadline.
 
 ### Steps
 
@@ -65,10 +66,14 @@ flowchart TD
   B --> C[Start grace timer — default 30s, configurable via GameRulesPort]
   C --> D{Player reconnects?}
   D -->|Yes — within grace period| E[Mark player reconnected]
-  D -->|No — timer expires| F[Mark player ABANDONED — emit PlayerAbandoned 🌐 — auto-skip remaining rounds, forfeit]
-  F --> G{Game in progress and one non-abandoned player left?}
-  G -->|Yes| H[That player wins — WinConditionMet 🌐 LAST_PLAYER_STANDING — EndGameSaga]
-  G -->|No| I[Continue game with remaining players]
+  D -->|No — deadline expires| F[Reconcile every due grace period — emit PlayerAbandoned 🌐 for each forfeit]
+  F --> Q{Era scoring in flight?}
+  Q -->|Yes| K[Wait for committed totals and reconcile deadlines again]
+  K --> G{Eligible contenders remaining?}
+  Q -->|No| G
+  G -->|One| H[WinConditionMet 🌐 LAST_PLAYER_STANDING — EndGameSaga]
+  G -->|Zero| J[GameEndedAbnormally 🌐 all-players-abandoned — EndGameSaga]
+  G -->|More than one| I[Continue game]
 ```
 
 This saga only tracks `game-service`'s connection bookkeeping. State restoration itself isn't one of its steps: a
@@ -81,7 +86,13 @@ whether this saga's grace period is still open.
 | Failure | Compensation |
 |---|---|
 | Player reconnects after `ABANDONED` | Reject reconnection — game already adapted |
-| All players disconnect simultaneously | One `PlayerReconnectSaga` per player runs independently; the abandonment that leaves one player standing ends the game with that player as the winner |
+| Equal or staggered deadlines have all expired | Reconcile all due periods before choosing contenders; zero contenders ends with no winner and all final scores |
 | Grace expires after the game ended | Nothing happens — the player is not marked abandoned and nothing is published |
-| Last player left while the era is being scored | The ending waits for that era's scores, then the remaining player wins with the scored total |
-| Timer service fails | Fallback: force abandonment after 2× grace period |
+| One or zero contenders while the era is being scored | Wait for committed scores, then recheck all deadlines; an expired contender cannot win |
+| Reconnect arrives after its deadline | Reject it even if the timer callback has not run |
+| In-memory timer is lost | The database sweep processes persisted due deadlines on a surviving instance |
+
+When zero contenders remain, `GameEnded` uses `ALL_PLAYERS_ABANDONED`, no winner fact is emitted, every final
+score is retained, and factions are revealed normally. An eligible normal-victory qualifier at the scoring boundary
+keeps precedence over last player standing. A grace expiry after game end retires its timer state without changing
+the roster or publishing a new abandonment.
