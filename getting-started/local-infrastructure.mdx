@@ -46,6 +46,10 @@ The stack runs an interactive OIDC test issuer on port `9000`. Tokens carry the 
 `http://localhost:9000/default`, and every service accepts only that issuer while fetching its signing keys over the
 Compose network. The isolated playtest deployment does not run it and requires its own external issuer.
 
+The login page accepts any username and issues it as both the token subject and `preferred_username`, so the game
+client prefills it as your player name in the lobby. After pulling an issuer change, recreate the container with
+`docker compose up -d identity-provider` and sign in again.
+
 ## Running the game client
 
 With the stack up, run `npm run dev` in a sibling `game-client` checkout after copying its `public/config.js.example`
