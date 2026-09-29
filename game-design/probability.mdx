@@ -4,14 +4,16 @@ description: "How outcome probabilities work, visibility tiers, and shift mechan
 ---
 
 
-Each event has three possible outcomes. At the start of an era, they are distributed evenly: two at 33% and one at 34%. From there, players spend their action rounds trying to shift those numbers in their favour.
+Each event has three possible outcomes, and every event card prints its own **starting weights**, which are public from the moment the event is revealed. Some cards are balanced (33/33/34), some lean one way (45/35/20), some have a clear favorite (50/30/20 or 60/25/15), and some are a two-way race (42/42/16). The favored outcome is whichever one the event's story makes most plausible. A freshly drawn event starts the era at its printed weights; an event carried over from the previous era keeps its current weights instead. From there, players spend their action rounds trying to shift those numbers in their favour.
+
+Because cards differ, knowing which events are coming next matters. A Prophet's Foresight shows the next era's fresh cards, with their printed weights, before anyone else sees them.
 
 Three constraints hold throughout:
 
 - The floor is **0%** and the ceiling is **90%** — no outcome can be guaranteed
 - All three outcomes always sum to **100%**; shifting one redistributes the remainder proportionally across the other two
 - Every probability is the outcome's **real chance of winning**, including after an outcome is erased
-- Exact probabilities are **hidden by default** — only a player who played `SCAN` on that event can see them
+- Exact probabilities are **hidden by default** once play begins — only a player who played `SCAN` on that event can see them. A card's printed starting weights stay public
 
 ## Banded probability reveal
 

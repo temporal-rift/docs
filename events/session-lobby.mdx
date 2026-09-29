@@ -130,17 +130,18 @@ either a paradox cascade or a stall.
     "eventId": "uuid",
     "title": "string",
     "outcomes": [
-      { "outcomeId": "uuid", "description": "string", "initialProbability": 33 },
-      { "outcomeId": "uuid", "description": "string", "initialProbability": 33 },
-      { "outcomeId": "uuid", "description": "string", "initialProbability": 34 }
+      { "outcomeId": "uuid", "description": "string", "initialProbability": 50 },
+      { "outcomeId": "uuid", "description": "string", "initialProbability": 30 },
+      { "outcomeId": "uuid", "description": "string", "initialProbability": 20 }
     ],
     "carryOverState": "FRESH"
   }]
 }
 ```
 
-`carryOverState` is required: `FRESH`, `CASCADED`, or `STALLED`. Carried events retain their last known probability
-state rather than being reset to 33/33/34.
+`carryOverState` is required: `FRESH`, `CASCADED`, or `STALLED`. `initialProbability` is the event card's printed
+starting weight (0–100), and it differs per card. A fresh event starts the era at it. A carried event keeps its last
+known probability state instead, and its `initialProbability` is still the printed weight, never that carried state.
 
 ## HandDealt 🔒
 
@@ -204,7 +205,7 @@ never ranks cards or favors a deal slot, category, or grade.
       "catalogEventId": "uuid",
       "title": "string",
       "outcomes": [
-        { "catalogOutcomeId": "uuid", "description": "string" }
+        { "catalogOutcomeId": "uuid", "description": "string", "initialProbability": 50 }
       ]
     }
   ],
@@ -214,6 +215,7 @@ never ranks cards or favors a deal slot, category, or grade.
 
 Private reveal for the foretelling Prophet. `playerId` is the sole viewer, not the player who caused anything —
 the message never identifies any other player. `revealedEvents` previews the next era's freshly-drawn deck slice
-in deck order: catalog identities with titles and outcome descriptions, never probabilities or bands. In the final
+in deck order: catalog identities with titles, outcome descriptions, and each outcome's printed starting weight as
+`initialProbability`, never live probabilities or bands. In the final
 era there is no next draw, so `revealedEvents` is `[]` with `emptyReason` set. The preview expires at the era
 boundary and is never broadcast.

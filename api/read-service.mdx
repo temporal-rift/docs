@@ -56,7 +56,7 @@ Full per-player view — no raw probabilities, no other players' factions.
         "catalogEventId": "uuid",
         "title": "string",
         "outcomes": [
-          { "catalogOutcomeId": "uuid", "description": "string" }
+          { "catalogOutcomeId": "uuid", "description": "string", "initialProbability": 50 }
         ]
       }
     ],
@@ -68,9 +68,9 @@ Full per-player view — no raw probabilities, no other players' factions.
       "title": "string",
       "carryOverState": "FRESH",
       "outcomes": [
-        { "outcomeId": "uuid", "description": "string" },
-        { "outcomeId": "uuid", "description": "string" },
-        { "outcomeId": "uuid", "description": "string" }
+        { "outcomeId": "uuid", "description": "string", "initialProbability": 60 },
+        { "outcomeId": "uuid", "description": "string", "initialProbability": 25 },
+        { "outcomeId": "uuid", "description": "string", "initialProbability": 15 }
       ]
     }
   ],
@@ -127,8 +127,10 @@ from the game's starting roster. Every field after `players` except `lastRoundSu
 absent means not yet computed by the owner, while an empty array means known-none. Refresh this view after reload or
 a rejected submission and retry at most once against the fresh era/round/deadline coordinates.
 
-Active events never expose exact outcome weights, including a carried event's retained state. Exact values appear only
-in the authenticated player's own `myRevealedIntel` after Scan; `publicBands` remains the shared probability view.
+Each active event outcome carries `initialProbability`, the event card's printed starting weight. It is public card
+data: a fresh event starts the era at it. Active events never expose live outcome weights, including a carried event's
+retained state. Exact values appear only in the authenticated player's own `myRevealedIntel` after Scan;
+`publicBands` remains the shared probability view.
 
 <Note title="Faction visibility">
 `faction` on other players is `null` until `FactionRevealed` fires at game end. Your own faction is always visible in `myFaction`.
@@ -189,10 +191,11 @@ Low/Medium/High bands after Action Round 2.
 ### Foresight preview
 
 `myForesightPreview` carries your own Prophet `FORESIGHT` preview of the next era's freshly-drawn events in deck
-order: `nextEraNumber`, `revealedEvents` (catalog event identity, title, and outcome identities with descriptions),
+order: `nextEraNumber`, `revealedEvents` (catalog event identity, title, and outcome identities with descriptions and
+printed starting weights),
 and `emptyReason` for the defined final-era empty result. It is `null` when you have no Foresight preview in the
 current era, never carries another player's preview, and expires at the era boundary — reload while the era is still
-active to recover it. It carries no probabilities, bands, or deck state beyond the previewed slice.
+active to recover it. It carries no live probabilities, bands, or deck state beyond the previewed slice.
 
 ### Freshness, deadlines, and retry
 
