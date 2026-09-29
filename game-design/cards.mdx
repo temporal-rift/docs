@@ -25,6 +25,12 @@ not optimize or systematically bias the resulting hand by category, grade, or de
 | **Swing** | Move 30% from one outcome to another on same event | `SWING` |
 | **Amplify** | Double a named player's card this round | `AMPLIFY` |
 
+Amplify multiplies the named player's Push, Suppress, or Swing by its grade's multiplier. Several Amplifies naming the
+same player do not stack: only the highest multiplier among them applies, so two grade III Amplifies still make a shift
+×3, never ×9. The amplified shift is rounded to the nearest whole percentage point (halves round up) once, before Rally
+and before the probability floor and ceiling. Amplify on a Collide has no effect, because Collide has no magnitude to
+multiply.
+
 ## Information
 
 | Card | Effect | `cardType` |
@@ -56,7 +62,8 @@ A jammed player can still play cards — only faction specials are blocked, and 
 Redirect needs no outcome selection. It retargets the named player's Push, Suppress, or Swing to the first
 non-annihilated outcome after that shift's effective destination in the event's displayed order, wrapping around;
 it skips the current destination and a Swing's source. A sealed selected outcome blocks the redirected shift, while
-no alternative leaves the original shift unchanged.
+no alternative leaves the original shift unchanged. Several Redirects naming the same player move the shift once, to
+the same outcome a single Redirect would pick; they never chain, whatever order they were played in.
 
 ## Paradox
 
