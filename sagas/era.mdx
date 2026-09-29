@@ -26,8 +26,8 @@ flowchart TD
   K --> L[emit EraEnded and EraStarted for era N+1]
 ```
 
-Each player selects exactly five cards during the configured hand-selection window. The starting configuration for
-`game.rules.hand-selection-timer-seconds` follows player count: 3→60s, 4→45s, 5→30s. A player who does not select in
+Each player selects exactly five cards during the configured hand-selection window. `game.rules.hand-selection-timer-seconds` is one
+duration for every player count, 120 seconds by default, because all players select at the same time. A player who does not select in
 time receives a uniformly random five-card subset of their seven cards (`HandSelected: TIMEOUT_RANDOM`); this does not
 favor deal slots, categories, grades, or perceived card usefulness. A reconnect before the persisted deadline can
 still select; after it, the player sees the completed selection.
