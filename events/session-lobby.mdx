@@ -106,7 +106,10 @@ Emitted when a player's WebSocket disconnects during an active game. Notifies al
 { "gameId": "uuid", "playerId": "uuid" }
 ```
 
-Emitted when the reconnect grace timer expires. Abandoning is final and forfeits: the player is auto-skipped for remaining rounds and can no longer win. If only one player who has not abandoned remains, that player wins immediately (`WinConditionMet` with `winType` `LAST_PLAYER_STANDING`).
+Emitted when an unreconnected player's persisted grace deadline expires. Abandonment is final: the player is
+auto-skipped for remaining rounds and can no longer win. Every deadline already due is reconciled before selecting
+contenders. One eligible contender wins with `LAST_PLAYER_STANDING`; zero contenders ends without a winner using
+`ALL_PLAYERS_ABANDONED`. Both endings wait for any scoring in flight and recheck deadlines at that boundary.
 
 ## EraStarted 🌐
 

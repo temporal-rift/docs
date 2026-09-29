@@ -27,3 +27,7 @@ flowchart TD
 | Resource cleanup fails | Log and alert — non-blocking, game result already delivered |
 
 Resource cleanup failure is non-critical because the game result has already been delivered to players via `GameEnded` and `FactionRevealed`. Leaked resources (timers, WebSocket sessions) are cleaned up by TTL mechanisms.
+
+The `all-players-abandoned` trigger finishes with `GameEnded.endReason = ALL_PLAYERS_ABANDONED`, an empty
+winner set, every participant's final score, and the normal faction reveal. If era scoring is in flight, the
+producer waits for it before triggering finalization.
