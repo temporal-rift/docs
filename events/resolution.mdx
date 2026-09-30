@@ -113,6 +113,26 @@ event and outcomes only; no field carries a probability value.
 }
 ```
 
+## ParadoxResolutionCardsOffered 🔒
+
+Published once per player when a paradox-resolution phase opens. Private to `playerId`.
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "playerId": "uuid",
+  "cards": [
+    { "cardInstanceId": "uuid", "cardType": "PUSH", "grade": "II" },
+    { "cardInstanceId": "uuid", "cardType": "STABILIZE", "grade": "I" },
+    { "cardInstanceId": "uuid", "cardType": "DETONATE", "grade": "I" }
+  ]
+}
+```
+
+`cards` is every card the player may submit in the phase: eligible cards from their hand plus the Stabilize and
+Detonate they are dealt for it. An empty list is valid.
+
 ## ParadoxResolutionCardPlayed 🔒
 
 Published by `game-service`'s action module to `game.events`; consumed by `timeline-service`. It is never published on
@@ -133,6 +153,17 @@ Published by `game-service`'s action module to `game.events`; consumed by `timel
 
 No faction special actions are allowed during paradox resolution. Eligible cards are `PUSH`, `SUPPRESS`, `STABILIZE`,
 and `DETONATE`; the phase-scoped event has no `roundNumber`. `grade` is always present; single-grade cards carry `I`.
+
+## ParadoxResolutionPassed 🔒
+
+Published after a player explicitly passes during an open paradox-resolution phase. Private to that player.
+
+```json
+{ "gameId": "uuid", "eraNumber": 1, "playerId": "uuid" }
+```
+
+The payload carries no card or target. A pass uses the player's one choice for the phase, counts toward closing it
+early, and applies nothing — the same neutral skip a timer expiry produces.
 
 ## ParadoxResolved 🌐
 

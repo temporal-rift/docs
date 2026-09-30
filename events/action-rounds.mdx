@@ -219,6 +219,22 @@ exposed Round-1 signature is public.
 Published at Round 3 close only when the target changes to a different qualifying signature. This observation does
 not control or add to the Round-2 reveal score. It never includes the Round-3 signature or its target.
 
+## ActionRoundPassed 🔒
+
+Published after a player explicitly passes in an open action round. Private to that player.
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "roundNumber": 2,
+  "playerId": "uuid"
+}
+```
+
+The payload carries no card, special, or target. A pass uses the player's one action for the round and counts toward
+closing the round early; everyone else sees only the same neutral skip a timer expiry produces.
+
 ## ActionRoundTimerExpired 🌐
 
 ```json
