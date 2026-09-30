@@ -29,7 +29,8 @@ Full per-player view — no raw probabilities, no other players' factions.
   },
   "phaseContext": {
     "declarationOpen": false,
-    "paradoxOpen": false
+    "paradoxOpen": false,
+    "actionRoundProgress": { "submittedCount": 2, "totalPlayers": 3, "pendingPlayerIds": ["uuid"] }
   },
   "myFaction": "ERASERS",
   "myHand": [
@@ -107,7 +108,16 @@ Full per-player view — no raw probabilities, no other players' factions.
     }
   ],
   "mySubmissions": [
-    { "eraNumber": 2, "roundNumber": 1, "kind": "ACTION", "status": "ACCEPTED", "actionType": "CARD" }
+    {
+      "eraNumber": 2,
+      "roundNumber": 1,
+      "window": "ACTION",
+      "status": "ACCEPTED",
+      "choice": "CARD",
+      "card": { "cardInstanceId": "uuid", "cardType": "PUSH", "grade": "II" },
+      "targets": { "targetEventId": "uuid", "targetOutcomeId": "uuid" }
+    },
+    { "eraNumber": 2, "roundNumber": 2, "window": "ACTION", "status": "ACCEPTED", "choice": "PASS" }
   ],
   "mySpecialBudgets": [
     { "specialAction": "SEAL", "remainingUsesThisEra": 1, "remainingUsesThisGame": 2 }
@@ -206,6 +216,15 @@ authoritative expiry timestamps owned by `game-service`, and `phaseContext` tell
 input (`declarationOpen` for Rally/Momentum before Round 1, `paradoxOpen` for reactive cards, with `paradoxIds`
 listing the open paradoxes — present only while `paradoxOpen` is true, absent otherwise).
 
+`phaseContext` also shows progress for the open window, identically for every player. `actionRoundProgress` is
+present while an action round is open; `paradoxResolutionProgress` and `affectedEventIds` (the events you may target
+with a resolution card) while `paradoxOpen` is true. Progress carries `submittedCount`, `totalPlayers`, and
+`pendingPlayerIds` — who has submitted or passed, never what anyone chose.
+
+While a paradox-resolution phase is open and you have neither submitted nor passed, `myEligibleResolutionCards` lists
+every card you may submit: eligible cards from your hand plus the Stabilize and Detonate you are dealt for the phase.
+It may be empty, and it disappears once you submit or pass, or the phase closes.
+
 After reload, a delayed response, or a rejected submission, refresh this view and retry at most once against the fresh
 coordinates instead of retrying blindly.
 
@@ -224,8 +243,11 @@ Round-3 signature is ever included. `signature.sourceOutcomeId` is populated onl
 
 ### Your submissions, budgets, and objective progress
 
-`mySubmissions` names your own accepted decisions (`HAND_SELECTION`, `DECLARATION`, `ACTION`, `PARADOX_CARD`) so a
-reloaded client can show what was accepted without asking twice. `mySpecialBudgets` lists remaining per-era and
+`mySubmissions` lists your own accepted decisions so a reloaded client can show what was accepted without asking
+twice. Each entry names its `window` (`HAND_SELECTION`, `DECLARATION`, `ACTION`, `PARADOX_RESOLUTION`). Action-round
+and paradox-resolution entries also name your `choice` (`CARD`, `SPECIAL`, or `PASS` in a round; `CARD` or `PASS` in
+paradox resolution) with what you played — `card` or `specialAction` — and `targets`, every target it named. A pass
+carries no detail. `mySpecialBudgets` lists remaining per-era and
 per-game uses for your own specials, including Seal. Neither field ever carries another player's choices or
 availability.
 
