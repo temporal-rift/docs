@@ -115,7 +115,8 @@ event and outcomes only; no field carries a probability value.
 
 ## ParadoxResolutionCardsOffered 🔒
 
-Published once per player when a paradox-resolution phase opens. Private to `playerId`.
+Published once per player per paradox-resolution phase, when the phase opens. A player who was not yet known when
+it opened receives theirs on joining the open phase. Private to `playerId`.
 
 ```json
 {
