@@ -48,6 +48,13 @@ Full per-player view — no raw probabilities, no other players' factions.
       "outcomes": [
         { "outcomeId": "uuid", "probability": 45, "isAnnihilated": false, "isSealed": false }
       ]
+    },
+    {
+      "kind": "INFLUENCE",
+      "observedInRound": 2,
+      "eventId": "uuid",
+      "influencerPlayerIds": ["uuid"],
+      "mimicInfluencerPlayerIds": []
     }
   ],
   "myForesightPreview": {
@@ -190,8 +197,12 @@ how fresh it is.
 | `kind` | From | Contents |
 |---|---|---|
 | `PROBABILITY` | Scan | exact outcome values for one event, refreshed every round until era end |
-| `INFLUENCE` | Trace | which players acted on one event last round |
+| `INFLUENCE` | Trace | which players acted on one event last round, and which of them acted through a Mimic |
 | `HAND_CARD` | Intercept | a card seen in another player's hand |
+
+An `INFLUENCE` entry always carries both `influencerPlayerIds` and `mimicInfluencerPlayerIds`. Every Mimic influencer
+is also listed in `influencerPlayerIds`; an empty `mimicInfluencerPlayerIds` means nobody acted through a Mimic, and a
+Trace that found no influence keeps its entry with both lists empty.
 
 <Note title="This is the only source of exact probabilities">
 Scan results reach you here and over the WebSocket — there is no probability endpoint. Every other player sees only
