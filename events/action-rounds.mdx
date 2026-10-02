@@ -6,6 +6,33 @@ description: "Events produced during action rounds by game-service"
 
 Events produced during action rounds by `game-service` action module.
 
+## DeclarationWindowOpened 🌐
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "expiresAt": "2026-09-16T00:00:30Z"
+}
+```
+
+Published when the declaration window opens before Action Round 1. It carries the authoritative UTC deadline for
+the window and intentionally contains no participant, faction, action, or eligibility data.
+
+## DeclarationOptionsOffered 🔒
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "playerId": "uuid",
+  "eligibleModes": ["RALLY"]
+}
+```
+
+Delivered only to `playerId`, and only when that player has at least one eligible mode. `eligibleModes` contains one
+or both of `RALLY` and `MOMENTUM`; it is a server-calculated offer and must never be forwarded to another player.
+
 ## ActionRoundStarted 🌐
 
 ```json

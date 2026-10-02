@@ -25,6 +25,7 @@ Full per-player view — no raw probabilities, no other players' factions.
   "deadlines": {
     "handSelectionExpiresAt": null,
     "actionRoundExpiresAt": "2026-09-16T00:01:00Z",
+    "declarationExpiresAt": null,
     "paradoxResolutionExpiresAt": null
   },
   "phaseContext": {
@@ -223,9 +224,10 @@ active to recover it. It carries no live probabilities, bands, or deck state bey
 `revision` is a monotonic freshness marker for one game's projection: a larger value means a newer view. It orders
 polls of the same game and never promises cross-game or cross-topic event order. `roundNumber` names the current
 round while an action round or paradox resolution is open and is `null` otherwise. `deadlines` carries the
-authoritative expiry timestamps owned by `game-service`, and `phaseContext` tells you which windows currently accept
-input (`declarationOpen` for Rally/Momentum before Round 1, `paradoxOpen` for reactive cards, with `paradoxIds`
-listing the open paradoxes — present only while `paradoxOpen` is true, absent otherwise).
+authoritative expiry timestamps owned by `game-service`; `declarationExpiresAt` is populated only while
+`phaseContext.declarationOpen` is true. `phaseContext` tells you which windows currently accept input
+(`declarationOpen` for Rally/Momentum before Round 1, `paradoxOpen` for reactive cards, with `paradoxIds` listing the
+open paradoxes — present only while `paradoxOpen` is true, absent otherwise).
 
 `phaseContext` also shows progress for the open window, identically for every player. `actionRoundProgress` is
 present while an action round is open; `paradoxResolutionProgress` and `affectedEventIds` (the events you may target
@@ -235,6 +237,10 @@ with a resolution card) while `paradoxOpen` is true. Progress carries `submitted
 While a paradox-resolution phase is open and you have neither submitted nor passed, `myEligibleResolutionCards` lists
 every card you may submit: eligible cards from your hand plus the Stabilize and Detonate you are dealt for the phase.
 It may be empty, and it disappears once you submit or pass, or the phase closes.
+
+While the declaration window is open, `myEligibleDeclarationModes` contains the caller's server-calculated `RALLY`
+and/or `MOMENTUM` options. It is present even when empty and disappears when the window closes. It never reveals
+another participant's eligibility or faction.
 
 After reload, a delayed response, or a rejected submission, refresh this view and retry at most once against the fresh
 coordinates instead of retrying blindly.
