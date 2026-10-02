@@ -226,8 +226,25 @@ polls of the same game and never promises cross-game or cross-topic event order.
 round while an action round or paradox resolution is open and is `null` otherwise. `deadlines` carries the
 authoritative expiry timestamps owned by `game-service`; `declarationExpiresAt` is populated only while
 `phaseContext.declarationOpen` is true. `phaseContext` tells you which windows currently accept input
-(`declarationOpen` for Rally/Momentum before Round 1, `paradoxOpen` for reactive cards, with `paradoxIds` listing the
+(`declarationOpen` for Rally/Momentum before Round 1, `paradoxOpen` for reactive cards, with `paradoxes` describing the
 open paradoxes — present only while `paradoxOpen` is true, absent otherwise).
+
+Each `paradoxes` entry is one paradox still pending in the open phase, listed in the order the phase opened them:
+`paradoxId`, `type` (`DEAD_HEAT`, `IMPOSSIBLE_ERASURE`, or `CHAIN_CONFLICT`), the `affectedEventId` it was detected
+on, and the `affectedOutcomeIds` it involves. A paradox leaves the list once it is resolved or cascades. The entries
+are the same for every player and never include probabilities or anyone's choice.
+
+```json
+"phaseContext": {
+  "declarationOpen": false,
+  "paradoxOpen": true,
+  "paradoxes": [
+    { "paradoxId": "uuid", "type": "DEAD_HEAT", "affectedEventId": "uuid", "affectedOutcomeIds": ["uuid", "uuid"] }
+  ],
+  "affectedEventIds": ["uuid"],
+  "paradoxResolutionProgress": { "submittedCount": 1, "totalPlayers": 3, "pendingPlayerIds": ["uuid", "uuid"] }
+}
+```
 
 `phaseContext` also shows progress for the open window, identically for every player. `actionRoundProgress` is
 present while an action round is open; `paradoxResolutionProgress` and `affectedEventIds` (the events you may target
