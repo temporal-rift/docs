@@ -33,9 +33,11 @@ favor deal slots, categories, grades, or perceived card usefulness. A reconnect 
 still select; after it, the player sees the completed selection.
 
 The last terminal selection opens one timed declaration window for the era; the window cannot be skipped by the last
-keep. An Activist may record one Rally or eligible Momentum declaration while it is open, consuming their Round-1
-special-action slot. When the window expires, it closes and Action Round 1 starts exactly once, with no declaration
-required.
+keep. Opening publishes `DeclarationWindowOpened` with the window's deadline once, and gives each player who can
+declare a private `DeclarationOptionsOffered` listing their eligible modes; a repeated or late opening publishes
+neither again. An Activist may record one Rally or eligible Momentum declaration while it is open, consuming their
+Round-1 special-action slot. When the window expires, it closes and Action Round 1 starts exactly once, with no
+declaration required.
 
 Between Round 2 and Round 3, the saga waits for timeline's authoritative band publication. Readiness is persisted
 for the current era under the saga lock, so an early band signal survives until the round-close listener runs.
