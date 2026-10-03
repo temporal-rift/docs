@@ -27,7 +27,7 @@ flowchart TD
 ```
 
 Each player selects exactly five cards during the configured hand-selection window. `game.rules.hand-selection-timer-seconds` is one
-duration for every player count, 120 seconds by default, because all players select at the same time. A player who does not select in
+duration for every player count, 300 seconds in normal play, because all players select at the same time. A player who does not select in
 time receives a uniformly random five-card subset of their seven cards (`HandSelected: TIMEOUT_RANDOM`); this does not
 favor deal slots, categories, grades, or perceived card usefulness. A reconnect before the persisted deadline can
 still select; after it, the player sees the completed selection.
@@ -36,8 +36,11 @@ The last terminal selection opens one timed declaration window for the era; the 
 keep. Opening publishes `DeclarationWindowOpened` with the window's deadline once, and gives each player who can
 declare a private `DeclarationOptionsOffered` listing their eligible modes; a repeated or late opening publishes
 neither again. An Activist may record one Rally or eligible Momentum declaration while it is open, consuming their
-Round-1 special-action slot. When the window expires, it closes and Action Round 1 starts exactly once, with no
-declaration required.
+Round-1 action. An eligible player may instead explicitly decline, preserving their ordinary Round 1 action.
+The phase persists the offered player set and each terminal decision. The final declaration or decline closes the
+window immediately; an empty eligible set also completes immediately. Missing participant state or faction defers
+opening until the durable trigger is retried. The normal 120-second limit is a fallback for pending decisions.
+Completion and expiry converge under the same phase lock, so Action Round 1 starts exactly once.
 
 Between Round 2 and Round 3, the saga waits for timeline's authoritative band publication. Readiness is persisted
 for the current era under the saga lock, so an early band signal survives until the round-close listener runs.

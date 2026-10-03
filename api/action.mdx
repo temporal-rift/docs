@@ -80,7 +80,7 @@ declaration, breaks the streak, and grants no Momentum eligibility. A later decl
 | Error | Code | Condition |
 |---|---|---|
 | `409` | `409-03` | Declaration window closed |
-| `409` | `409-04` | Round-1 special slot or declaration already used |
+| `409` | `409-04` | Declaration decision or Round-1 special slot already used |
 | `422` | `422-02` | Player is Jammed |
 | `422` | `422-04` | Faction required |
 | `422` | `422-05` | Player is not an Activist |
@@ -88,6 +88,29 @@ declaration, breaks the streak, and grants no Momentum eligibility. A later decl
 | `422` | `422-08` | Momentum not eligible |
 
 Error codes are shared by every action endpoint: each code keeps one meaning wherever it appears.
+
+## Decline declaration
+
+```http
+POST /api/v1/games/{gameId}/eras/{eraNumber}/declarations/decline
+```
+
+Record the authenticated eligible Activist's decision not to declare. There is no request body or client-supplied
+player identity. A decline preserves the ordinary Round 1 action. Accepted decisions are terminal; a decline cannot
+replace an accepted declaration. Retrying an accepted decline returns the same acknowledgement, even after closure.
+
+**Response `202`:**
+
+```json
+{"gameId":"uuid","eraNumber":1,"playerId":"uuid","status":"DECLINED"}
+```
+
+**Errors:** `404-01` unknown participant; `409-03` missing, closed or expired window; `409-04` declaration already
+accepted; `422-02` Jammed; `422-04` missing faction; `422-05` incompatible faction.
+
+The server persists the eligible decision set when opening the declaration window. Round 1 starts when every
+offered player declares or declines, or when the deadline expires. No eligible player means immediate completion.
+Participant state that has not arrived defers opening until it is known, so eligibility is never silently lost.
 
 ## Submit action
 
