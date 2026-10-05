@@ -1,0 +1,56 @@
+---
+title: "Simulation Workbench API"
+description: "Immutable experiments, durable runs, statistical reports, comparisons, and replay"
+---
+
+The Simulation Workbench is a separate designer-facing product that runs real game services in isolated lanes. It does not expose its controls to a human-game client and it does not replace the authoritative game rules.
+
+All requests use a JWT bearer token. Reads require `simulation:read`, mutations require `simulation:write`, and an observer replay additionally requires `simulation:observe`. Every mutation has a UUID `Idempotency-Key` header. Repeating a key with the same request returns the original resource; reusing it with a different request returns `409 IDEMPOTENCY_CONFLICT`.
+
+## Experiment and run operations
+
+| Operation | Method and path | Success |
+|---|---|---|
+| Create experiment | `POST /api/v1/experiments` | `201` |
+| Start run | `POST /api/v1/experiments/{experimentId}/runs` | `202` |
+| Get run | `GET /api/v1/runs/{runId}` | `200` |
+| Cancel run | `POST /api/v1/runs/{runId}/cancel` | `202`, or `200` for a terminal repeat |
+| Resume run | `POST /api/v1/runs/{runId}/resume` | `202` |
+| Get report | `GET /api/v1/runs/{runId}/report` | `200` |
+| Create comparison | `POST /api/v1/comparisons` | `201` |
+| Get comparison | `GET /api/v1/comparisons/{comparisonId}` | `200` |
+| Get case | `GET /api/v1/runs/{runId}/cases/{caseId}` | `200` |
+| Get replay | `GET /api/v1/runs/{runId}/cases/{caseId}/replay` | `200` |
+| Reproduce case | `POST /api/v1/runs/{runId}/cases/{caseId}/reproductions` | `202` |
+
+## Immutable experiment manifests
+
+Creating an experiment freezes a version-1 manifest. It records variants; resolved rules and content artifact digests; game, timeline, and read service image/source provenance; exact contract versions; policies and their seat assignments; seeds; player counts; faction sets; cyclic seat rotation; logical timing; and execution bounds.
+
+Artifact references are portable SHA-256 digests, never credentials or local machine paths. The product retains the resolved artifact bytes. Changing a rule, content bundle, policy, or pinned service revision creates a new experiment; it never modifies a launched manifest.
+
+With all faction sets, cyclic rotations, one seed, two homogeneous policies, and two variants, the matrix contains 220 cases: 55 player-count/faction/seat coordinates per policy/variant. The manifest validates counts from three to five players, unique variant labels, unique seeds, unique factions per set, and positive execution limits before scheduling work.
+
+## Durable runs and cases
+
+A run progresses through `QUEUED`, `RUNNING`, `INTERRUPTED`, `CANCELLING`, `CANCELLED`, `COMPLETED`, or `FAILED`. It reports requested, pending, running, succeeded, failed, and cancelled case counts. Resumption is valid only from `INTERRUPTED`; the retained completed cases remain a single logical sample and are not scheduled again.
+
+Each case has a stable case key, a variant, a seed, ordered seat/faction/policy assignments, and its own lifecycle. Attempts are separately retained with their checkpoint evidence, game identity when present, and failure. A reproduction creates a separate attempt and never adds a research sample. A missing or changed pinned artifact causes `409 MANIFEST_MISMATCH`.
+
+## Reports and comparisons
+
+Reports always expose whether they are complete, all case counts, an analysis version and seed, and cohorts stratified by player count, faction set, seat, policy/version, and variant. Every metric carries its numerator, denominator, unit, availability status, and a named unknown-opportunity count where relevant.
+
+Faction win rate is wins divided by eligible successful games containing the faction. Shared wins count as wins and also have their own shared-win metric, so faction rates need not sum to 100%. Failed, cancelled, and unmatched cases remain visible rather than disappearing from a report.
+
+Intervals are 95% block-bootstrap intervals over independent seed/cohort blocks. Fewer than two blocks yields `INSUFFICIENT_SAMPLE` with no numeric interval. Comparisons retain declared variant differences, matched blocks, unmatched cases, failed counterparts, paired metric differences, and pinned analysis metadata. Incompatible run definitions return `422 INCOMPARABLE_RUNS`.
+
+## Replay and reproduction
+
+Replay requires `perspective=PLAYER` or `perspective=OBSERVER`. A player replay requires `seatIndex` and returns only that seat's entitled facts at the relevant step; it excludes opposing hidden hands, hidden factions, and future information. An observer replay requires `simulation:observe`, is explicitly separate from player data, and never feeds a policy.
+
+Reproduction runs the exact pinned manifest and accepted transcript in a clean lane. Its state is `QUEUED`, `RUNNING`, `MATCH`, `DIVERGED`, or `FAILED`; on divergence it reports the first semantic step, kind, expected value, and actual value.
+
+## Error codes
+
+The API uses RFC 9457 problem details with a stable `code`. Validation errors are `INVALID_EXPERIMENT`, `INVALID_REPLAY_PERSPECTIVE`, or `INVALID_COMPARISON`. State and identity errors include `IDEMPOTENCY_CONFLICT`, `EXPERIMENT_IMMUTABLE`, `INVALID_RUN_STATE`, and `MANIFEST_MISMATCH`. `CONTRACT_MISMATCH` and `CONFIGURATION_DRIFT` are retained as attempt failures, not reported as normal games.
