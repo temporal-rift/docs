@@ -8,15 +8,18 @@ description: "Tools required to build and run Temporal Rift locally"
 | Tool | Minimum version | Notes |
 |---|---|---|
 | Java | 26 | |
-| Maven | 3.9.13 | |
+| Maven | 4.0.0-rc-7 or newer | Maven 3 cannot build the projects |
 | Docker | any recent | For Testcontainers + local infrastructure |
+
+Maven 3 fails fast with "Maven 4.0.0-rc-7 or newer is required to build Temporal Rift projects".
 
 ## GitHub Packages — a read token is needed
 
 The `apis` REST and event contract jars, plus `temporal-rift-bom`, are published to **GitHub Packages** on every merge
 and promoted to Maven Central manually. GitHub Packages requires a token even for public packages, so add a `github`
 server to `~/.m2/settings.xml` with your GitHub username and a personal access token that has the `read:packages`
-scope. Each service repository declares the registry in its own `.mvn/settings.xml`.
+scope. Maven 4 picks up each repository's `.mvn/settings.xml`, where the registry is declared, automatically — the
+`github` server entry is the only per-contributor setup.
 
 <Note>
 Publishing to Maven Central requires Sonatype Central Portal credentials and a GPG key, and happens only through a
