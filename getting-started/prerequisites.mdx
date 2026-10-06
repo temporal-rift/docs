@@ -11,11 +11,14 @@ description: "Tools required to build and run Temporal Rift locally"
 | Maven | 3.9.13 | |
 | Docker | any recent | For Testcontainers + local infrastructure |
 
-## Maven Central — no credentials needed
+## GitHub Packages — a read token is needed
 
-The `apis` REST and event contract jars, plus `temporal-rift-bom`, are published to **Maven Central**. No
-`~/.m2/settings.xml` configuration is required to consume them as dependencies.
+The `apis` REST and event contract jars, plus `temporal-rift-bom`, are published to **GitHub Packages** on every merge
+and promoted to Maven Central manually. GitHub Packages requires a token even for public packages, so add a `github`
+server to `~/.m2/settings.xml` with your GitHub username and a personal access token that has the `read:packages`
+scope. Each service repository declares the registry in its own `.mvn/settings.xml`.
 
 <Note>
-Publishing requires Sonatype Central Portal credentials + a GPG key in `~/.m2/settings.xml`. Consuming does not.
+Publishing to Maven Central requires Sonatype Central Portal credentials and a GPG key, and happens only through a
+manually run promotion workflow. Consuming does not.
 </Note>
