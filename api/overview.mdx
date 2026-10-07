@@ -22,6 +22,11 @@ The services derive the internal `playerId` used to scope responses from the val
 | `timeline-service` | Gated Weaver chain read |
 | `read-service` | Full game state, history, WebSocket stream |
 | `simulation-workbench` | Immutable experiments, durable runs, reports, comparisons, and replay |
+| `game-service`, `timeline-service` (isolated simulation lanes) | Simulation execution control (configure, checkpoint, advance clock) |
+
+Operator-only deterministic execution is documented separately in
+[Simulation Execution Control](/api/simulation-control). It is unavailable in ordinary deployments and never
+appears in participant responses.
 
 ## Game phases
 
@@ -53,7 +58,7 @@ All errors follow [RFC 9457 Problem Details](https://www.rfc-editor.org/rfc/rfc9
 }
 ```
 
-Game-platform errors carry a stable `code` property (`<status>-<nn>`, per module) — branch on it rather than parsing `detail`. The Simulation Workbench uses symbolic `code` values instead (see the Simulation Workbench API page).
+Game-platform errors carry a stable `code` property (`<status>-<nn>`, per module) — branch on it rather than parsing `detail`. The Simulation Workbench and the simulation execution-control interface use symbolic `code` values instead (see the Simulation Workbench API page and the Simulation Execution Control page).
 Unexpected server errors return a sanitized `500` without a `code`.
 
 ## Rate limiting
