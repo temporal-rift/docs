@@ -1,0 +1,176 @@
+---
+title: "Simulation Execution Control"
+description: "Operator-only deterministic execution inputs, per-service checkpoints, and logical clock control"
+---
+
+Operator-only controls for reproducible execution in isolated simulation deployments. The game and timeline
+services each expose this contract independently and own their own execution revision and checkpoint. The
+caller coordinates both services and downstream projection barriers; an acknowledgement from one service does
+not imply global completion.
+
+This interface supplies entropy, logical identities, validated faction/seat assignment, and logical time. It
+never supplies commands, outcomes, scores, or winner decisions, and its inputs never appear in
+participant-facing responses.
+
+## Authorization and deployment boundary
+
+All three operations require a JWT bearer token carrying the `simulation:control` scope:
+
+```http
+Authorization: Bearer <jwt>
+```
+
+The routes are registered only in isolated simulation deployments:
+
+| Caller | Result |
+|---|---|
+| Missing, invalid, or expired token | `401` without disclosing execution state |
+| Authenticated participant token without `simulation:control` | `403 SIMULATION_CONTROL_FORBIDDEN` without disclosing execution context |
+| Any caller against an ordinary deployment | `404 SIMULATION_CONTROL_UNAVAILABLE`, even with a control-scoped token |
+
+## Operations
+
+| Operation | Method and path | Success |
+|---|---|---|
+| Configure execution | `PUT /internal/simulation/v1/execution` | `200` checkpoint |
+| Read checkpoint | `GET /internal/simulation/v1/checkpoint` | `200` checkpoint |
+| Advance clock | `PUT /internal/simulation/v1/clock` | `200` acknowledgement |
+
+## Configure execution
+
+```http
+PUT /internal/simulation/v1/execution
+```
+
+Registers deterministic execution inputs before gameplay begins. The request body is an `ExecutionContext`; every
+field is required:
+
+```json
+{
+  "schemaVersion": 1,
+  "caseKey": "uuid",
+  "seed": "42",
+  "entropyVersion": "SHA256_V1",
+  "manifestDigest": "64 lowercase hex characters",
+  "logicalTime": "2026-10-05T19:00:00Z",
+  "seats": [
+    { "seatIndex": 0, "playerId": "uuid", "faction": "ERASERS" },
+    { "seatIndex": 1, "playerId": "uuid", "faction": "WEAVERS" },
+    { "seatIndex": 2, "playerId": "uuid", "faction": "ARCHIVISTS" }
+  ]
+}
+```
+
+- `schemaVersion` is the integer constant `1`.
+- `seed` is a decimal string in unsigned 64-bit range (`0` through `18446744073709551615`).
+- `entropyVersion` is `SHA256_V1`.
+- `manifestDigest` is 64 lowercase SHA-256 hex characters identifying the immutable execution manifest.
+- `logicalTime` is a UTC date-time.
+- `seats` is an ordered array of 3 to 5 entries with contiguous `seatIndex` values starting at `0`, unique
+  `playerId` values, and unique factions. Player IDs identify existing authenticated bot subjects.
+
+Configuration is idempotent: repeating an identical context is a no-op returning the current checkpoint, and the
+first accepted configuration yields revision `0`. A changed context, or any configuration against a nonempty
+active lane, returns `409 EXECUTION_CONTEXT_CONFLICT`. A malformed context returns
+`400 INVALID_EXECUTION_CONTEXT`.
+
+## Read checkpoint
+
+```http
+GET /internal/simulation/v1/checkpoint
+```
+
+Reads this service's checkpoint. The response is an `ExecutionCheckpoint`:
+
+```json
+{
+  "caseKey": "uuid",
+  "manifestDigest": "64 lowercase hex characters",
+  "revision": 0,
+  "logicalTime": "2026-10-05T19:00:00Z",
+  "gameId": null,
+  "state": "READY",
+  "drained": true,
+  "outboxPending": 0,
+  "continuationsPending": 0,
+  "dueTimersPending": 0,
+  "nextDeadline": null,
+  "sourceWatermarks": [
+    { "groupId": "string", "topic": "string", "partition": 0, "nextOffset": 0 }
+  ]
+}
+```
+
+- `revision` is a service-owned nonnegative integer; each service advances its own revision independently.
+- `state` is `READY`, `ACTIVE`, or `TERMINAL`.
+- `gameId` and `nextDeadline` are required but nullable.
+- `outboxPending`, `continuationsPending`, and `dueTimersPending` are nonnegative counters.
+- `sourceWatermarks` are per source/group positions (`groupId`, `topic`, `partition`, `nextOffset`); they do not
+  define a global event order.
+
+A drained checkpoint (`"drained": true`) means all work observed up to its listed watermarks has completed. It
+does not preclude unseen upstream work from arriving later. A service with no configured execution returns
+`409 EXECUTION_NOT_CONFIGURED`.
+
+## Advance clock
+
+```http
+PUT /internal/simulation/v1/clock
+```
+
+Advances only this service's logical clock. The request body is a `ClockAdvance`; the response is a
+`ClockAcknowledgement`:
+
+```json
+{
+  "operationId": "uuid",
+  "expectedRevision": 0,
+  "targetTime": "2026-10-05T20:00:00Z"
+}
+```
+
+```json
+{
+  "operationId": "uuid",
+  "appliedRevision": 1,
+  "logicalTime": "2026-10-05T20:00:00Z"
+}
+```
+
+- Advancing to the current logical time is a legal idempotent operation; moving backward is rejected with
+  `422 CLOCK_REGRESSION`.
+- Repeating an `operationId` with the identical body returns its original acknowledgement without another
+  advance. Reusing an `operationId` with a different body returns `409 IDEMPOTENCY_CONFLICT`.
+- An `expectedRevision` that no longer matches the service's revision returns
+  `409 STALE_EXECUTION_REVISION`. Track each service's revision separately.
+- A malformed advance returns `400 INVALID_CLOCK_ADVANCE`.
+
+## Coordinating game, timeline, and projection services
+
+One acknowledgement never means the whole simulation has advanced:
+
+1. Configure the game service and the timeline service with the same execution context.
+2. Inspect each service's checkpoint separately; revisions, states, and watermarks are service-owned.
+3. Advance each service's clock with its own current `expectedRevision`, then re-read its checkpoint.
+4. Wait for downstream projection barriers before treating the step as globally visible; a drained per-service
+   checkpoint alone does not imply global completion.
+
+Execution inputs, seat assignments, and checkpoints stay on this operator interface. Ordinary gameplay keeps
+using the participant session, action, scoring, and read APIs, which never expose them.
+
+## Error codes
+
+Errors use RFC 9457 problem details with a required stable string `code`.
+
+| Status | Code | Condition |
+|---|---|---|
+| `400` | `INVALID_EXECUTION_CONTEXT` | Malformed execution context (for example duplicate factions, gaps in seat indices, or an out-of-range seed) |
+| `400` | `INVALID_CLOCK_ADVANCE` | Malformed clock advance |
+| `401` | `AUTHENTICATION_REQUIRED` | Missing, invalid, or expired bearer token |
+| `403` | `SIMULATION_CONTROL_FORBIDDEN` | Authenticated caller lacks `simulation:control` |
+| `404` | `SIMULATION_CONTROL_UNAVAILABLE` | Control interface not registered in this deployment |
+| `409` | `EXECUTION_NOT_CONFIGURED` | No execution configured yet |
+| `409` | `EXECUTION_CONTEXT_CONFLICT` | Context differs from the configured execution or the lane is active |
+| `409` | `IDEMPOTENCY_CONFLICT` | `operationId` reused with a different clock body |
+| `409` | `STALE_EXECUTION_REVISION` | `expectedRevision` no longer matches the service revision |
+| `422` | `CLOCK_REGRESSION` | `targetTime` precedes the current logical time |
