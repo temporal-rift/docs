@@ -20,12 +20,14 @@ All three operations require a JWT bearer token carrying the `simulation:control
 Authorization: Bearer <jwt>
 ```
 
-The routes are registered only in isolated simulation deployments:
+The routes are registered only in isolated simulation deployments. The first two rows below describe an
+isolated simulation deployment; against an ordinary deployment the third row takes precedence for every caller,
+because the request never reaches authentication:
 
 | Caller | Result |
 |---|---|
-| Missing, invalid, or expired token | `401` without disclosing execution state |
-| Authenticated participant token without `simulation:control` | `403 SIMULATION_CONTROL_FORBIDDEN` without disclosing execution context |
+| Missing, invalid, or expired token (isolated simulation deployment) | `401` without disclosing execution state |
+| Authenticated participant token without `simulation:control` (isolated simulation deployment) | `403 SIMULATION_CONTROL_FORBIDDEN` without disclosing execution context |
 | Any caller against an ordinary deployment | `404 SIMULATION_CONTROL_UNAVAILABLE`, even with a control-scoped token |
 
 ## Operations
