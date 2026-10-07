@@ -53,4 +53,4 @@ Reproduction runs the exact pinned manifest and accepted transcript in a clean l
 
 ## Error codes
 
-The API uses RFC 9457 problem details with a stable `code`. Validation errors are `INVALID_EXPERIMENT`, `INVALID_REPLAY_PERSPECTIVE`, or `INVALID_COMPARISON`. State and identity errors include `IDEMPOTENCY_CONFLICT`, `EXPERIMENT_IMMUTABLE`, `INVALID_RUN_STATE`, and `MANIFEST_MISMATCH`. `CONTRACT_MISMATCH` and `CONFIGURATION_DRIFT` are retained as attempt failures, not reported as normal games.
+The API uses RFC 9457 problem details with a stable symbolic `code`. Unlike the game-platform APIs, workbench codes are symbolic names rather than `<status>-<nn>` values. Validation errors are `INVALID_EXPERIMENT`, `INVALID_REPLAY_PERSPECTIVE`, or `INVALID_COMPARISON`. State and identity errors include `IDEMPOTENCY_CONFLICT`, `EXPERIMENT_IMMUTABLE`, `INVALID_RUN_STATE`, and `MANIFEST_MISMATCH`. `CONTRACT_MISMATCH` and `CONFIGURATION_DRIFT` are retained as attempt failures, not reported as normal games.
