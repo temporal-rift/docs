@@ -69,7 +69,9 @@ field is required:
 - `manifestDigest` is 64 lowercase SHA-256 hex characters identifying the immutable execution manifest.
 - `logicalTime` is a UTC date-time.
 - `seats` is an ordered array of 3 to 5 entries with contiguous `seatIndex` values starting at `0`, unique
-  `playerId` values, and unique factions. Player IDs identify existing authenticated bot subjects.
+  `playerId` values, and unique factions. Each `faction` is one of `ERASERS`, `PROPHETS`, `REVISIONISTS`,
+  `WEAVERS`, or `ACTIVISTS` (see [Factions](/game-design/factions)). Player IDs identify existing authenticated bot
+  subjects.
 
 Configuration is idempotent: repeating an identical context is a no-op returning the current checkpoint, and the
 first accepted configuration yields revision `0`. A changed context, or any configuration against a nonempty
