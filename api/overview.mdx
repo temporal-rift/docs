@@ -53,7 +53,7 @@ All errors follow [RFC 9457 Problem Details](https://www.rfc-editor.org/rfc/rfc9
 }
 ```
 
-Errors carry a stable `code` property (`<status>-<nn>`, per module) — branch on it rather than parsing `detail`.
+Game-platform errors carry a stable `code` property (`<status>-<nn>`, per module) — branch on it rather than parsing `detail`. The Simulation Workbench uses symbolic `code` values instead (see the Simulation Workbench API page).
 Unexpected server errors return a sanitized `500` without a `code`.
 
 ## Rate limiting
