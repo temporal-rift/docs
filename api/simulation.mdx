@@ -35,7 +35,13 @@ With all faction sets, cyclic rotations, one seed, two homogeneous policies, and
 
 A run progresses through `QUEUED`, `RUNNING`, `INTERRUPTED`, `CANCELLING`, `CANCELLED`, `COMPLETED`, or `FAILED`. It reports requested, pending, running, succeeded, failed, and cancelled case counts. Resumption is valid only from `INTERRUPTED`; the retained completed cases remain a single logical sample and are not scheduled again.
 
-Each case has a stable case key, a variant, a seed, ordered seat/faction/policy assignments, and its own lifecycle. Attempts are separately retained with their checkpoint evidence, game identity when present, and failure. A reproduction creates a separate attempt and never adds a research sample. A missing or changed pinned artifact causes `409 MANIFEST_MISMATCH`.
+Each case has a stable case key, a variant, a seed, ordered seat/faction/policy assignments, and its own lifecycle (`PENDING`, `RUNNING`, `SUCCEEDED`, `FAILED`, or `CANCELLED`). Attempts are separately retained with their checkpoint evidence, game identity when present, and failure. A reproduction creates a separate attempt and never adds a research sample. A missing or changed pinned artifact causes `409 MANIFEST_MISMATCH`.
+
+A run keeps its completed results through interruption and cancellation. After an interruption, `resumeRun` schedules only the cases that have no final state, so a case is never counted twice however many attempts recovered it. Cancelling stops scheduling, cancels the pending cases, and lets running cases stop at their next step; every completed result stays readable and the rest are reported as cancelled. Repeating a cancel never reopens a terminal run.
+
+A case succeeds when its game reaches an authoritative ending whose winners, faction reveal, and final scores agree. An ending without winners (`RESOLUTION_FAILED`, `ALL_PLAYERS_ABANDONED`, or `DECK_EXHAUSTED`) is a valid game outcome: the case succeeds with that `endReason`, no winners, and its final scores, and its attempt is not a failure. The winners of `TIMELINE_COLLAPSED` and `TIMELINE_STABILIZED` have no `winType` (`null`); only a normal victory has one.
+
+An attempt fails with `RUNNER_TIMEOUT` when no authoritative ending is reached within the manifest's case limit, `EXECUTION_FAILED` when a lane or service call fails in a way that cannot be reconciled, `CONTRACT_MISMATCH` when a response or policy reference does not match the pinned contracts, `CONFIGURATION_DRIFT` when a service executes another case or manifest than configured, or `POLICY_EXHAUSTED` when a seat has no candidate, pass, or decline left. Timeouts and execution failures are retried on a fresh attempt up to a configured limit; the other failures are deterministic and fail the case at once. A failed attempt is never turned into a game sample.
 
 ## Reports and comparisons
 
@@ -53,4 +59,4 @@ Reproduction runs the exact pinned manifest and accepted transcript in a clean l
 
 ## Error codes
 
-The API uses RFC 9457 problem details with a stable symbolic `code`. Unlike the game-platform APIs, workbench codes are symbolic names rather than `<status>-<nn>` values. Validation errors are `INVALID_EXPERIMENT`, `INVALID_REPLAY_PERSPECTIVE`, or `INVALID_COMPARISON`. State and identity errors include `IDEMPOTENCY_CONFLICT`, `EXPERIMENT_IMMUTABLE`, `INVALID_RUN_STATE`, and `MANIFEST_MISMATCH`. `CONTRACT_MISMATCH` and `CONFIGURATION_DRIFT` are retained as attempt failures, not reported as normal games.
+The API uses RFC 9457 problem details with a stable symbolic `code`. Unlike the game-platform APIs, workbench codes are symbolic names rather than `<status>-<nn>` values. Validation errors are `INVALID_EXPERIMENT`, `INVALID_REPLAY_PERSPECTIVE`, or `INVALID_COMPARISON`. State and identity errors include `IDEMPOTENCY_CONFLICT`, `EXPERIMENT_IMMUTABLE`, `INVALID_RUN_STATE`, and `MANIFEST_MISMATCH`. `RUNNER_TIMEOUT`, `EXECUTION_FAILED`, `CONTRACT_MISMATCH`, `CONFIGURATION_DRIFT`, and `POLICY_EXHAUSTED` are retained as attempt failures, not reported as normal games.
