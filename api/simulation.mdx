@@ -45,11 +45,42 @@ An attempt fails with `RUNNER_TIMEOUT` when no authoritative ending is reached w
 
 ## Reports and comparisons
 
-Reports always expose whether they are complete, all case counts, an analysis version and seed, and cohorts stratified by player count, faction set, seat, policy/version, and variant. Every metric carries its numerator, denominator, unit, availability status, and a named unknown-opportunity count where relevant.
+### Reports
 
-Faction win rate is wins divided by eligible successful games containing the faction. Shared wins count as wins and also have their own shared-win metric, so faction rates need not sum to 100%. Failed, cancelled, and unmatched cases remain visible rather than disappearing from a report.
+`getRunReport` returns the report as JSON, or as CSV with `Accept: text/csv`. It states whether it is complete, the run's case counts (requested, pending, running, succeeded, failed, cancelled), its analysis version and analysis seed, and a list of cohorts. For every variant, policy, and player count of the run there are four cohort levels:
 
-Intervals are 95% block-bootstrap intervals over independent seed/cohort blocks. Fewer than two blocks yields `INSUFFICIENT_SAMPLE` with no numeric interval. Comparisons retain declared variant differences, matched blocks, unmatched cases, failed counterparts, paired metric differences, and pinned analysis metadata. Incompatible run definitions return `422 INCOMPARABLE_RUNS`.
+| Level | `factionSet` | `seatIndex` |
+|---|---|---|
+| Pooled | `null` | `null` |
+| Per seat | `null` | seat |
+| Per faction set | set | `null` |
+| Per faction set and seat | set | seat |
+
+Only succeeded cases are games. Each cohort reports its own case counts, its eligible games (succeeded cases, each counted once however many attempts it took), and its independent blocks. Pending, running, failed, and cancelled cases appear only in the counts, never in a denominator, and a report is incomplete while any requested case has not succeeded. A valid ending without winners is still an eligible game.
+
+Every metric names its `statistic` and its `dimensions`:
+
+- `RATE` is the numerator over the denominator, `MEAN` is a total over its sample size, and `QUANTILE` is the smallest observed value whose cumulative share reaches the quantile.
+- `dimensions` restricts the metric to a `faction`, `cardType`, `cardGrade`, `specialAction`, `paradoxType`, `endReason`, or `quantile`; a missing dimension means the metric is not split by it.
+- A metric with no eligible data is `NO_DATA` with a null value.
+
+Faction win rate counts the games in which the faction's seat is among the winners, over the eligible games containing that faction. A shared win counts as a win for every winner and also feeds the faction's shared-win rate, so faction rates need not sum to 100%. For example, Erasers present in 10 games and winning 4, one of them shared, have a win rate of 0.4 and a shared-win rate of 0.1.
+
+Card metrics separate cards offered, kept, and played, and measure playability per card and action round. A round the seat did not observe has unknown playability; it is left out of the rate and counted in `unknownCount`. Card and faction associations describe how the run's policies played, not the strength of a card or faction.
+
+### Uncertainty
+
+Cases that share a seed share their randomness across faction sets, seat rotations, and variants, so a seed is one independent block. Intervals are 95% percentile intervals from resampling a cohort's seeds with replacement (`BLOCK_BOOTSTRAP`). A cohort with fewer than two seeds reports `INSUFFICIENT_SAMPLE` with its value and no interval. The same analysis version, analysis seed, and case results always reproduce the same report.
+
+### Comparisons
+
+`createComparison` takes a `baseline` and a `candidate`, each a run and one of its variant labels; both may name the same run. The two runs' frozen experiments must be equal in services, contracts, policies and their parameters, seeds, player counts, faction sets, seat rotation, timing mode, and rejected-candidate budget, otherwise the request returns `422 INCOMPARABLE_RUNS` naming each difference. The compared variants' rules and content may differ and are listed in `declaredDifferences`. An unknown run returns `404 RESOURCE_NOT_FOUND`; an unknown variant label or two identical sides return `400 INVALID_COMPARISON`.
+
+A baseline case and a candidate case form a pair when they share seed, player count, policy, and seat-to-faction assignment. In each cohort a seed is a block, and only blocks whose every pair succeeded on both sides enter the paired estimates. Each metric difference reports the baseline value, the candidate value, their difference, and a 95% block-bootstrap interval of the difference. Every pair with a failed or cancelled side (`FAILED_COUNTERPART`) or an unfinished side (`UNFINISHED`) is listed in `excludedPairs`. A comparison is recomputed from current results on every read and stays incomplete while any pair is unfinished or failed.
+
+### CSV exports
+
+Both CSV exports start with a header row and repeat the full attribution on every row, so a single row stands on its own. A report row holds `formatVersion`, `runId`, `manifestDigest`, `analysisVersion`, `analysisSeed`, `complete`, the cohort (`variantLabel`, `policyId`, `policyVersion`, `playerCount`, `factionSet` joined with `|`, `seatIndex`), `eligibleGames`, `independentBlocks`, the six case counts, then `metric`, `statistic`, one column per dimension, `unit`, `value`, `numerator`, `denominator`, `status`, `intervalLower`, `intervalUpper`, and `unknownCount`. A comparison row holds `formatVersion`, `comparisonId`, both sides' run and variant, the analysis version and seed, `complete`, the cohort, `matchedBlocks`, `excludedBlocks`, then `metric`, `statistic`, the dimensions, `unit`, `baselineValue`, `candidateValue`, `difference`, `status`, `intervalLower`, and `intervalUpper`. Empty fields are null values.
 
 ## Replay and reproduction
 
