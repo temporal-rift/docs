@@ -32,7 +32,7 @@ All requests use a JWT bearer token. Reads require `simulation:read`, mutations 
 
 ## Discovery
 
-Discovery operations let a designer client find and preview what it can act on without holding identifiers in advance. Reads require `simulation:read`; previewing a manifest requires `simulation:write`.
+Discovery operations let a designer client find and preview what it can act on without holding identifiers in advance. Reads require `simulation:read`; previewing a manifest requires `simulation:write`. Previewing creates nothing, so it takes no `Idempotency-Key` header.
 
 `previewExperiment` validates a manifest exactly as `createExperiment` does but stores nothing. It returns the `manifestDigest` the manifest would freeze under, the total `caseCount`, a `breakdown` by variant and player count, and a page of `cases` (`caseKey`, `variantLabel`, `seed`, `playerCount`, per-seat `assignments`) in the order and with the case keys the durable run will use. Its query parameters are `limit` (1 to 500, default 100) and `offset`. An invalid or over-bound manifest is `400 INVALID_EXPERIMENT`.
 
