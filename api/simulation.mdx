@@ -22,6 +22,21 @@ All requests use a JWT bearer token. Reads require `simulation:read`, mutations 
 | Get case | `GET /api/v1/runs/{runId}/cases/{caseId}` | `200` |
 | Get replay | `GET /api/v1/runs/{runId}/cases/{caseId}/replay` | `200` |
 | Reproduce case | `POST /api/v1/runs/{runId}/cases/{caseId}/reproductions` | `202` |
+| List experiments | `GET /api/v1/experiments` | `200` |
+| Get experiment | `GET /api/v1/experiments/{experimentId}` | `200` |
+| Preview experiment | `POST /api/v1/experiment-previews` | `200` |
+| List runs | `GET /api/v1/runs` | `200` |
+| List cases | `GET /api/v1/runs/{runId}/cases` | `200` |
+| List comparisons | `GET /api/v1/comparisons` | `200` |
+| List policies | `GET /api/v1/policies` | `200` |
+
+## Discovery
+
+Discovery operations let a designer client find and preview what it can act on without holding identifiers in advance. Reads require `simulation:read`; previewing a manifest requires `simulation:write`.
+
+`previewExperiment` validates a manifest exactly as `createExperiment` does but stores nothing. It returns the `manifestDigest` the manifest would freeze under, the total `caseCount`, a `breakdown` by variant and player count, and a page of `cases` (`caseKey`, `variantLabel`, `seed`, `playerCount`, per-seat `assignments`) in the order and with the case keys the durable run will use. Its query parameters are `limit` (1 to 500, default 100) and `offset`. An invalid or over-bound manifest is `400 INVALID_EXPERIMENT`.
+
+Lists return `{ items, total }` and take `limit` (1 to 500, default 50) and `offset`. Experiments, runs and comparisons are newest first; a run's cases are in matrix order. `listRuns` filters by `experimentId` and `state`; `listCases` by `state` and `variantLabel` and answers `404 RESOURCE_NOT_FOUND` for an unknown run; `listComparisons` by `runId` (baseline or candidate). A case summary carries its identifiers, variant, seed, player count, `state` and a nullable `endReason`. `listPolicies` returns each referenceable bot policy bundle with its `id`, `version`, `artifactDigest`, `description` and accepted `parameters`; a manifest policy built from an entry passes verification.
 
 ## Immutable experiment manifests
 
