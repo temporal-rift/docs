@@ -1,0 +1,72 @@
+---
+title: "Designer Guide"
+description: "From a configured experiment to a reproduced case in the Simulation Workbench"
+---
+
+The Simulation Workbench web application takes a balance question through the whole research loop: configure an experiment, freeze it, run it, read the report, compare variants, inspect a case, and reproduce it. This guide walks through that loop in the order a designer follows it. The [Simulation Workbench API](/api/simulation) describes what the application does underneath.
+
+You sign in with the workbench's identity provider. The application offers each action according to your scopes: reading needs `simulation:read`, changing anything needs `simulation:write`, and observer replay additionally needs `simulation:observe`. An action your session may not take is shown as unavailable and names the missing scope.
+
+## 1. Configure and preview
+
+On **Experiments → New experiment**, name the experiment and add the variants you want to compare, the bot policies (chosen from the catalog) with the seats each one plays, the seeds, player counts and faction sets, and the execution bounds. A value the service refuses is marked on its own field, and an unsent draft survives a reload or an expired session.
+
+**Preview matrix** shows the exact set of cases the experiment will run: the total, the count per variant and player count, and a page of case coordinates. Nothing is stored by a preview.
+
+## 2. Freeze
+
+**Freeze this experiment…** asks you to confirm the digest and case count you were shown. A frozen experiment never changes; **Change: new draft from this experiment** starts a new draft from it and leaves the original as it was.
+
+## 3. Launch and follow a run
+
+**Launch a run** starts the cases on the workbench's isolated lanes. The run page shows its state and the counts of requested, pending, running, succeeded, failed and cancelled cases, and refreshes while the run is open. A run can be cancelled until it settles and resumed only from `INTERRUPTED`. Failed cases are listed with their code and message and link to the case.
+
+Cases that have not succeeded are never results. Anywhere data covers only part of the run, it is marked **Partial**.
+
+## 4. Read the report
+
+A report is organised in cohorts. Each shows its eligible games and independent blocks and then every metric with its value, denominator and interval.
+
+| You see | It means |
+|---|---|
+| Interval | A 95% interval over independent seed blocks |
+| Insufficient sample | Fewer than two independent blocks support the value, so there is no interval |
+| No data | The denominator is 0 |
+| Unknown count | Opportunities whose playability could not be determined; they are excluded from the denominator |
+| Partial report | Some requested cases have not succeeded |
+
+**Export JSON** and **Export CSV** download exactly what the service returned.
+
+## 5. Compare two variants
+
+On **Comparisons**, choose the run and variant on each side. A comparison lists the differences the two sides declare (rules or content), the matched blocks, the pairs left out because a side failed or has not finished, and each paired difference with its interval. If the two runs differ in anything beyond the declared variant, the comparison is refused and the differences are named.
+
+## 6. Inspect a case
+
+Open a case from its run to see its seats, every attempt with its state and failure, and its result, or the plain statement that it has none.
+
+**Replay** shows one perspective at a time:
+
+- **View as player** shows only the chosen seat's steps and only what that seat knew at each step: no opponent's hand or faction and no information it had not yet earned. Step numbers belong to the whole case, so a seat's steps skip the numbers of other seats. Use **Later steps** and **Earlier steps** to page.
+- **View as observer…** requires `simulation:observe`. It is labelled **Observer evidence** and shows every seat's steps followed by the raw events, one list per source in the order that source delivered them. Without the scope, access is denied and nothing is shown. Observer evidence is for inspection only and is never used by bot policies.
+
+Switching seat or perspective discards the previous view's data before anything else is shown.
+
+## 7. Reproduce a case
+
+**Reproduce this case** replays the saved case and compares it with the recording. It checks the case; it never adds a research sample and never changes the case's result.
+
+| You see | It means |
+|---|---|
+| Waiting | The lane that played the case is busy. The reproduction starts when it is free; this is not a failure. |
+| Running | The case is being replayed. |
+| Match | Every accepted decision and the final result equal the recording. |
+| Diverged | The first difference: its step, its kind, and the expected and actual values. |
+| The reproduction failed | It could not be completed this time. This says nothing about the case. |
+| Cannot be reproduced | The case has no saved result or transcript, or its pinned configuration no longer matches. |
+
+A divergence is one of `OBSERVATION`, `DECISION`, `WINDOW`, `MISSING_STEP`, `UNEXPECTED_STEP`, `UNEXPECTED_WINDOW` or `COMMAND_REJECTED`, or, after the last step, `END_REASON`, `WINNERS`, `FINAL_SCORES`, `ERAS` or `SEMANTIC_DIGEST`.
+
+## When something goes wrong
+
+Every refusal is shown as a plain sentence with a way to continue. If the service cannot be reached, the last data stays on screen marked stale with a **Retry** button and nothing you entered is lost. Progress, errors and denials are announced to screen readers, and every control can be used from the keyboard.
