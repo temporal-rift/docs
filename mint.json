@@ -73,6 +73,10 @@
       ]
     },
     {
+      "group": "Simulation Workbench",
+      "pages": ["workbench/designer-guide"]
+    },
+    {
       "group": "API Reference",
       "pages": [
         "api/overview",
