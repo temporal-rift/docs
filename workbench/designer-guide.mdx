@@ -19,7 +19,7 @@ On **Experiments → New experiment**, name the experiment and add the variants 
 
 ## 3. Launch and follow a run
 
-**Launch a run** starts the cases on the workbench's isolated lanes. The run page shows its state and the counts of requested, pending, running, succeeded, failed and cancelled cases, and refreshes while the run is open. A run can be cancelled until it settles and resumed only from `INTERRUPTED`. Failed cases are listed with their code and message and link to the case.
+**Launch a run** starts the cases on the workbench's isolated lanes; each case plays only on a lane serving its variant's rules and content. If some variant has no such lane, the launch is refused, the refusal names the variant, and no run is created. The run page shows its state and the counts of requested, pending, running, succeeded, failed and cancelled cases, and refreshes while the run is open. A run can be cancelled until it settles and resumed only from `INTERRUPTED`. Failed cases are listed with their code and message and link to the case.
 
 Cases that have not succeeded are never results. Anywhere data covers only part of the run, it is marked **Partial**.
 
@@ -58,7 +58,7 @@ Switching seat or perspective discards the previous view's data before anything 
 
 | You see | It means |
 |---|---|
-| Waiting | The lane that played the case is busy. The reproduction starts when it is free; this is not a failure. |
+| Waiting | The lane that played the case is busy or serves other rules or content. The reproduction starts when it is free and serving this case's variant again; this is not a failure. |
 | Running | The case is being replayed. |
 | Match | Every accepted decision and the final result equal the recording. |
 | Diverged | The first difference: its step, its kind, and the expected and actual values. |
