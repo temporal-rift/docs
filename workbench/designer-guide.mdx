@@ -9,7 +9,9 @@ You sign in with the workbench's identity provider. The application offers each 
 
 ## 1. Configure and preview
 
-On **Experiments → New experiment**, name the experiment and add the variants you want to compare, the bot policies (chosen from the catalog) with the seats each one plays, the seeds, player counts and faction sets, and the execution bounds. A value the service refuses is marked on its own field, and an unsent draft survives a reload or an expired session.
+On **Experiments → New experiment**, you can **Start from** a template: *Baseline policy comparison* (one variant; the random and faction-greedy policies, each on every seat) or *Rules variant comparison* (two variants; the random policy on every seat). A template fills one variant slot per variant it needs with the bundles the lanes serve, in order, and proposes seed `42`, player counts 3, 4 and 5, every faction set, and the execution bounds. Every value it fills stays editable, and your experiment name is kept.
+
+Name the experiment, label each variant and choose its **Bundle** from the rules and content bundles the lanes serve. The bundle's artifacts and effective digests, and the service images and contract versions it pins, are shown read-only: you never type a digest. Variants can be compared only when their bundles pin the same services and contracts; otherwise the page names the fields that differ and the draft cannot be previewed or frozen. If no lane is configured, the page says so and nothing can be frozen. Then choose the bot policies (from the catalog) with the seats each one plays, the seeds, player counts and faction sets, and the execution bounds. A value the service refuses is marked on its own field, and an unsent draft survives a reload or an expired session.
 
 **Preview matrix** shows the exact set of cases the experiment will run: the total, the count per variant and player count, and a page of case coordinates. Nothing is stored by a preview.
 
