@@ -1,6 +1,6 @@
 ---
 title: "Simulation Workbench API"
-description: "Immutable experiments, durable runs, statistical reports, comparisons, and replay"
+description: "Immutable experiments, durable runs, statistical reports, comparisons, replay, balance criteria, and run evaluation"
 ---
 
 The Simulation Workbench is a separate designer-facing product that runs real game services in isolated lanes. It does not expose its controls to a human-game client and it does not replace the authoritative game rules.
@@ -29,6 +29,9 @@ All requests use a JWT bearer token. Reads require `simulation:read`, mutations 
 | List cases | `GET /api/v1/runs/{runId}/cases` | `200` |
 | List comparisons | `GET /api/v1/comparisons` | `200` |
 | List policies | `GET /api/v1/policies` | `200` |
+| List balance criteria | `GET /api/v1/balance-criteria` | `200` |
+| Get balance criterion | `GET /api/v1/balance-criteria/{criterionVersion}` | `200` |
+| Get run evaluation | `GET /api/v1/runs/{runId}/evaluation` | `200` |
 
 ## Discovery
 
@@ -80,12 +83,14 @@ Only succeeded cases are games. Each cohort reports its own case counts, its eli
 Every metric names its `statistic` and its `dimensions`:
 
 - `RATE` is the numerator over the denominator, `MEAN` is a total over its sample size, and `QUANTILE` is the smallest observed value whose cumulative share reaches the quantile.
-- `dimensions` restricts the metric to a `faction`, `cardType`, `cardGrade`, `specialAction`, `paradoxType`, `endReason`, or `quantile`; a missing dimension means the metric is not split by it.
+- `dimensions` restricts the metric to a `faction`, `cardType`, `cardGrade`, `specialAction`, `paradoxType`, `endReason`, `quantile`, or `failureCode`; a missing dimension means the metric is not split by it.
 - A metric with no eligible data is `NO_DATA` with a null value.
 
 Faction win rate counts the games in which the faction's seat is among the winners, over the eligible games containing that faction. A shared win counts as a win for every winner and also feeds the faction's shared-win rate, so faction rates need not sum to 100%. For example, Erasers present in 10 games and winning 4, one of them shared, have a win rate of 0.4 and a shared-win rate of 0.1.
 
 Card metrics separate cards offered, kept, and played, and measure playability per card and action round. A round the seat did not observe has unknown playability; it is left out of the rate and counted in `unknownCount`. Card and faction associations describe how the run's policies played, not the strength of a card or faction.
+
+Reports of analysis version `2` additionally carry `failure_share` (statistic `RATE`, unit `cases`) in every cohort that pools seats: failed cases with that code over succeeded-or-failed cases, once without a `failureCode` dimension and once per code present. A case's code is the code of its final failed attempt, so a retried attempt that later succeeded does not count; cancelled, pending, and running cases are in neither count. Its interval is the same seed block bootstrap as every other metric.
 
 ### Uncertainty
 
@@ -96,6 +101,12 @@ Cases that share a seed share their randomness across faction sets, seat rotatio
 `createComparison` takes a `baseline` and a `candidate`, each a run and one of its variant labels; both may name the same run. The two runs' frozen experiments must be equal in services, contracts, policies and their parameters, seeds, player counts, faction sets, seat rotation, timing mode, and rejected-candidate budget, otherwise the request returns `422 INCOMPARABLE_RUNS` naming each difference. The compared variants' rules and content may differ and are listed in `declaredDifferences`. An unknown run returns `404 RESOURCE_NOT_FOUND`; an unknown variant label or two identical sides return `400 INVALID_COMPARISON`.
 
 A baseline case and a candidate case form a pair when they share seed, player count, policy, and seat-to-faction assignment. In each cohort a seed is a block, and only blocks whose every pair succeeded on both sides enter the paired estimates. Each metric difference reports the baseline value, the candidate value, their difference, and a 95% block-bootstrap interval of the difference. Every pair with a failed or cancelled side (`FAILED_COUNTERPART`) or an unfinished side (`UNFINISHED`) is listed in `excludedPairs`. A comparison is recomputed from current results on every read and stays incomplete while any pair is unfinished or failed.
+
+### Balance criteria and run evaluation
+
+Balance criteria are read-only resources served from the workbench's configuration; a new version is added by configuration, never through the API. `listBalanceCriteria` (`GET /api/v1/balance-criteria`) returns every served criterion version ordered by `version`. `getBalanceCriterion` (`GET /api/v1/balance-criteria/{criterionVersion}`) returns one version; an unknown version is `404 RESOURCE_NOT_FOUND`. A criterion carries its `version`, `digest`, `title`, `analysisVersion`, `lines`, the `WEIGHTED_SUM_OF_SQUARED_DEVIATIONS` aggregation, and the evidence rule. Each line names its `metric`, `derivation` (`DIRECT`, `RATIO_TO_WIN_REFERENCE`, or `SUM_OF_FAILURE_CODES`), `dimension`, `policies`, `playerCounts`, `pooling` (`POOLED` or `PER_FACTION_SET`), `band` (a closed interval, or a one-sided limit with a normalisation `scale`), `role` (`GATE` or `SCORED`), `weight` (positive for scored lines, null for gates), and `rationale`.
+
+`getRunEvaluation` (`GET /api/v1/runs/{runId}/evaluation`) takes a required `variantLabel`, a required `criterionVersion`, and an optional `mode` (`SCREENING` by default, or `CONFIRMATION`). The evaluation is computed from the run's cases on every read with the analysis seed, so the same inputs always return byte-identical documents and nothing is persisted. Every criterion line expands into one evaluated line per cohort and dimension value it covers; the faction ratio and summed failure shares are recomputed in every bootstrap resample. A line `MEETS` when its interval lies inside the band, `FAILS` when it lies wholly outside, and is `INCONCLUSIVE` otherwise (always for `INSUFFICIENT_SAMPLE` or `NO_DATA`); the score is the sum of `weight × deviation²` over the scored lines. Validity comes first: unfinished cases, `CONTRACT_MISMATCH` or `CONFIGURATION_DRIFT` failures, an over-limit `EXECUTION_FAILED` share, or an `ALL_PLAYERS_ABANDONED` game make the evaluation `INVALID` with a null score. A valid evaluation is `REJECTED` when any gate fails; in confirmation mode it is `CONFIRMED` only with a satisfied sample (at least the criterion's minimum seeds over the full case matrix), every pooled gate met, and no scored line failing — otherwise `UNCONFIRMED`, which screening mode always returns. An unknown run, variant, or criterion is `404 RESOURCE_NOT_FOUND`; a missing or invalid parameter is `400 INVALID_REQUEST`. Both reads need `simulation:read`.
 
 ### CSV exports
 
@@ -115,4 +126,4 @@ The divergence `kind` is one of `OBSERVATION`, `DECISION`, or `WINDOW` (another 
 
 ## Error codes
 
-The API uses RFC 9457 problem details with a stable symbolic `code`. Unlike the game-platform APIs, workbench codes are symbolic names rather than `<status>-<nn>` values. Validation errors are `INVALID_EXPERIMENT`, `INVALID_REPLAY_PERSPECTIVE`, or `INVALID_COMPARISON`. `INVALID_EXPERIMENT` and `MANIFEST_MISMATCH` refusals of a manifest that are attributable to one value also carry `field`, the path of that value in the manifest (for example `seeds[1]` or `policies[0].seatAssignment[2].seatIndex`), so a client can place the problem on the input that caused it. No other code carries `field`. State and identity errors include `IDEMPOTENCY_CONFLICT`, `EXPERIMENT_IMMUTABLE`, `INVALID_RUN_STATE`, and `MANIFEST_MISMATCH`. `RUNNER_TIMEOUT`, `EXECUTION_FAILED`, `CONTRACT_MISMATCH`, `CONFIGURATION_DRIFT`, and `POLICY_EXHAUSTED` are retained as attempt failures, not reported as normal games.
+The API uses RFC 9457 problem details with a stable symbolic `code`. Unlike the game-platform APIs, workbench codes are symbolic names rather than `<status>-<nn>` values. Validation errors are `INVALID_EXPERIMENT`, `INVALID_REPLAY_PERSPECTIVE`, or `INVALID_COMPARISON`. A missing or invalid run-evaluation parameter is `400 INVALID_REQUEST`, and an unknown run, variant label, or criterion version is `404 RESOURCE_NOT_FOUND`. `INVALID_EXPERIMENT` and `MANIFEST_MISMATCH` refusals of a manifest that are attributable to one value also carry `field`, the path of that value in the manifest (for example `seeds[1]` or `policies[0].seatAssignment[2].seatIndex`), so a client can place the problem on the input that caused it. No other code carries `field`. State and identity errors include `IDEMPOTENCY_CONFLICT`, `EXPERIMENT_IMMUTABLE`, `INVALID_RUN_STATE`, and `MANIFEST_MISMATCH`. `RUNNER_TIMEOUT`, `EXECUTION_FAILED`, `CONTRACT_MISMATCH`, `CONFIGURATION_DRIFT`, and `POLICY_EXHAUSTED` are retained as attempt failures, not reported as normal games.
