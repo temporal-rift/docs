@@ -17,7 +17,7 @@ participant-facing responses.
 
 ## Authorization and deployment boundary
 
-All three operations require a JWT bearer token carrying the `simulation:control` scope:
+Every operation requires a JWT bearer token carrying the `simulation:control` scope:
 
 ```http
 Authorization: Bearer <jwt>
@@ -228,8 +228,8 @@ Errors use RFC 9457 problem details with a required stable string `code`.
 | `401` | `AUTHENTICATION_REQUIRED` | Missing, invalid, or expired bearer token |
 | `403` | `SIMULATION_CONTROL_FORBIDDEN` | Authenticated caller lacks `simulation:control` |
 | `404` | `SIMULATION_CONTROL_UNAVAILABLE` | Control interface not registered in this deployment |
-| `409` | `EXECUTION_NOT_CONFIGURED` | No context is open, or a close arrives with no open and no previously closed context |
-| `409` | `EXECUTION_CONTEXT_CONFLICT` | A different context is already open, or a close names a case key that matches neither the open nor the most recently closed context |
+| `409` | `EXECUTION_NOT_CONFIGURED` | No context is open: `getSimulationCheckpoint` and gameplay operations return it. A close returns it only when no context is open and none was ever closed; repeating the most recently closed case key is `204`. |
+| `409` | `EXECUTION_CONTEXT_CONFLICT` | A different context is already open, or a close names a case key that matches neither the open nor the most recently closed context once a context has been configured |
 | `409` | `IDEMPOTENCY_CONFLICT` | `operationId` reused with a different clock body |
 | `409` | `STALE_EXECUTION_REVISION` | `expectedRevision` no longer matches the service revision |
 | `422` | `CLOCK_REGRESSION` | `targetTime` precedes the current logical time |
