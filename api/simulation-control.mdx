@@ -1,12 +1,15 @@
 ---
 title: "Simulation Execution Control"
-description: "Operator-only deterministic execution inputs, per-service checkpoints, and logical clock control"
+description: "Operator-only per-game execution contexts, deterministic inputs, checkpoints, and logical clock control"
 ---
 
 Operator-only controls for reproducible execution in isolated simulation deployments. The game and timeline
 services each expose this contract independently and own their own execution revision and checkpoint. The
 caller coordinates both services and downstream projection barriers; an acknowledgement from one service does
 not imply global completion.
+
+A service executes one game per execution context. The operator opens a context carrying that game's effective
+rules, plays it, and closes it before opening the next one; no restart is needed between games.
 
 This interface supplies entropy, logical identities, validated faction/seat assignment, and logical time. It
 never supplies commands, outcomes, scores, or winner decisions, and its inputs never appear in
@@ -34,26 +37,35 @@ because the request never reaches authentication:
 
 | Operation | Method and path | Success |
 |---|---|---|
-| Configure execution | `PUT /internal/simulation/v1/execution` | `200` checkpoint |
+| Open execution context | `PUT /internal/simulation/v1/execution` | `200` checkpoint |
+| Close execution context | `DELETE /internal/simulation/v1/execution?caseKey=` | `204` |
 | Read checkpoint | `GET /internal/simulation/v1/checkpoint` | `200` checkpoint |
 | Advance clock | `PUT /internal/simulation/v1/clock` | `200` acknowledgement |
 
-## Configure execution
+## Open execution context
 
 ```http
 PUT /internal/simulation/v1/execution
 ```
 
-Registers deterministic execution inputs before gameplay begins. The request body is an `ExecutionContext`; every
-field is required:
+Opens the execution context for one game with its deterministic inputs and effective rules. The request body is an
+`ExecutionContext`; every field is required:
 
 ```json
 {
   "schemaVersion": 1,
-  "caseKey": "uuid",
+  "caseKey": "6f3f2a52-4f0a-4c69-9a39-2a8f0e2b9d11",
   "seed": "42",
   "entropyVersion": "SHA256_V1",
   "manifestDigest": "64 lowercase hex characters",
+  "rules": {
+    "schemaVersion": 1,
+    "properties": {
+      "game.rules.probability.amplify-multiplier.II": 2,
+      "game.rules.win-score-threshold": 20
+    }
+  },
+  "rulesDigest": "2f4e77d6f2f5ad41eb3b05de091e524133995ef6f274a58f539adbf2d5b06fad",
   "logicalTime": "2026-10-05T19:00:00Z",
   "seats": [
     { "seatIndex": 0, "playerId": "uuid", "faction": "ERASERS" },
@@ -67,16 +79,49 @@ field is required:
 - `seed` is a decimal string in unsigned 64-bit range (`0` through `18446744073709551615`).
 - `entropyVersion` is `SHA256_V1`.
 - `manifestDigest` is 64 lowercase SHA-256 hex characters identifying the immutable execution manifest.
+- `rules` is the complete effective rules document: `schemaVersion` `1` and every rules property keyed by its full
+  `game.rules.` path. Nested maps are flattened with `.`, and values are JSON numbers, booleans, strings, or arrays of
+  those in served order. See [Effective rules](#effective-rules).
+- `rulesDigest` is the lowercase hex SHA-256 of the UTF-8 bytes of the RFC 8785 (JSON Canonicalization Scheme)
+  serialization of `rules.properties`. Key order and number spelling do not matter: `2.0` and `2` give the same
+  digest. The example above pairs its rules with their canonical digest.
 - `logicalTime` is a UTC date-time.
 - `seats` is an ordered array of 3 to 5 entries with contiguous `seatIndex` values starting at `0`, unique
   `playerId` values, and unique factions. Each `faction` is one of `ERASERS`, `PROPHETS`, `REVISIONISTS`,
   `WEAVERS`, or `ACTIVISTS` (see [Factions](/game-design/factions)). Player IDs identify existing authenticated bot
   subjects.
 
-Configuration is idempotent: repeating an identical context is a no-op returning the current checkpoint, and the
-first accepted configuration yields revision `0`. A changed context, or any configuration against a nonempty
-active lane, returns `409 EXECUTION_CONTEXT_CONFLICT`. A malformed context returns
-`400 INVALID_EXECUTION_CONTEXT`.
+With no context open, the context is accepted, its revision starts at `0`, and its logical time is the context's
+`logicalTime`. Opening the same context again is a no-op returning the current checkpoint. Any other context while one
+is open returns `409 EXECUTION_CONTEXT_CONFLICT`. A malformed context returns `400 INVALID_EXECUTION_CONTEXT`.
+
+The service validates the rules it uses for this game:
+
+- It recomputes the canonical digest of `rules.properties` and rejects a mismatch with `400
+  INVALID_EXECUTION_CONTEXT`.
+- Every key must start with `game.rules.`; otherwise the response is `400 INVALID_EXECUTION_CONTEXT`.
+- It reads each rule it uses from `rules` and ignores keys it does not use. A missing key, or a value that fails that
+  rule's own validation, returns `400 INVALID_EXECUTION_CONTEXT` with `detail` naming the key.
+
+## Close execution context
+
+```http
+DELETE /internal/simulation/v1/execution?caseKey=<uuid>
+```
+
+Closes the open context for `caseKey` in any state (`READY`, `ACTIVE`, or `TERMINAL`) and answers `204`. On closing,
+every pending outbox record, continuation and due timer of that context is discarded and never acts, and the context's
+game never changes again. The service then accepts a new context without restarting.
+
+Repeating the close for the most recently closed `caseKey` is a no-op `204`. A `caseKey` that matches neither the open
+nor the most recently closed context returns `409 EXECUTION_CONTEXT_CONFLICT`. With no context open and no context ever
+closed, the response is `409 EXECUTION_NOT_CONFIGURED`.
+
+## Events of other games
+
+While a context is open, an inbound event whose `gameId` header is not the open context's game is consumed and ignored:
+no handler runs. Its offset still advances the `sourceWatermarks` the checkpoint reports. With no context open, every
+inbound event is ignored the same way. A late event from a closed game therefore never reaches the next game.
 
 ## Read checkpoint
 
@@ -90,6 +135,7 @@ Reads this service's checkpoint. The response is an `ExecutionCheckpoint`:
 {
   "caseKey": "uuid",
   "manifestDigest": "64 lowercase hex characters",
+  "rulesDigest": "64 lowercase hex characters",
   "revision": 0,
   "logicalTime": "2026-10-05T19:00:00Z",
   "gameId": null,
@@ -105,6 +151,7 @@ Reads this service's checkpoint. The response is an `ExecutionCheckpoint`:
 }
 ```
 
+- `rulesDigest` is the digest of the open context's rules.
 - `revision` is a service-owned nonnegative integer; each service advances its own revision independently.
 - `state` is `READY`, `ACTIVE`, or `TERMINAL`.
 - `gameId` and `nextDeadline` are required but nullable.
@@ -153,11 +200,19 @@ Advances only this service's logical clock. The request body is a `ClockAdvance`
 
 One acknowledgement never means the whole simulation has advanced:
 
-1. Configure the game service and the timeline service with the same execution context.
-2. Inspect each service's checkpoint separately; revisions, states, and watermarks are service-owned.
+1. Open the same execution context on the game service and the timeline service.
+2. Inspect each service's checkpoint separately; revisions, rules digests, states, and watermarks are service-owned.
 3. Advance each service's clock with its own current `expectedRevision`, then re-read its checkpoint.
 4. Wait for downstream projection barriers before treating the step as globally visible; a drained per-service
    checkpoint alone does not imply global completion.
+5. When the case ends, close the same `caseKey` on both services before opening the next case's context.
+
+### Effective rules
+
+`EffectiveRules` is the shared `schemaVersion` `1` document with a `properties` object keyed by full `game.rules.`
+paths. It is the same document a workbench variant materialises, so a context's rules and a variant's frozen effective
+rules are directly comparable by digest. Rule values are JSON numbers, booleans, strings, or arrays of those in served
+order; the digest is computed over `properties` only, so key order and number spelling cannot change it.
 
 Execution inputs, seat assignments, and checkpoints stay on this operator interface. Ordinary gameplay keeps
 using the participant session, action, scoring, and read APIs, which never expose them.
@@ -168,13 +223,13 @@ Errors use RFC 9457 problem details with a required stable string `code`.
 
 | Status | Code | Condition |
 |---|---|---|
-| `400` | `INVALID_EXECUTION_CONTEXT` | Malformed execution context (for example duplicate factions, gaps in seat indices, or an out-of-range seed) |
+| `400` | `INVALID_EXECUTION_CONTEXT` | Malformed execution context (for example duplicate factions, gaps in seat indices, an out-of-range seed, a mismatched `rulesDigest`, or a missing or invalid used rule) |
 | `400` | `INVALID_CLOCK_ADVANCE` | Malformed clock advance |
 | `401` | `AUTHENTICATION_REQUIRED` | Missing, invalid, or expired bearer token |
 | `403` | `SIMULATION_CONTROL_FORBIDDEN` | Authenticated caller lacks `simulation:control` |
 | `404` | `SIMULATION_CONTROL_UNAVAILABLE` | Control interface not registered in this deployment |
-| `409` | `EXECUTION_NOT_CONFIGURED` | No execution configured yet |
-| `409` | `EXECUTION_CONTEXT_CONFLICT` | Context differs from the configured execution or the lane is active |
+| `409` | `EXECUTION_NOT_CONFIGURED` | No context is open, or a close arrives with no open and no previously closed context |
+| `409` | `EXECUTION_CONTEXT_CONFLICT` | A different context is already open, or a close names a case key that matches neither the open nor the most recently closed context |
 | `409` | `IDEMPOTENCY_CONFLICT` | `operationId` reused with a different clock body |
 | `409` | `STALE_EXECUTION_REVISION` | `expectedRevision` no longer matches the service revision |
 | `422` | `CLOCK_REGRESSION` | `targetTime` precedes the current logical time |
