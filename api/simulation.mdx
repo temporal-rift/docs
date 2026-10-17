@@ -32,6 +32,10 @@ All requests use a JWT bearer token. Reads require `simulation:read`, mutations 
 | List balance criteria | `GET /api/v1/balance-criteria` | `200` |
 | Get balance criterion | `GET /api/v1/balance-criteria/{criterionVersion}` | `200` |
 | Get run evaluation | `GET /api/v1/runs/{runId}/evaluation` | `200` |
+| List parameter spaces | `GET /api/v1/parameter-spaces` | `200` |
+| Get parameter space | `GET /api/v1/parameter-spaces/{version}` | `200` |
+| Preview variant rules | `POST /api/v1/variant-rules-previews` | `200` |
+| Get variant rules | `GET /api/v1/experiments/{experimentId}/variants/{label}/rules` | `200` |
 
 ## Discovery
 
@@ -41,15 +45,27 @@ Discovery operations let a designer client find and preview what it can act on w
 
 Lists return `{ items, total }` and take `limit` (1 to 500, default 50) and `offset`. Experiments, runs and comparisons are newest first; a run's cases are in matrix order. `listRuns` filters by `experimentId` and `state`; `listCases` by `state` and `variantLabel` and answers `404 RESOURCE_NOT_FOUND` for an unknown run; `listComparisons` by `runId` (baseline or candidate). A case summary carries its identifiers, variant, seed, player count, `state` and a nullable `endReason`. A comparison summary identifies the baseline and candidate sides, the analysis version and seed, and the creation time; `getComparison` returns the computed result. `listPolicies` returns each referenceable bot policy bundle with its `id`, `version`, `artifactDigest`, `description` and accepted `parameters`; a manifest policy built from an entry passes verification.
 
-Guided setup has two more reads. `listLaneBundles` (`GET /api/v1/lane-bundles`) returns one item per distinct pair of effective rules and content digests the lanes serve, busy or free, ordered by those digests. Each item carries the rules and content artifacts, the effective digests, the `services` and `contracts` of the lanes serving it, and `laneCount`; it never names a lane, its address, a credential or a bot identity. Without lanes the page is empty. `listExperimentTemplates` (`GET /api/v1/experiment-templates`) returns `baseline-policy-comparison` (one variant; `random` and `faction-greedy`, each on seats 0 to 4) and `rules-variant-comparison` (two variants; `random` on seats 0 to 4). Both default to seeds `["42"]`, player counts `[3, 4, 5]`, every valid faction set, `CYCLIC` rotation, `LOGICAL` time, one concurrent case per lane (from 1 to 64), and the deployment's case timeout and rejected-candidate bound. A client builds the `ExperimentManifest` from a template's defaults, the chosen bundles (the manifest's `services` and `contracts` come from bundles that share them) and the designer's edits. Both reads need `simulation:read`, and an out-of-range `limit` or `offset` on any list returns `400 INVALID_REQUEST`.
+Guided setup has two more reads. `listLaneBundles` (`GET /api/v1/lane-bundles`) returns one item per distinct pair of effective rules and content digests the lanes serve, busy or free, ordered by those digests. Each item carries the rules and content artifacts, the effective digests, the `services` and `contracts` of the lanes serving it, and `laneCount`; its `rulesArtifact` names the lane's baseline rules document and `effectiveRulesDigest` is that document's digest. It never names a lane, its address, a credential or a bot identity. Without lanes the page is empty. `listExperimentTemplates` (`GET /api/v1/experiment-templates`) returns `baseline-policy-comparison` (one variant; `random` and `faction-greedy`, each on seats 0 to 4) and `rules-variant-comparison` (two variants; `random` on seats 0 to 4). Both default to seeds `["42"]`, player counts `[3, 4, 5]`, every valid faction set, `CYCLIC` rotation, `LOGICAL` time, one concurrent case per lane (from 1 to 64), and the deployment's case timeout and rejected-candidate bound. A client builds the `ExperimentManifest` from a template's defaults, the chosen bundles (the manifest's `services` and `contracts` come from bundles that share them) and the designer's edits. Both reads need `simulation:read`, and an out-of-range `limit` or `offset` on any list returns `400 INVALID_REQUEST`.
 
 ## Immutable experiment manifests
 
 Creating an experiment freezes a version-1 manifest. It records variants; resolved rules and content artifact digests; game, timeline, and read service image/source provenance; exact contract versions; policies and their seat assignments; seeds; player counts; faction sets; cyclic seat rotation; logical timing; and execution bounds.
 
+A variant's `rulesArtifact` is its baseline rules document. Optional numeric `overrides` and a `parameterSpaceVersion` express parameter changes instead of a second hand-made bundle; creating the experiment validates those overrides, drops overrides equal to the baseline value, and recomputes the variant's `effectiveRulesDigest`.
+
 Artifact references are portable SHA-256 digests, never credentials or local machine paths. The product retains the resolved artifact bytes. Changing a rule, content bundle, policy, or pinned service revision creates a new experiment; it never modifies a launched manifest.
 
 With all faction sets, cyclic rotations, one seed, two homogeneous policies, and two variants, the matrix contains 220 cases: 55 player-count/faction/seat coordinates per policy/variant. The manifest validates counts from three to five players, unique variant labels, unique seeds, unique factions per set, and positive execution limits before scheduling work.
+
+## Variant rules and parameter spaces
+
+An `EffectiveRules` document has `schemaVersion: 1` and a `properties` object holding every rules property keyed by its full `game.rules.` path. Segments are lowercase kebab-case, except enum-constant map keys, which keep their constant name, and nested maps are flattened with `.`. Values are numbers, booleans, strings, or arrays of those, in served order. Its digest is the lowercase hex SHA-256 of the RFC 8785 canonical JSON serialization of `properties`, so key order and number spelling do not matter: the properties `{"game.rules.probability.amplify-multiplier.II": 2, "game.rules.win-score-threshold": 20}` in either order, with `2` or `2.0`, hash to `2f4e77d6f2f5ad41eb3b05de091e524133995ef6f274a58f539adbf2d5b06fad`.
+
+A variant is a baseline document plus overrides. `parameterSpaceVersion` is required when `overrides` is non-empty, and a supplied `effectiveRulesDigest` that differs from the recomputed value is refused as `400 INVALID_EXPERIMENT`.
+
+`listParameterSpaces` returns every served version ordered by `version`, and `getParameterSpace` returns one, answering `404 RESOURCE_NOT_FOUND` for an unknown version. A parameter space lists `parameters` (`key`, `services`, `baseline`, `min`, `max`, `step`), `derived` (`key` equals `factor × from`), `constraints` (`id`, `expression`, `description`), and `heldFixed` (`key`, `reason`).
+
+`previewVariantRules` applies and validates `rulesArtifact`, `parameterSpaceVersion`, and `overrides` without persisting anything, returning the effective rules, digest, and normalized overrides that freezing would store. `getVariantRules` returns a frozen variant's effective rules, answering `404 RESOURCE_NOT_FOUND` for an unknown experiment or label. A refused override is `400 INVALID_EXPERIMENT` or `400 INVALID_REQUEST` and names the value in `field` plus a `reason`: `UNKNOWN_PARAMETER_SPACE`, `UNKNOWN_BASELINE`, `UNKNOWN_PARAMETER`, `OUT_OF_RANGE`, `OFF_STEP`, or `CONSTRAINT_VIOLATED`; the last also carries `constraintId`.
 
 ## Durable runs and cases
 
