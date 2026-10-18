@@ -39,6 +39,21 @@ A report is organised in cohorts. Each shows its eligible games and independent 
 
 **Export JSON** and **Export CSV** download exactly what the service returned.
 
+### Judge a variant against the balance criterion
+
+The **Evaluation** panel on the run page applies a balance criterion version to one variant of the run. Choose the variant, the criterion version and the mode: screening ranks and discards candidates and never confirms, confirmation may confirm. The panel is computed from the run's cases every time it is read.
+
+| You see | It means |
+|---|---|
+| Rejected | A gate line fails: its whole interval lies outside its band |
+| Confirmed | Confirmation mode, a satisfied sample, every pooled gate met and no scored line failing |
+| Unconfirmed | Nothing rejects the variant and nothing confirms it yet |
+| Invalid | The run cannot be used as evidence; the panel lists every reason and shows no score |
+| Score | The weighted sum of squared deviations of the scored lines; lower is closer to the targets |
+| Confirmation sample | The seeds the run has against the seeds the criterion requires, and whether the full case matrix was played |
+
+The table lists every evaluated line with its cohort, value, interval, band, deviation and verdict (meets, fails or inconclusive) and can be filtered to failing or inconclusive lines. The panel always states that bot results say nothing about balance among human players.
+
 ## 5. Compare two variants
 
 On **Comparisons**, choose the run and variant on each side. A comparison lists the differences the two sides declare (rules or content), the matched blocks, the pairs left out because a side failed or has not finished, and each paired difference with its interval. If the two runs differ in anything beyond the declared variant, the comparison is refused and the differences are named.
