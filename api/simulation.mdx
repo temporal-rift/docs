@@ -85,7 +85,7 @@ An attempt fails with `RUNNER_TIMEOUT` when no authoritative ending is reached w
 
 ### Reports
 
-`getRunReport` returns the report as JSON, or as CSV with `Accept: text/csv`. It states whether it is complete, the run's case counts (requested, pending, running, succeeded, failed, cancelled), its analysis version and analysis seed, and a list of cohorts. For every variant, policy, and player count of the run there are four cohort levels:
+`getRunReport` returns the report as JSON, or as CSV with `Accept: text/csv`. It states whether it is complete, the run's case counts (requested, pending, running, succeeded, failed, cancelled), its analysis version and analysis seed, its `formatVersion` (`2`), and a list of cohorts. The version 2 JSON layout is unchanged from version 1 apart from `formatVersion`; the CSV gained the `failureCode` column described below. For every variant, policy, and player count of the run there are four cohort levels:
 
 | Level | `factionSet` | `seatIndex` |
 |---|---|---|
@@ -126,7 +126,7 @@ Balance criteria are read-only resources served from the workbench's configurati
 
 ### CSV exports
 
-Both CSV exports start with a header row and repeat the full attribution on every row, so a single row stands on its own. A report row holds `formatVersion`, `runId`, `manifestDigest`, `analysisVersion`, `analysisSeed`, `complete`, the cohort (`variantLabel`, `policyId`, `policyVersion`, `playerCount`, `factionSet` joined with `|`, `seatIndex`), `eligibleGames`, `independentBlocks`, the six case counts, then `metric`, `statistic`, one column per dimension, `unit`, `value`, `numerator`, `denominator`, `status`, `intervalLower`, `intervalUpper`, and `unknownCount`. A comparison row holds `formatVersion`, `comparisonId`, both sides' run and variant, the analysis version and seed, `complete`, the cohort, `matchedBlocks`, `excludedBlocks`, then `metric`, `statistic`, the dimensions, `unit`, `baselineValue`, `candidateValue`, `difference`, `status`, `intervalLower`, and `intervalUpper`. Empty fields are null values.
+Both CSV exports start with a header row and repeat the full attribution on every row, so a single row stands on its own. A report row holds `formatVersion` (`2`), `runId`, `manifestDigest`, `analysisVersion`, `analysisSeed`, `complete`, the cohort (`variantLabel`, `policyId`, `policyVersion`, `playerCount`, `factionSet` joined with `|`, `seatIndex`), `eligibleGames`, `independentBlocks`, the six case counts, then `metric`, `statistic`, the dimensions (`faction`, `cardType`, `cardGrade`, `specialAction`, `paradoxType`, `endReason`, `quantile`, `failureCode`), `unit`, `value`, `numerator`, `denominator`, `status`, `intervalLower`, `intervalUpper`, and `unknownCount`. `failureCode` follows `quantile`; it is empty for a metric not split by failure code, including the all-codes `failure_share` row, and holds the `AttemptFailureCode` of a per-code `failure_share` row. A comparison row holds `formatVersion` (`1`), `comparisonId`, both sides' run and variant, the analysis version and seed, `complete`, the cohort, `matchedBlocks`, `excludedBlocks`, then `metric`, `statistic`, the dimensions, `unit`, `baselineValue`, `candidateValue`, `difference`, `status`, `intervalLower`, and `intervalUpper`. Comparisons carry no `failure_share`, so their CSV has no `failureCode` column. Empty fields are null values.
 
 ## Replay and reproduction
 
