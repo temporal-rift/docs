@@ -1,6 +1,6 @@
 ---
 title: "Simulation Workbench API"
-description: "Immutable experiments, durable runs, statistical reports, comparisons, replay, balance criteria, run evaluation, and simulator fidelity"
+description: "Immutable experiments, durable runs, statistical reports, comparisons, replay, balance criteria, run evaluation, simulator fidelity, and configuration search campaigns"
 ---
 
 The Simulation Workbench is a separate designer-facing product that runs real game services in isolated lanes. It does not expose its controls to a human-game client and it does not replace the authoritative game rules.
@@ -36,6 +36,15 @@ All requests use a JWT bearer token. Reads require `simulation:read`, mutations 
 | Get parameter space | `GET /api/v1/parameter-spaces/{version}` | `200` |
 | Preview variant rules | `POST /api/v1/variant-rules-previews` | `200` |
 | Get variant rules | `GET /api/v1/experiments/{experimentId}/variants/{label}/rules` | `200` |
+| Create campaign | `POST /api/v1/campaigns` | `201` |
+| List campaigns | `GET /api/v1/campaigns` | `200` |
+| Get campaign | `GET /api/v1/campaigns/{campaignId}` | `200` |
+| Pause campaign | `POST /api/v1/campaigns/{campaignId}/pause` | `200` |
+| Resume campaign | `POST /api/v1/campaigns/{campaignId}/resume` | `200` |
+| Cancel campaign | `POST /api/v1/campaigns/{campaignId}/cancel` | `200` |
+| Set campaign parallelism | `PUT /api/v1/campaigns/{campaignId}/parallelism` | `200` |
+| Get campaign log | `GET /api/v1/campaigns/{campaignId}/log` | `200` |
+| Start confirmation | `POST /api/v1/campaigns/{campaignId}/confirmation` | `202` |
 | Start fidelity check | `POST /api/v1/fidelity-checks` | `202` |
 | List fidelity checks | `GET /api/v1/fidelity-checks` | `200` |
 | Get fidelity check | `GET /api/v1/fidelity-checks/{fidelityCheckId}` | `200` |
@@ -85,6 +94,20 @@ A run keeps its completed results through interruption and cancellation. After a
 A case succeeds when its game reaches an authoritative ending whose winners, faction reveal, and final scores agree. An ending without winners (`RESOLUTION_FAILED`, `ALL_PLAYERS_ABANDONED`, or `DECK_EXHAUSTED`) is a valid game outcome: the case succeeds with that `endReason`, no winners, and its final scores, and its attempt is not a failure. The winners of `TIMELINE_COLLAPSED` and `TIMELINE_STABILIZED` have no `winType` (`null`); only a normal victory has one.
 
 An attempt fails with `RUNNER_TIMEOUT` when no authoritative ending is reached within the manifest's case limit, `EXECUTION_FAILED` when a lane or service call fails in a way that cannot be reconciled, `CONTRACT_MISMATCH` when a response or policy reference does not match the pinned contracts, `CONFIGURATION_DRIFT` when a service executes another case or manifest than configured, or `POLICY_EXHAUSTED` when a seat has no candidate, pass, or decline left. Timeouts and execution failures are retried on a fresh attempt up to a configured limit; the other failures are deterministic and fail the case at once. A failed attempt is never turned into a game sample.
+
+## Configuration search campaigns
+
+A campaign runs the whole configuration search as one durable resource. `createCampaign` (`POST /api/v1/campaigns`) takes a `CampaignDefinition`: a name; a `baseline` pair of rules and content artifacts; a `parameterSpaceVersion` and `criterionVersion`; at least one policy; unique player counts drawn from 3, 4, and 5; separate `searchMasterSeed` and `confirmationMasterSeed` values; and a `SearchAlgorithm` (`SUCCESSIVE_HALVING_V1` with `initialCandidates`, `screeningSeeds`, `eta`, and `shortListSize`). `budgetSeconds` defaults to 14400 active compute seconds and `parallelism` to 4. The campaign is created in `QUEUED`, starts without another client call, and survives a restart with its budget, state, and log. Equal master seeds are refused.
+
+A `Campaign` returns the frozen definition plus `campaignId`, `state`, `spentSeconds`, `round`, `shortList`, nullable `confirmation` and `failure`, and `createdAt`, `startedAt`, and `finishedAt`. The state is `QUEUED`, `RUNNING`, `PAUSED`, `SEARCH_COMPLETED`, `CONFIRMING`, `COMPLETED`, `CANCELLED`, or `FAILED`; the `shortList` stays empty until `SEARCH_COMPLETED`. `listCampaigns` returns `{ items, total }` newest first and `getCampaign` returns one campaign, both with `simulation:read`; an unknown id is `404 RESOURCE_NOT_FOUND`.
+
+The lifecycle writes need `simulation:write` and an `Idempotency-Key`. `pauseCampaign` is accepted from `QUEUED` and `RUNNING` and moves to `PAUSED`; a campaign already `PAUSED` is returned unchanged. `resumeCampaign` is accepted from `PAUSED` and moves to `RUNNING`; a campaign already `RUNNING` is returned unchanged. `cancelCampaign` is accepted from every state except `COMPLETED` and `FAILED` and moves to `CANCELLED`; a campaign already `CANCELLED` is returned unchanged. `setCampaignParallelism` is accepted from every state except `COMPLETED`, `CANCELLED`, and `FAILED`, and its new value applies to the next game started. Any other disallowed state returns `409 INVALID_CAMPAIGN_STATE`. Games in flight when a campaign pauses finish or are discarded and are never counted twice.
+
+`getCampaignLog` returns `{ items, total }` in decision order. An entry carries `sequence` from 1, `round`, `candidateId`, `overrides`, `effectiveRulesDigest`, the `seeds` played so far, `gamesSpent`, a nullable `evaluation` (`verdict` and `score`), a `decision` (`GENERATED`, `KEPT`, `DISCARDED`, or `SHORT_LISTED`), a nullable `reason` (`GATE_FAILS`, `DOMINATED`, `NOT_IN_TOP_FRACTION`, or `BUDGET_EXHAUSTED`), and nullable `evidence`. The evidence names the failing criterion `lineIds` for `GATE_FAILS` and the `dominatedBy` candidate id for `DOMINATED`.
+
+`startConfirmation` is allowed only from `SEARCH_COMPLETED`, moves the campaign to `CONFIRMING`, and returns `202`. It starts one confirmation run per short-listed candidate and one for the baseline; each run carries `candidateId` (the literal `baseline` for the baseline run), `experimentId`, `runId`, and a nullable `evaluation`. The `CampaignConfirmation` carries `seedCount` (the criterion's `confirmationMinimumSeeds`), `runs`, and `seedOverlap`, which is false for an accepted confirmation. Confirmation seeds derive from `confirmationMasterSeed` only; if any of them already appears in the log's `seeds`, the request returns `409 SEED_OVERLAP` and starts nothing.
+
+An invalid definition returns `400 INVALID_CAMPAIGN` with `field` naming the offending value and a `reason` of `UNKNOWN_PARAMETER_SPACE`, `UNKNOWN_CRITERION`, `UNKNOWN_BASELINE`, `EQUAL_MASTER_SEEDS`, or `INVALID_VALUE`.
 
 ## Reports and comparisons
 
@@ -159,4 +182,4 @@ The divergence `kind` is one of `OBSERVATION`, `DECISION`, or `WINDOW` (another 
 
 ## Error codes
 
-The API uses RFC 9457 problem details with a stable symbolic `code`. Unlike the game-platform APIs, workbench codes are symbolic names rather than `<status>-<nn>` values. Validation errors are `INVALID_EXPERIMENT`, `INVALID_REPLAY_PERSPECTIVE`, or `INVALID_COMPARISON`. A missing or invalid run-evaluation parameter is `400 INVALID_REQUEST`, and an unknown run, variant label, or criterion version is `404 RESOURCE_NOT_FOUND`. `INVALID_EXPERIMENT`, `MANIFEST_MISMATCH`, and a variant-rule `INVALID_REQUEST` refusal that is attributable to one value also carry `field`, the path of that value (for example `seeds[1]`, `policies[0].seatAssignment[2].seatIndex`, or `variants[1].overrides.game.rules.win-score-threshold`), so a client can place the problem on the input that caused it. Variant-rule refusals also carry `reason`, and a `CONSTRAINT_VIOLATED` refusal carries `constraintId`. No other code carries `field`. State and identity errors include `IDEMPOTENCY_CONFLICT`, `EXPERIMENT_IMMUTABLE`, `INVALID_RUN_STATE`, and `MANIFEST_MISMATCH`, and for fidelity checks `FIDELITY_CHECK_ACTIVE` and `SIMULATOR_NOT_AVAILABLE`. `RUNNER_TIMEOUT`, `EXECUTION_FAILED`, `CONTRACT_MISMATCH`, `CONFIGURATION_DRIFT`, and `POLICY_EXHAUSTED` are retained as attempt failures, not reported as normal games.
+The API uses RFC 9457 problem details with a stable symbolic `code`. Unlike the game-platform APIs, workbench codes are symbolic names rather than `<status>-<nn>` values. Validation errors are `INVALID_EXPERIMENT`, `INVALID_REPLAY_PERSPECTIVE`, `INVALID_COMPARISON`, or `INVALID_CAMPAIGN`. A missing or invalid run-evaluation parameter is `400 INVALID_REQUEST`, and an unknown run, variant label, or criterion version is `404 RESOURCE_NOT_FOUND`. `INVALID_EXPERIMENT`, `INVALID_CAMPAIGN`, `MANIFEST_MISMATCH`, and a variant-rule `INVALID_REQUEST` refusal that is attributable to one value also carry `field`, the path of that value (for example `seeds[1]`, `policies[0].seatAssignment[2].seatIndex`, `variants[1].overrides.game.rules.win-score-threshold`, or `confirmationMasterSeed`), so a client can place the problem on the input that caused it. Variant-rule and campaign refusals also carry `reason`; a `CONSTRAINT_VIOLATED` refusal carries `constraintId`, and campaign reasons include `UNKNOWN_PARAMETER_SPACE`, `UNKNOWN_CRITERION`, `UNKNOWN_BASELINE`, `EQUAL_MASTER_SEEDS`, and `INVALID_VALUE`. State and identity errors include `IDEMPOTENCY_CONFLICT`, `EXPERIMENT_IMMUTABLE`, `INVALID_RUN_STATE`, `INVALID_CAMPAIGN_STATE`, `SEED_OVERLAP`, and `MANIFEST_MISMATCH`, and for fidelity checks `FIDELITY_CHECK_ACTIVE` and `SIMULATOR_NOT_AVAILABLE`. `RUNNER_TIMEOUT`, `EXECUTION_FAILED`, `CONTRACT_MISMATCH`, `CONFIGURATION_DRIFT`, and `POLICY_EXHAUSTED` are retained as attempt failures, not reported as normal games.
