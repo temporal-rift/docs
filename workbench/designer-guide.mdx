@@ -92,7 +92,9 @@ The configuration search plays on an in-process simulator, so its results hold o
 
 **Start a check** takes a seed and, on **Start a check**, plays the full set of cases on the simulator for that seed: three, four and five players, every faction set and seat rotation, both baseline policies, for the baseline and for two variants that set as many parameters as the constraints allow at the minimum and at the maximum of their ranges. It then reproduces every case on one real lane. Starting is refused while another check is queued or running, and when the simulator is not enabled or no real lane matches its source revisions, content, contract versions and bot identities.
 
-Open a check to follow it. It shows its state, the case counts, the builds of the simulator and of the real lane, the variants with their overrides, and the cases, which you can filter by variant and by result.
+Open a check to follow it. It shows its state, the simulator run that plays its cases (linked once the check begins), the case counts, the builds of the simulator and of the real lane, the variants with their overrides, and the cases, which you can filter by variant and by result.
+
+The counts stay at zero while the simulator plays, because the check has cases only once its run completes; follow that phase on the run's page. To abandon a check, cancel its run there: the check then fails with `RUN_CANCELLED`, and a new one can be started.
 
 | Result of a case | It means |
 |---|---|
