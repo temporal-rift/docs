@@ -84,6 +84,27 @@ Switching seat or perspective discards the previous view's data before anything 
 
 A divergence is one of `OBSERVATION`, `DECISION`, `WINDOW`, `MISSING_STEP`, `UNEXPECTED_STEP`, `UNEXPECTED_WINDOW` or `COMMAND_REJECTED`, or, after the last step, `END_REASON`, `WINNERS`, `FINAL_SCORES`, `ERAS` or `SEMANTIC_DIGEST`.
 
+## 8. Check that the simulator plays the real game
+
+The configuration search plays on an in-process simulator, so its results hold only if the simulator plays the same game as the real services. The **Simulator fidelity** page shows whether that has been checked for the simulator you are running, and lets you check it.
+
+**The simulator's source revisions** lists the revision of each of the three services the simulator embeds. The page says either that the simulator is *established*, because a passing check exists for exactly these revisions, or that it is *not established*, because none does. A passing check applies only to the revisions it ran with, so the simulator is not established again whenever it embeds a new revision, until a check passes on it. A search campaign is refused while the simulator is not established.
+
+**Start a check** takes a seed and, on **Start a check**, plays the full set of cases on the simulator for that seed: three, four and five players, every faction set and seat rotation, both baseline policies, for the baseline and for two variants that set as many parameters as the constraints allow at the minimum and at the maximum of their ranges. It then reproduces every case on one real lane. Starting is refused while another check is queued or running, and when the simulator is not enabled or no real lane matches its source revisions, content, contract versions and bot identities.
+
+Open a check to follow it. It shows its state, the case counts, the builds of the simulator and of the real lane, the variants with their overrides, and the cases, which you can filter by variant and by result.
+
+| Result of a case | It means |
+|---|---|
+| Pending | Not reproduced yet. |
+| Match | The real lane played the case exactly as the simulator did. |
+| Diverged | The real lane ran the case to its end and differed. The case shows the step and the kind of the first difference. |
+| Cannot be reproduced | The simulator could not play the case, or the reproduction could not reach an ending. It says nothing about fidelity, but the check does not pass. |
+
+A check **passes** only when it has at least one case and every case matches. One diverged case, or one case that cannot be reproduced, fails it; no difference is tolerated. A diverged case points at an in-memory behaviour of the simulator that differs from its production counterpart, and is a defect to fix before the simulator is trusted again.
+
+**Download report** saves the check as a markdown report, named for the seed and the game-service revision, with the counts, both environments, the variants and the cases that did not match. A passing report is kept in the workbench repository, under `docs/fidelity`, as the evidence that the simulator was established for those revisions.
+
 ## When something goes wrong
 
 Every refusal is shown as a plain sentence with a way to continue. If the service cannot be reached, the last data stays on screen marked stale with a **Retry** button and nothing you entered is lost. Progress, errors and denials are announced to screen readers, and every control can be used from the keyboard.
