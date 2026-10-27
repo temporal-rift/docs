@@ -1,6 +1,6 @@
 ---
 title: "Simulation Workbench API"
-description: "Immutable experiments, durable runs, statistical reports, comparisons, replay, balance criteria, run evaluation, and configuration search campaigns"
+description: "Immutable experiments, durable runs, statistical reports, comparisons, replay, balance criteria, run evaluation, simulator fidelity, and configuration search campaigns"
 ---
 
 The Simulation Workbench is a separate designer-facing product that runs real game services in isolated lanes. It does not expose its controls to a human-game client and it does not replace the authoritative game rules.
@@ -45,6 +45,11 @@ All requests use a JWT bearer token. Reads require `simulation:read`, mutations 
 | Set campaign parallelism | `PUT /api/v1/campaigns/{campaignId}/parallelism` | `200` |
 | Get campaign log | `GET /api/v1/campaigns/{campaignId}/log` | `200` |
 | Start confirmation | `POST /api/v1/campaigns/{campaignId}/confirmation` | `202` |
+| Start fidelity check | `POST /api/v1/fidelity-checks` | `202` |
+| List fidelity checks | `GET /api/v1/fidelity-checks` | `200` |
+| Get fidelity check | `GET /api/v1/fidelity-checks/{fidelityCheckId}` | `200` |
+| List fidelity cases | `GET /api/v1/fidelity-checks/{fidelityCheckId}/cases` | `200` |
+| Get simulator fidelity | `GET /api/v1/simulator/fidelity` | `200` |
 
 ## Discovery
 
@@ -151,6 +156,18 @@ Balance criteria are read-only resources served from the workbench's configurati
 
 Both CSV exports start with a header row and repeat the full attribution on every row, so a single row stands on its own. A report row holds `formatVersion` (`2`), `runId`, `manifestDigest`, `analysisVersion`, `analysisSeed`, `complete`, the cohort (`variantLabel`, `policyId`, `policyVersion`, `playerCount`, `factionSet` joined with `|`, `seatIndex`), `eligibleGames`, `independentBlocks`, the six case counts, then `metric`, `statistic`, the dimensions (`faction`, `cardType`, `cardGrade`, `specialAction`, `paradoxType`, `endReason`, `quantile`, `failureCode`), `unit`, `value`, `numerator`, `denominator`, `status`, `intervalLower`, `intervalUpper`, and `unknownCount`. `failureCode` follows `quantile`; it is empty for a metric not split by failure code, including the all-codes `failure_share` row, and holds the `AttemptFailureCode` of a per-code `failure_share` row. A comparison row holds `formatVersion` (`1`), `comparisonId`, both sides' run and variant, the analysis version and seed, `complete`, the cohort, `matchedBlocks`, `excludedBlocks`, then `metric`, `statistic`, the dimensions, `unit`, `baselineValue`, `candidateValue`, `difference`, `status`, `intervalLower`, and `intervalUpper`. Comparisons carry no `failure_share`, so their CSV has no `failureCode` column. Empty fields are null values.
 
+## Simulator fidelity
+
+The configuration search plays on an in-process simulator, so its results hold only if the simulator plays the same game as the real services. A fidelity check proves it. For one `seed` it plays the full case matrix on the simulator (player counts 3, 4 and 5, every faction set and seat rotation, policies `faction-greedy-v1` and `random-v1`) for the variants `baseline`, `low` and `high`, then reproduces every case on one real lane.
+
+`startFidelityCheck` takes `{ "seed": "42" }` (a decimal unsigned 64-bit string) and answers `202` with a `FidelityCheck`. It requires `simulation:write` and an `Idempotency-Key`. It is refused with `409 FIDELITY_CHECK_ACTIVE` while another check is `QUEUED` or `RUNNING`, and with `409 SIMULATOR_NOT_AVAILABLE` when the simulator is not enabled or no real lane fits its source revisions.
+
+A `FidelityCheck` carries its `seed`, `state` (`QUEUED`, `RUNNING`, `PASSED`, `FAILED`), a `verdict` that is null until the state is final, the `simulator` and the `lane` (null until chosen) as environments holding each service's `imageDigest` and `sourceRevision`, the content digest and the contract versions, the three `variants` with their effective rules digests and overrides, and `counts` (`total`, `matched`, `diverged`, `unreproducible`, `pending`). The verdict is `PASSED` only when every case matched; one divergence or one case that cannot be reproduced makes it `FAILED`, and no tolerance exists.
+
+`listFidelityChecks` is newest first and filters by `state`. `listFidelityCases` pages a check's cases in matrix order and filters by `variantLabel` and `result` (`PENDING`, `MATCH`, `DIVERGED`, `UNREPRODUCIBLE`); a case carries its `firstDivergence` only when it diverged and its `failure` only when it could not be reproduced. All reads need `simulation:read`, and an unknown check is `404 RESOURCE_NOT_FOUND`.
+
+A record applies only to the exact source revisions of the three services the simulator embedded when the check ran. `getSimulatorFidelity` answers the revisions the simulator embeds now, `established` (a `PASSED` record exists for exactly those revisions) and that record or null. When the simulator is not enabled it is `409 SIMULATOR_NOT_AVAILABLE`.
+
 ## Replay and reproduction
 
 Replay requires `perspective=PLAYER` or `perspective=OBSERVER`. A player replay requires `seatIndex` and returns only that seat's entitled facts at the relevant step; it excludes opposing hidden hands, hidden factions, and future information. An observer replay requires `simulation:observe`, is explicitly separate from player data, and never feeds a policy.
@@ -165,4 +182,4 @@ The divergence `kind` is one of `OBSERVATION`, `DECISION`, or `WINDOW` (another 
 
 ## Error codes
 
-The API uses RFC 9457 problem details with a stable symbolic `code`. Unlike the game-platform APIs, workbench codes are symbolic names rather than `<status>-<nn>` values. Validation errors are `INVALID_EXPERIMENT`, `INVALID_REPLAY_PERSPECTIVE`, `INVALID_COMPARISON`, or `INVALID_CAMPAIGN`. A missing or invalid run-evaluation parameter is `400 INVALID_REQUEST`, and an unknown run, variant label, or criterion version is `404 RESOURCE_NOT_FOUND`. `INVALID_EXPERIMENT`, `INVALID_CAMPAIGN`, `MANIFEST_MISMATCH`, and a variant-rule `INVALID_REQUEST` refusal that is attributable to one value also carry `field`, the path of that value (for example `seeds[1]`, `policies[0].seatAssignment[2].seatIndex`, `variants[1].overrides.game.rules.win-score-threshold`, or `confirmationMasterSeed`), so a client can place the problem on the input that caused it. Variant-rule and campaign refusals also carry `reason`; a `CONSTRAINT_VIOLATED` refusal carries `constraintId`, and campaign reasons include `UNKNOWN_PARAMETER_SPACE`, `UNKNOWN_CRITERION`, `UNKNOWN_BASELINE`, `EQUAL_MASTER_SEEDS`, and `INVALID_VALUE`. State and identity errors include `IDEMPOTENCY_CONFLICT`, `EXPERIMENT_IMMUTABLE`, `INVALID_RUN_STATE`, `INVALID_CAMPAIGN_STATE`, `SEED_OVERLAP`, and `MANIFEST_MISMATCH`. `RUNNER_TIMEOUT`, `EXECUTION_FAILED`, `CONTRACT_MISMATCH`, `CONFIGURATION_DRIFT`, and `POLICY_EXHAUSTED` are retained as attempt failures, not reported as normal games.
+The API uses RFC 9457 problem details with a stable symbolic `code`. Unlike the game-platform APIs, workbench codes are symbolic names rather than `<status>-<nn>` values. Validation errors are `INVALID_EXPERIMENT`, `INVALID_REPLAY_PERSPECTIVE`, `INVALID_COMPARISON`, or `INVALID_CAMPAIGN`. A missing or invalid run-evaluation parameter is `400 INVALID_REQUEST`, and an unknown run, variant label, or criterion version is `404 RESOURCE_NOT_FOUND`. `INVALID_EXPERIMENT`, `INVALID_CAMPAIGN`, `MANIFEST_MISMATCH`, and a variant-rule `INVALID_REQUEST` refusal that is attributable to one value also carry `field`, the path of that value (for example `seeds[1]`, `policies[0].seatAssignment[2].seatIndex`, `variants[1].overrides.game.rules.win-score-threshold`, or `confirmationMasterSeed`), so a client can place the problem on the input that caused it. Variant-rule and campaign refusals also carry `reason`; a `CONSTRAINT_VIOLATED` refusal carries `constraintId`, and campaign reasons include `UNKNOWN_PARAMETER_SPACE`, `UNKNOWN_CRITERION`, `UNKNOWN_BASELINE`, `EQUAL_MASTER_SEEDS`, and `INVALID_VALUE`. State and identity errors include `IDEMPOTENCY_CONFLICT`, `EXPERIMENT_IMMUTABLE`, `INVALID_RUN_STATE`, `INVALID_CAMPAIGN_STATE`, `SEED_OVERLAP`, and `MANIFEST_MISMATCH`, and for fidelity checks `FIDELITY_CHECK_ACTIVE` and `SIMULATOR_NOT_AVAILABLE`. `RUNNER_TIMEOUT`, `EXECUTION_FAILED`, `CONTRACT_MISMATCH`, `CONFIGURATION_DRIFT`, and `POLICY_EXHAUSTED` are retained as attempt failures, not reported as normal games.
