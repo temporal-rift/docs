@@ -3,10 +3,11 @@ title: "Simulation Execution Control"
 description: "Operator-only per-game execution contexts, deterministic inputs, checkpoints, and logical clock control"
 ---
 
-Operator-only controls for reproducible execution in isolated simulation deployments. The game and timeline
-services each expose this contract independently and own their own execution revision and checkpoint. The
-caller coordinates both services and downstream projection barriers; an acknowledgement from one service does
-not imply global completion.
+Operator-only controls for reproducible execution in isolated simulation deployments. The game, timeline and
+read services each expose this contract independently and own their own execution revision and checkpoint. The
+caller coordinates the services and downstream projection barriers; an acknowledgement from one service does
+not imply global completion. read-service has no timers: advancing its logical clock only moves its logical
+time, and a caller is not required to advance it.
 
 A service executes one game per execution context. The operator opens a context carrying that game's effective
 rules, plays it, and closes it before opening the next one; no restart is needed between games.
@@ -93,7 +94,9 @@ Opens the execution context for one game with its deterministic inputs and effec
 
 With no context open, the context is accepted, its revision starts at `0`, and its logical time is the context's
 `logicalTime`. Opening the same context again is a no-op returning the current checkpoint. Any other context while one
-is open returns `409 EXECUTION_CONTEXT_CONFLICT`. A malformed context returns `400 INVALID_EXECUTION_CONTEXT`.
+is open returns `409 EXECUTION_CONTEXT_CONFLICT`. With no context open while the service still holds gameplay state of
+an earlier context, it opens nothing and returns `409 EXECUTION_STATE_NOT_CLEAN`. A malformed context returns `400
+INVALID_EXECUTION_CONTEXT`.
 
 The service validates the rules it uses for this game:
 
@@ -111,7 +114,9 @@ DELETE /internal/simulation/v1/execution?caseKey=<uuid>
 
 Closes the open context for `caseKey` in any state (`READY`, `ACTIVE`, or `TERMINAL`) and answers `204`. On closing,
 every pending outbox record, continuation and due timer of that context is discarded and never acts, and the context's
-game never changes again. The service then accepts a new context without restarting.
+game never changes again. It also discards every other gameplay state of the context, the game's projections and
+idempotency claims and the request rate counters of the context's participants, so after a close the service behaves
+for the next context exactly as a newly started service. The service then accepts a new context without restarting.
 
 Repeating the close for the most recently closed `caseKey` is a no-op `204`. A `caseKey` that matches neither the open
 nor the most recently closed context returns `409 EXECUTION_CONTEXT_CONFLICT`. With no context open and no context ever
@@ -169,7 +174,8 @@ does not preclude unseen upstream work from arriving later. A service with no co
 PUT /internal/simulation/v1/clock
 ```
 
-Advances only this service's logical clock. The request body is a `ClockAdvance`; the response is a
+Advances only this service's logical clock. read-service owns no timers, so advancing it only moves its logical
+time and a caller is not required to advance it. The request body is a `ClockAdvance`; the response is a
 `ClockAcknowledgement`:
 
 ```json
@@ -200,12 +206,13 @@ Advances only this service's logical clock. The request body is a `ClockAdvance`
 
 One acknowledgement never means the whole simulation has advanced:
 
-1. Open the same execution context on the game service and the timeline service.
+1. Open the same execution context on the game service, the timeline service and the read service.
 2. Inspect each service's checkpoint separately; revisions, rules digests, states, and watermarks are service-owned.
-3. Advance each service's clock with its own current `expectedRevision`, then re-read its checkpoint.
+3. Advance each service that owns timers with its own current `expectedRevision`, then re-read its checkpoint.
+   read-service need not be advanced; when it is, only its logical time moves.
 4. Wait for downstream projection barriers before treating the step as globally visible; a drained per-service
    checkpoint alone does not imply global completion.
-5. When the case ends, close the same `caseKey` on both services before opening the next case's context.
+5. When the case ends, close the same `caseKey` on every service before opening the next case's context.
 
 ### Effective rules
 
@@ -230,6 +237,7 @@ Errors use RFC 9457 problem details with a required stable string `code`.
 | `404` | `SIMULATION_CONTROL_UNAVAILABLE` | Control interface not registered in this deployment |
 | `409` | `EXECUTION_NOT_CONFIGURED` | No context is open: `getSimulationCheckpoint` and gameplay operations return it. A close returns it only when no context is open and none was ever closed; repeating the most recently closed case key is `204`. |
 | `409` | `EXECUTION_CONTEXT_CONFLICT` | A different context is already open, or a close names a case key that matches neither the open nor the most recently closed context once a context has been configured |
+| `409` | `EXECUTION_STATE_NOT_CLEAN` | No context is open, but the service still holds gameplay state of an earlier context; nothing is opened, and the caller must close that earlier context before retrying |
 | `409` | `IDEMPOTENCY_CONFLICT` | `operationId` reused with a different clock body |
 | `409` | `STALE_EXECUTION_REVISION` | `expectedRevision` no longer matches the service revision |
 | `422` | `CLOCK_REGRESSION` | `targetTime` precedes the current logical time |
