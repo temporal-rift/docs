@@ -22,7 +22,7 @@ The services derive the internal `playerId` used to scope responses from the val
 | `timeline-service` | Gated Weaver chain read |
 | `read-service` | Full game state, history, WebSocket stream |
 | `simulation-workbench` | Immutable experiments, durable runs, reports, comparisons, and replay |
-| `game-service`, `timeline-service` (isolated simulation lanes) | Simulation execution control (configure, checkpoint, advance clock) |
+| `game-service`, `timeline-service`, `read-service` (isolated simulation lanes) | Simulation execution control (configure, checkpoint, advance clock) |
 
 Operator-only deterministic execution is documented separately in
 [Simulation Execution Control](/api/simulation-control). It is unavailable in ordinary deployments and never
