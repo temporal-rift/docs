@@ -140,7 +140,10 @@ Full per-player view — no raw probabilities, no other players' factions.
 }
 ```
 
-Every active event has required `carryOverState`: `FRESH`, `CASCADED`, or `STALLED`. `playerName` is the player's name
+`activeEvents` lists the current era's unresolved events in reveal order: the order of the era's `EventsDrawn`
+events, carried-over events included. Resolving an event removes it without reordering the rest, and a game always
+lists its events in the same order. Every active event has required `carryOverState`: `FRESH`, `CASCADED`, or
+`STALLED`. `playerName` is the player's name
 from the game's starting roster. Every field after `players` except `lastRoundSummary` and `chain` is optional:
 absent means not yet computed by the owner, while an empty array means known-none. Refresh this view after reload or
 a rejected submission and retry at most once against the fresh era/round/deadline coordinates.
