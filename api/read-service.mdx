@@ -143,8 +143,8 @@ Full per-player view — no raw probabilities, no other players' factions.
 `activeEvents` lists the current era's unresolved events in reveal order: the order of the era's `EventsDrawn`
 events, carried-over events included. Resolving an event removes it without reordering the rest, and a game always
 lists its events in the same order. Every active event has required `carryOverState`: `FRESH`, `CASCADED`, or
-`STALLED`. `playerName` is the player's name
-from the game's starting roster. Every field after `players` except `lastRoundSummary` and `chain` is optional:
+`STALLED`. `players` is in seat order, the order of the game's starting roster, and `playerName` is the player's
+name from that roster. Every field after `players` except `lastRoundSummary` and `chain` is optional:
 absent means not yet computed by the owner, while an empty array means known-none. Refresh this view after reload or
 a rejected submission and retry at most once against the fresh era/round/deadline coordinates.
 
@@ -252,7 +252,7 @@ are the same for every player and never include probabilities or anyone's choice
 `phaseContext` also shows progress for the open window, identically for every player. `actionRoundProgress` is
 present while an action round is open; `paradoxResolutionProgress` and `affectedEventIds` (the events you may target
 with a resolution card) while `paradoxOpen` is true. Progress carries `submittedCount`, `totalPlayers`, and
-`pendingPlayerIds` — who has submitted or passed, never what anyone chose.
+`pendingPlayerIds` (in seat order) — who has submitted or passed, never what anyone chose.
 
 While a paradox-resolution phase is open and you have neither submitted nor passed, `myEligibleResolutionCards` lists
 every card you may submit: eligible cards from your hand plus the Stabilize and Detonate you are dealt for the phase.
