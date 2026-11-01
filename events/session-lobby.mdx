@@ -166,7 +166,7 @@ known probability state instead, and its `initialProbability` is still the print
 `cardInstanceId` distinguishes two copies of the same card type in the same hand. `grade` is always present;
 single-grade cards carry `I`.
 
-This is the private pending seven-card selection pool, not the action hand. `dealSlot` is the stable deal order and
+This is the private pending selection pool, not the action hand. `dealSlot` is the stable deal order and
 `selectionExpiresAt` is the authoritative deadline. Stabilize and Detonate never appear here; they are dealt
 separately if a Paradox Resolution phase opens.
 
@@ -188,8 +188,8 @@ separately if a Paradox Resolution phase opens.
 }
 ```
 
-The selected five cards become the player's action hand. `selectionOrigin` is `PLAYER` for an accepted choice or
-`TIMEOUT_RANDOM` if the window expired. A timeout uniformly chooses one of the 21 possible five-card subsets; it
+The selected cards become the player's action hand. `selectionOrigin` is `PLAYER` for an accepted choice or
+`TIMEOUT_RANDOM` if the window expired. A timeout uniformly chooses one of the possible subsets of the hand size; it
 never ranks cards or favors a deal slot, category, or grade.
 
 ## ForesightRevealed 🔒
