@@ -107,6 +107,14 @@ A check **passes** only when it has at least one case and every case matches. On
 
 **Download report** saves the check as a markdown report, named for the seed and the game-service revision, with the counts, both environments, the variants and the cases that did not match. A passing report is kept in the workbench repository, under `docs/fidelity`, as the evidence that the simulator was established for those revisions.
 
+## 9. Search for a configuration
+
+The **Campaigns** page lists the campaigns, newest first, with their state, round and the active time they have spent against their budget, and starts a new one. A campaign searches the rules of a baseline for configurations that meet the balance criterion: choose the baseline rules and content, a policy, the player counts, a budget in seconds of active time, how many games to play at once, two different master seeds, and the size of the search (candidates in the first round, seeds per candidate, how many candidates each round keeps, and how long the short list is). The form checks what it can before sending anything, and shows a refusal of the service on the field it names.
+
+A campaign starts by itself. While the simulator is not established it stays queued and the campaign page says so; it starts as soon as a fidelity check passes for the simulator you are running.
+
+The campaign page shows the state, the budget spent and remaining, the round, the short list and the **Decision log**, which records every candidate generated, kept, discarded or short-listed, with the reason and the evidence for each. **Pause campaign** stops the budget and starts no new game, and games already playing finish; **Resume campaign** continues it; **Cancel campaign** ends it and keeps the log. **Games at once** changes how many games are played together from the next game on. The page refreshes while the campaign is open. Confirming the short list on fresh seeds is not available yet.
+
 ## When something goes wrong
 
 Every refusal is shown as a plain sentence with a way to continue. If the service cannot be reached, the last data stays on screen marked stale with a **Retry** button and nothing you entered is lost. Progress, errors and denials are announced to screen readers, and every control can be used from the keyboard.
