@@ -9,11 +9,11 @@ You sign in with the workbench's identity provider. The application offers each 
 
 ## 1. Configure and preview
 
-On **Experiments → New experiment**, you can **Start from** a template: *Baseline policy comparison* (one variant; the random and faction-greedy policies, each on every seat) or *Rules variant comparison* (two variants; the random policy on every seat). A template fills one variant slot per variant it needs with the bundles the lanes serve, in order, and proposes seed `42`, player counts 3, 4 and 5, every faction set, and the execution bounds. Every value it fills stays editable, and your experiment name is kept.
+On **Experiments → New experiment**, you can **Start from** a template: *Baseline policy comparison* (one variant; the tables *faction-greedy* and *random*, each playing one policy on every seat) or *Rules variant comparison* (two variants; the table *random*). A template fills one variant slot per variant it needs with the bundles the lanes serve, in order, and proposes seed `42`, player counts 3, 4 and 5, every faction set, and the execution bounds. Every value it fills stays editable, and your experiment name is kept.
 
-Name the experiment, label each variant and choose its **Bundle** from the rules and content bundles the lanes serve. The bundle's artifacts and effective digests, and the service images and contract versions it pins, are shown read-only: you never type a digest. Variants can be compared only when their bundles pin the same services and contracts; otherwise the page names the fields that differ and the draft cannot be previewed or frozen. If no lane is configured, the page says so and nothing can be frozen. Then choose the bot policies (from the catalog) with the seats each one plays, the seeds, player counts and faction sets, and the execution bounds. A value the service refuses is marked on its own field, and an unsent draft survives a reload or an expired session.
+Name the experiment, label each variant and choose its **Bundle** from the rules and content bundles the lanes serve. The bundle's artifacts and effective digests, and the service images and contract versions it pins, are shown read-only: you never type a digest. Variants can be compared only when their bundles pin the same services and contracts; otherwise the page names the fields that differ and the draft cannot be previewed or frozen. If no lane is configured, the page says so and nothing can be frozen. Then choose the policies (bot policy bundles from the catalog), then the **tables**: a table gives a name and one policy to each seat, so a table can mix policies, such as a random seat among faction-greedy seats. Every policy you choose must be used by a seat of some table, and a table names a policy for every seat up to your largest player count. Then choose the seeds, player counts and faction sets, and the execution bounds. A value the service refuses is marked on its own field, and an unsent draft survives a reload or an expired session.
 
-**Preview matrix** shows the exact set of cases the experiment will run: the total, the count per variant and player count, and a page of case coordinates. Nothing is stored by a preview.
+**Preview matrix** shows the exact set of cases the experiment will run: the total, the count per variant, table and player count, and a page of case coordinates. The total is variants × tables × seeds × the games of one seed for your player counts and faction sets (55 for all three player counts and every faction set). Nothing is stored by a preview.
 
 ## 2. Freeze
 
@@ -27,7 +27,7 @@ Cases that have not succeeded are never results. Anywhere data covers only part 
 
 ## 4. Read the report
 
-A report is organised in cohorts. Each shows its eligible games and independent blocks and then every metric with its value, denominator and interval.
+A report is organised in cohorts, each of one variant, one table and one player count. Each shows its eligible games and independent blocks and then every metric with its value, denominator and interval.
 
 | You see | It means |
 |---|---|
@@ -52,11 +52,13 @@ The **Evaluation** panel on the run page applies a balance criterion version to 
 | Score | The weighted sum of squared deviations of the scored lines; lower is closer to the targets |
 | Confirmation sample | The seeds the run has against the seeds the criterion requires, and whether the full case matrix was played |
 
-The table lists every evaluated line with its cohort, value, interval, band, deviation and verdict (meets, fails or inconclusive) and can be filtered to failing or inconclusive lines. The panel always states that bot results say nothing about balance among human players.
+The table lists every evaluated line with its table, cohort, value, interval, band, deviation and verdict (meets, fails or inconclusive) and can be filtered to failing or inconclusive lines. The panel always states that bot results say nothing about balance among human players.
+
+Criterion version 2 adds a confirmation-only table, *random-seat-vs-faction-greedy-v1*, in which seat 0 plays at random and the other seats play faction-greedy. Its line **G-07** reads the random seat only: a faction's win rate on that seat, divided by the win reference of the whole table, must not exceed 1.0, so a faction that wins more often than an average seat when a random player holds it is flagged. Its confirmation sample is 104 seeds over the full case matrix.
 
 ## 5. Compare two variants
 
-On **Comparisons**, choose the run and variant on each side. A comparison lists the differences the two sides declare (rules or content), the matched blocks, the pairs left out because a side failed or has not finished, and each paired difference with its interval. If the two runs differ in anything beyond the declared variant, the comparison is refused and the differences are named.
+On **Comparisons**, choose the run and variant on each side. Cases are paired when they share seed, player count, table and seat assignment. A comparison lists the differences the two sides declare (rules or content), the matched blocks, the pairs left out because a side failed or has not finished, and each paired difference with its interval. If the two runs differ in anything beyond the declared variant, the comparison is refused and the differences are named.
 
 ## 6. Inspect a case
 
@@ -90,17 +92,17 @@ The configuration search plays on an in-process simulator, so its results hold o
 
 **The simulator's source revisions** lists the revision of each of the three services the simulator embeds. The page says either that the simulator is *established*, because a passing check exists for exactly these revisions, or that it is *not established*, because none does. A passing check applies only to the revisions it ran with, so the simulator is not established again whenever it embeds a new revision, until a check passes on it. A search campaign is refused while the simulator is not established.
 
-**Start a check** takes a seed and, on **Start a check**, plays the full set of cases on the simulator for that seed: three, four and five players, every faction set and seat rotation, both baseline policies, for the baseline and for two variants that set as many parameters as the constraints allow at the minimum and at the maximum of their ranges. It then reproduces every case on one real lane. Starting is refused while another check is queued or running, and when the simulator is not enabled or no real lane matches its source revisions, content, contract versions and bot identities.
+**Start a check** takes a seed and, on **Start a check**, plays the full set of cases on the simulator for that seed: three, four and five players, every faction set and seat rotation, both uniform tables (faction-greedy and random), for the baseline and for two variants that set as many parameters as the constraints allow at the minimum and at the maximum of their ranges. It then reproduces every case on one deployed lane. Starting is refused while another check is queued or running, and when the simulator is not enabled or no deployed lane matches its source revisions, content, contract versions and bot identities.
 
-Open a check to follow it. It shows its state, the simulator run that plays its cases (linked once the check begins), the case counts, the builds of the simulator and of the real lane, the variants with their overrides, and the cases, which you can filter by variant and by result.
+Open a check to follow it. It shows its state, the simulator run that plays its cases (linked once the check begins), the case counts, the builds of the simulator and of the deployed lane, the variants with their overrides, and the cases, which you can filter by variant and by result.
 
 The counts stay at zero while the simulator plays, because the check has cases only once its run completes; follow that phase on the run's page. To abandon a check, cancel its run there: the check then fails with `RUN_CANCELLED`, and a new one can be started.
 
 | Result of a case | It means |
 |---|---|
 | Pending | Not reproduced yet. |
-| Match | The real lane played the case exactly as the simulator did. |
-| Diverged | The real lane ran the case to its end and differed. The case shows the step and the kind of the first difference. |
+| Match | The deployed lane played the case exactly as the simulator did. |
+| Diverged | The deployed lane ran the case to its end and differed. The case shows the step and the kind of the first difference. |
 | Cannot be reproduced | The simulator could not play the case, or the reproduction could not reach an ending. It says nothing about fidelity, but the check does not pass. |
 
 A check **passes** only when it has at least one case and every case matches. One diverged case, or one case that cannot be reproduced, fails it; no difference is tolerated. A diverged case points at an in-memory behaviour of the simulator that differs from its production counterpart, and is a defect to fix before the simulator is trusted again.
@@ -109,11 +111,11 @@ A check **passes** only when it has at least one case and every case matches. On
 
 ## 9. Search for a configuration
 
-The **Campaigns** page lists the campaigns, newest first, with their state, round and the active time they have spent against their budget, and starts a new one. A campaign searches the rules of a baseline for configurations that meet the balance criterion: choose the baseline rules and content, a policy, the player counts, a budget in seconds of active time, how many games to play at once, two different master seeds, and the size of the search (candidates in the first round, seeds per candidate, how many candidates each round keeps, and how long the short list is). The form checks what it can before sending anything, and shows a refusal of the service on the field it names.
+The **Campaigns** page lists the campaigns, newest first, with their state, round and the active time they have spent against their budget, and starts a new one. A campaign searches the rules of a baseline for configurations that meet the balance criterion: choose the baseline rules and content, the player counts, a budget in seconds of active time, how many games to play at once, two different master seeds, and the size of the search (candidates in the first round, seeds per candidate, how many candidates each round keeps, and how long the short list is). The campaign plays the tables of the balance criterion, so you do not choose policies or seats: the search plays the criterion's screening tables and the confirmation plays its confirmation tables. The form checks what it can before sending anything, and shows a refusal of the service on the field it names.
 
 A campaign starts by itself. While the simulator is not established it stays queued and the campaign page says so; it starts as soon as a fidelity check passes for the simulator you are running.
 
-The campaign page shows the state, the budget spent and remaining, the round, the short list and the **Decision log**, which records every candidate generated, kept, discarded or short-listed, with the reason and the evidence for each. **Pause campaign** stops the budget and starts no new game, and games already playing finish; **Resume campaign** continues it; **Cancel campaign** ends it and keeps the log. **Games at once** changes how many games are played together from the next game on. The page refreshes while the campaign is open. When the search is complete, **Confirm short list** plays the baseline and each short-listed candidate on fresh seeds through the real services, one case at a time; seeds the search already played are refused. The **Confirmation** report shows, for each of them, the progress of its run while it plays, then the verdict, the verdict of every criterion line and the confirmation sample, with the reminder that bot results say nothing about balance among human players.
+The campaign page shows the state, the budget spent and remaining, the round, the short list and the **Decision log**, which records every candidate generated, kept, discarded or short-listed, with the reason and the evidence for each. **Pause campaign** stops the budget and starts no new game, and games already playing finish; **Resume campaign** continues it; **Cancel campaign** ends it and keeps the log. **Games at once** changes how many games are played together from the next game on. The page refreshes while the campaign is open. When the search is complete, **Confirm short list** plays each short-listed candidate on fresh seeds on the simulator, one candidate after another and without a run for the baseline. At criterion version 2 it takes about 3.2 hours per candidate. It is refused while simulator fidelity is not established (see section 8), and when the simulator is not available, when no bundle serves a policy of the confirmation tables, or when a seed was already played by the search; the refusal names the reason. The **Confirmation** report shows, for each candidate, the progress of its run while it plays, then the verdict, the verdict of every criterion line and the confirmation sample, with the reminder that bot results say nothing about balance among human players.
 
 ## When something goes wrong
 
