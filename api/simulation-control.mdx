@@ -232,7 +232,7 @@ Errors use RFC 9457 problem details with a required stable string `code`.
 
 | Status | Code | Condition |
 |---|---|---|
-| `400` | `INVALID_EXECUTION_CONTEXT` | Malformed execution context (for example duplicate factions, gaps in seat indices, an out-of-range seed, a mismatched `rulesDigest`, or a missing or invalid used rule) |
+| `400` | `INVALID_EXECUTION_CONTEXT` | Malformed execution context (for example duplicate factions, gaps in seat indices, an out-of-range seed, a mismatched `rulesDigest`, or a missing or invalid used rule; a rule with a documented default may be omitted and takes that default) |
 | `400` | `INVALID_CLOCK_ADVANCE` | Malformed clock advance |
 | `401` | `AUTHENTICATION_REQUIRED` | Missing, invalid, or expired bearer token |
 | `403` | `SIMULATION_CONTROL_FORBIDDEN` | Authenticated caller lacks `simulation:control` |
