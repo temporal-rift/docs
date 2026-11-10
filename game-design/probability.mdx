@@ -66,6 +66,24 @@ full 100%. Starting from A=33%, B=33%, C=34%, erasing C gives A=50%, B=50%, C=0%
   event's last outcome, or erasing down to a single outcome that would win with certainty, is always rejected.
 - Erasures on the same event in the same round are judged together: if they can't all fit, none of them apply.
 
+### Fate fills the gap
+
+When a Prophet has written an outcome of the event with `FORESIGHT`, the erased weight goes to the written outcome
+first, up to the 90% ceiling, and only the rest goes to the other survivor. The written outcome is the one named by the
+first Foresight on that event this era that Nullify did not cancel; a later Foresight doesn't replace it, and a
+Foresight in the same round as the Annihilate already counts.
+
+- Starting from A=50%, B=30%, C=20% with C written, erasing A gives A=0%, B=30%, C=70% (proportionally it would be
+  B=60%, C=40%).
+- Starting from A=70%, B=25%, C=5% with B written, erasing A gives A=0%, B=90%, C=10%.
+- If the written outcome is the one erased, is sealed, or was written only after the erasure, the split is
+  proportional as usual.
+- It never changes whether an erasure is accepted, and a Cascade's carried erasure is never routed.
+- The written outcome stays secret. Only Scan's exact values and the published bands show where the weight went.
+
+The rule is the game setting `game.rules.probability.erased-weight-to-written-outcome` (on by default). With it off,
+erased weight is always shared proportionally.
+
 A cascaded or stalled event keeps its probabilities, so an outcome erased last era comes back at 0% and can be pushed
 up again. A `CASCADE` erases it again for one more era instead.
 
