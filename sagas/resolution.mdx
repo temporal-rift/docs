@@ -57,7 +57,8 @@ The lock clears when the event returns in the next era.
 | 1 | `NULLIFY` | Cancels each named player's eligible action (one player at grade I, two at grade II) before it has any effect |
 | 2 | `SEAL` | Locks outcomes before other effects can modify them |
 | 3 | `TAPESTRY` | Arms chain protection before a same-round Annihilate can reach the pending link |
-| 4 | `ANNIHILATE` | Removes outcomes before probability shifts |
+| 3a | `FORESIGHT` writing | Records the event's written outcome (first non-cancelled Foresight this era) so a same-round Annihilate already routes erased weight to it |
+| 4 | `ANNIHILATE` | Removes outcomes before probability shifts; the erased weight goes to the written outcome first when the default-on rule allows it |
 | 5 | `REWEAVE`, then `THREAD` | Judged against the post-Annihilate outcomes: a Reweave escapes a same-round Annihilate, and a Thread naming an annihilated outcome is rejected |
 | 6 | `CORRUPT` | Inverts other cards before they apply |
 | 7 | `MIMIC` | Picks the strongest inward transfer toward the named outcome (a Push targeting it or a Swing destined for it; largest base magnitude, then lowest player id — never a Suppress or a Swing away from it) and adds an independent copy at its base magnitude to the simultaneous tier |
