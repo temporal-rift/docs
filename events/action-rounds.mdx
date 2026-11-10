@@ -45,6 +45,30 @@ or both of `RALLY` and `MOMENTUM`; it is a server-calculated offer and must neve
 }
 ```
 
+## SpecialActionAvailabilityReported 🔒
+
+```json
+{
+  "gameId": "uuid",
+  "eraNumber": 1,
+  "roundNumber": 1,
+  "playerId": "uuid",
+  "specials": [
+    { "specialAction": "ANNIHILATE", "available": false, "unavailableReason": "NOT_ELIGIBLE_THIS_ROUND" },
+    { "specialAction": "CORRUPT", "available": true },
+    { "specialAction": "CASCADE", "available": true }
+  ]
+}
+```
+
+Delivered only to `playerId`, which identifies the player the report belongs to and is its sole viewer. Published
+once per player per action round when the round opens, carrying exactly that player's three faction specials. Each
+entry states whether the special is `available`; `unavailableReason` appears only when it is false and is one of
+`JAMMED`, `DECLARATION_WINDOW_ONLY`, `NOT_ELIGIBLE_THIS_ERA`, `NOT_ELIGIBLE_THIS_ROUND`, `GAME_BUDGET_EXHAUSTED`, or
+`ERA_BUDGET_EXHAUSTED`. Availability is advisory — the authoritative check stays on submission — and covers round,
+era, budget, jam and declaration-window rules only; target-dependent and timeline prerequisite checks are not
+represented.
+
 ## CardPlayed 🔒
 
 ```json

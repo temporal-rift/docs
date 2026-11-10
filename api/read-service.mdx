@@ -40,6 +40,11 @@ Full per-player view — no raw probabilities, no other players' factions.
   ],
   "myScore": 12,
   "mySpecialActions": ["ANNIHILATE", "CORRUPT", "CASCADE"],
+  "mySpecialAvailability": [
+    { "specialAction": "ANNIHILATE", "isAvailableThisRound": false, "unavailableReason": "ERA_BUDGET_EXHAUSTED" },
+    { "specialAction": "CORRUPT", "isAvailableThisRound": true },
+    { "specialAction": "CASCADE", "isAvailableThisRound": true }
+  ],
   "myJammedUntilRound": null,
   "myRevealedIntel": [
     {
@@ -191,6 +196,14 @@ selection—the field disappears and `myHand` contains those five cards.
 `myJammedUntilRound` is private to the authenticated player. It is `null` when that player is not jammed and otherwise
 contains the round through which faction specials are blocked. The value clears after that round passes and never
 carries across an era boundary. Jam does not prevent the player from playing cards.
+
+### Special-action availability
+
+`mySpecialAvailability` is private to the authenticated player and appears only during an action round for a player
+with a faction. It carries exactly the faction's three specials, each with `isAvailableThisRound` and, when false, a
+shared `unavailableReason` (`JAMMED`, `DECLARATION_WINDOW_ONLY`, `NOT_ELIGIBLE_THIS_ERA`, `NOT_ELIGIBLE_THIS_ROUND`,
+`GAME_BUDGET_EXHAUSTED`, `ERA_BUDGET_EXHAUSTED`). It is advisory, like `isPlayableThisRound`: the submission remains
+authoritative, and target-dependent or timeline prerequisite checks are not represented.
 
 ### Revealed intel
 
