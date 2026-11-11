@@ -205,6 +205,10 @@ shared `unavailableReason` (`JAMMED`, `DECLARATION_WINDOW_ONLY`, `NOT_ELIGIBLE_T
 `GAME_BUDGET_EXHAUSTED`, `ERA_BUDGET_EXHAUSTED`). It is advisory, like `isPlayableThisRound`: the submission remains
 authoritative, and target-dependent or timeline prerequisite checks are not represented.
 
+The field reflects the latest report read-service has projected for the caller and is absent unless that report is for
+the era and round now open. At the start of a round it can therefore be absent for a moment until the round's report
+arrives; the caller is notified of it over the WebSocket, so refetch the state then.
+
 ### Revealed intel
 
 `myRevealedIntel` is always present. It holds what you have bought with Information cards **this era**, is `[]` when
