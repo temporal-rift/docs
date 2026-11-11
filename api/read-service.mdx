@@ -207,7 +207,8 @@ authoritative, and target-dependent or timeline prerequisite checks are not repr
 
 The field reflects the latest report read-service has projected for the caller and is absent unless that report is for
 the era and round now open. At the start of a round it can therefore be absent for a moment until the round's report
-arrives; the caller is notified of it over the WebSocket, so refetch the state then.
+arrives. The caller is also notified of the report over the WebSocket, but the notification and the projection are
+consumed independently, so a refetch it triggers can still find the field absent; retry shortly.
 
 ### Revealed intel
 
