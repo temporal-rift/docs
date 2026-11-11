@@ -38,7 +38,7 @@ without it, a faction with a strong repeatable special would rarely need to play
 
 | Special        | Effect                                                              |
 |----------------|---------------------------------------------------------------------|
-| **Annihilate** | Remove one outcome from an event this era: it drops to 0% and its probability moves to the other outcomes. Rejected, at no cost, if the survivors can't hold it within 0–90% — so an event always keeps at least two outcomes in contention. Not playable in Round 1 by default (the earliest round is configurable): an early attempt is rejected at no cost and your Round 1 slot stays open |
+| **Annihilate** | Remove one outcome from an event this era: it drops to 0% and its probability moves to the other outcomes. Rejected, at no cost, if the survivors can't hold it within 0–90% — so an event always keeps at least two outcomes in contention. Not playable in Round 1 by default (the earliest round is configurable): an early attempt is rejected at no cost and your Round 1 slot stays open. Erasing a Prophet's written outcome in or after the round it was written scores nothing (see [Scoring](/game-design/scoring)) |
 | **Corrupt**    | Invert the probability effect of another player's card this round   |
 | **Cascade**    | If the erased outcome's event carries into next era (Stall or paradox cascade), erase it again there automatically so it can't be pushed back up; not playable in the final era |
 
@@ -46,9 +46,9 @@ without it, a faction with a strong repeatable special would rarely need to play
 
 | Special         | Effect                                                                       |
 |-----------------|------------------------------------------------------------------------------|
-| **Foresight**   | See next era's fresh future events, with their printed starting weights, and write a current-era outcome; an Annihilate on that event moves its erased weight to the written outcome first. The writing expires without score if the event Stalls |
+| **Foresight**   | See next era's fresh future events, with their printed starting weights, and write a current-era outcome; an Annihilate on that event moves its erased weight to the written outcome first, and an Annihilate that erases the written outcome in or after its writing round scores nothing for either side. The writing expires without score if the event Stalls or its written outcome is erased that way |
 | **Seal**        | Lock one outcome's probability through the end of the era — later shifts against it are blocked with weights unchanged and no paradox; shifts that leave sealed weights unchanged reroute normally. A sealed outcome never absorbs an erased outcome's probability, and Annihilate can still erase it |
-| **Fulfillment** | Declare a current-era event; score +8 if its written outcome wins this era. A Stall expires the declaration |
+| **Fulfillment** | Declare a current-era event; score +8 if its written outcome wins this era. A Stall, or an Annihilate erasing the written outcome in or after its writing round, expires the declaration |
 
 ### 🔄 Revisionists
 

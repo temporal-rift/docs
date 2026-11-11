@@ -32,6 +32,14 @@ event's remaining outcomes (a tie for highest counts) before that round's Annihi
 or already-erased outcome scores nothing. Only these scoring Annihilates count toward the Erasers' four-annihilation
 win condition.
 
+**Fate protects what is written.** A Prophet's Foresight writes an outcome for an event, in a given action round.
+An Annihilate that erases that written outcome in the same round or a later one still erases it, but scores nothing
+for either side: the Eraser gets no points and no step toward the win condition, even if the outcome was leading,
+and the Prophet's writing and any Fulfillment on that event expire with no score and no penalty, whichever outcome
+wins. An Annihilate in an earlier round than the writing, or on a different outcome, scores as usual. This rule is
+the setting `game.rules.scoring.written-outcome-shields-annihilation` (on by default). Nothing announces it; the only
+trace is the missing score.
+
 A cascaded or stalled declaration has no winning outcome in that era and earns no declaration score. A Stall breaks
 the Activist's consecutive-era streak. Prophet writing and Fulfillment on that event expire without score or penalty,
 and a pending Weaver Thread clears without changing confirmed chain length. A later declaration or Thread on the
