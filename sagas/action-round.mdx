@@ -12,7 +12,8 @@ or both Round 2 closure and authoritative band publication (round 3)
 
 ```mermaid
 flowchart TD
-  A[emit ActionRoundStarted — with timer] --> B{Race condition}
+  A[emit ActionRoundStarted — with timer] --> A2[emit SpecialActionAvailabilityReported × each active player]
+  A2 --> B{Race condition}
   B -->|All players submit| C[All submitted path]
   B -->|Timer expires| D[Timer path]
   D --> E[emit ActionRoundTimerExpired]
@@ -21,6 +22,16 @@ flowchart TD
   F --> G
   G --> H[emit RoundSummaryPublished]
 ```
+
+## Special availability at round open
+
+In the same transaction that opens the round, before it accepts a submission, the saga publishes one private
+`SpecialActionAvailabilityReported` per player who has a faction and has not abandoned. A special is unavailable
+exactly when submitting it would be rejected for a reason that does not depend on its target, with the first
+matching reason in this order: `JAMMED`, `DECLARATION_WINDOW_ONLY`, `NOT_ELIGIBLE_THIS_ERA`,
+`NOT_ELIGIBLE_THIS_ROUND`, `GAME_BUDGET_EXHAUSTED`, `ERA_BUDGET_EXHAUSTED`. Target-dependent checks and
+prerequisites judged by `timeline-service` are not reflected. The report names only its viewer and never who
+jammed them.
 
 ## After the round closes
 
