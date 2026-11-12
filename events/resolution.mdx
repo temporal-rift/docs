@@ -291,9 +291,19 @@ Internal-only: signals an invalid probability state after resolution. Not expect
     { "outcomeId": "uuid", "probability": 65 },
     { "outcomeId": "uuid", "probability": 25 },
     { "outcomeId": "uuid", "probability": 10 }
-  ]
+  ],
+  "consequentialErasures": ["uuid"]
 }
 ```
+
+`consequentialErasures` names the outcomes whose erasure changed the event's winner: the same draw roll would have
+selected a different outcome without that erasure. The erasure may be a direct Annihilate or a carried-forward
+Cascade, and a consumer matches an entry to its annihilation fact by `targetEventId` and `targetOutcomeId`. Only
+timeline holds the roll, so it decides this and publishes the list with the outcome; each outcome id appears at most
+once. An erasure that would leave a lone survivor above the 90% ceiling is rejected, so the list has at most one entry
+in practice even though the schema does not limit it. Producers at 7.4.0 or later always send the field: an empty list
+means no erasure changed the winner, while an absent field means an older producer and the consumer keeps its previous
+behaviour. Because the list travels in the same message as the outcome, a redelivery carries the identical list.
 
 ## EraResolutionCompleted 🔒
 
