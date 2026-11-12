@@ -41,6 +41,24 @@ scoring completion. `CASCADED` entries advance collapse accounting; both `CASCAD
 forward in the barrier's reveal order. A paradox-resolution timeout force-cascades each event with unresolved
 findings once; it does not produce `STALLED`.
 
+### Which erasures changed the winner
+
+When an event's winner is drawn, timeline also decides whether the event's erasure changed that winner, and publishes
+the answer as `OutcomeApplied.consequentialErasures`. It takes the weights recorded just before and just after the
+erasure and gives that erasure's redistribution back on the final weights: the erased outcome regains its earlier
+weight, and each other outcome loses the share it received, never going below 0. Shifts made after the erasure stay.
+The same draw value is then walked over those weights in outcome order. If that walk selects a different outcome from
+the real draw, the erased outcome is listed; otherwise the list is empty. No second random value is drawn, and the
+real draw is unchanged.
+
+For example, a 40/40/20 event whose third outcome is erased becomes 50/50/0. A draw value of 85 selects the second
+outcome, while the same value would have selected the third outcome under 40/40/20, so the erasure is listed. A draw
+value of 10 selects the first outcome either way, so the list is empty.
+
+Erasures from a direct Annihilate and from a carried-forward Cascade are judged the same way. An erasure from an
+earlier era is not judged once the event has carried into a new era. Stalled and cascaded events publish no
+`OutcomeApplied`, so they have no list.
+
 ## Card effect application order
 
 Effects are applied in this fixed order within each round. Submission time never affects the result:
