@@ -12,7 +12,7 @@ the exact delta applied to each entry.
 
 | Faction | Scoring trigger | Points |
 |---|---|---|
-| ⚡ Erasers | Annihilate erased an outcome that was leading its event | +3 |
+| ⚡ Erasers | Annihilate erased an outcome that was leading its event, and the erasure changed the winner | +3 |
 | | Corrupted card that inverted an opponent's effect | +2 |
 | 📜 Prophets | Event resolves exactly as written | +4 |
 | | Fulfillment declared and succeeds | +8 |
@@ -32,6 +32,16 @@ An Annihilate scores only when its target was still in contention and held the h
 event's remaining outcomes (a tie for highest counts) before that round's Annihilates took effect. Erasing a trailing
 or already-erased outcome scores nothing. Only these scoring Annihilates count toward the Erasers' four-annihilation
 win condition.
+
+**An erasure has to matter.** With the setting `game.rules.scoring.annihilation-requires-consequence` on (the
+default), an Annihilate that meets those conditions still scores, and still counts toward the win condition, only
+when it changed which outcome won. When the event resolves, the timeline checks whether the same draw would have
+picked a different winner without that erasure (see [Erasing an outcome](/game-design/probability#erasing-an-outcome)).
+On a 50/30/20 event, erasing the leading 50% outcome leaves 0/60/40. A draw of 90 then picks the third outcome, as
+it would have under 50/30/20, so the erasure scores nothing; a draw of 70 picks the third outcome where 50/30/20 would
+have picked the second, so the erasure scores. An erasure on an event that stalls or
+cascades has no winner to change and scores nothing. With the setting off, an Annihilate scores on the conditions
+above alone.
 
 **Fate protects what is written.** A Prophet's Foresight writes an outcome for an event, in a given action round.
 An Annihilate that erases that written outcome in the same round or a later one still erases it, but scores nothing

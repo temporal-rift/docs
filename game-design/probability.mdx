@@ -87,6 +87,17 @@ erased weight is always shared proportionally.
 A cascaded or stalled event keeps its probabilities, so an outcome erased last era comes back at 0% and can be pushed
 up again. A `CASCADE` erases it again for one more era instead.
 
+### Did the erasure change the winner?
+
+When an event resolves, the timeline decides for each erasure on it whether that erasure changed the winner. It
+gives the erased outcome back the weight it held and takes back the shares its erasure handed to the other outcomes
+(shifts made after the erasure stay), then reads the **same draw** against those weights. If that picks a different
+outcome than the real draw, the erasure was consequential. No second random value is drawn and the real result never
+changes. On a 40/40/20 event, erasing the third outcome gives 50/50/0: a draw of 85 picks the second outcome, but
+would have picked the third under 40/40/20, so that erasure changed the winner; a draw of 10 picks the first outcome
+either way, so it changed nothing. An Eraser scores an Annihilate only for a consequential erasure (see
+[Scoring](/game-design/scoring)).
+
 ## Scan card
 
 `SCAN` reveals the exact probability state of one event to the player who played it, and **keeps it current for the
