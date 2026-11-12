@@ -17,7 +17,8 @@ the exact delta applied to each entry.
 | 📜 Prophets | Event resolves exactly as written | +4 |
 | | Fulfillment declared and succeeds | +8 |
 | | Event resolves differently than written | −2 |
-| 🔄 Revisionists | Secret preferred outcome wins this era | +3 |
+| 🔄 Revisionists | Secret preferred outcome (your locked Rewrite) wins this era | +3 |
+| | Locked Rewrite's event resolves with a different outcome | −1 |
 | | Mimic never traced by another player (final era, once per game) | +4 |
 | | Successful Mimic contributed to outcome winning | +1 |
 | 🧵 Weavers | Event added to an active chain | +2 |
@@ -44,6 +45,14 @@ A cascaded or stalled declaration has no winning outcome in that era and earns n
 the Activist's consecutive-era streak. Prophet writing and Fulfillment on that event expire without score or penalty,
 and a pending Weaver Thread clears without changing confirmed chain length. A later declaration or Thread on the
 carried event is independent. Each fact is recorded and consumed at most once for its game, era, player, and reason.
+
+A Revisionist's Rewrite is a commitment: the first Rewrite of an era is locked, and it is the only one you can make that
+era. Whether it scores is decided when the era resolves. If its event resolves with your preferred outcome you earn
+`SECRET_OUTCOME_WON`; if it resolves with a different outcome you lose points with `SECRET_OUTCOME_MISSED` (−1 by
+default; a deployment can set it to 0 to switch the penalty off); if the event stalls or cascades you earn nothing and
+lose nothing. A Rewrite cancelled by Nullify leaves no preference and no penalty, but still uses your Rewrite for that
+era. A miss is a score entry like any other and gives no progress toward the Revisionist objective, which counts only
+eras where the preferred outcome won. The outcome you named stays private.
 
 The `MIMIC_NEVER_TRACED` Revisionist bonus is scored with the final era (era 5), together with that era's other
 scores and before its victory check, so it can carry a Revisionist to the 20-point threshold. A game that ends earlier
