@@ -291,9 +291,16 @@ Internal-only: signals an invalid probability state after resolution. Not expect
     { "outcomeId": "uuid", "probability": 65 },
     { "outcomeId": "uuid", "probability": 25 },
     { "outcomeId": "uuid", "probability": 10 }
-  ]
+  ],
+  "consequentialErasures": ["uuid"]
 }
 ```
+
+`consequentialErasures` names the outcomes whose accepted direct erasure changed the event's winner: the same draw roll
+would have selected a different outcome without that erasure. Only timeline holds the roll, so it decides this and
+publishes the list with the outcome; each outcome id appears at most once. An event with no erasure, or none that
+changed the winner, sends an empty list, and older producers omit the field. Because the list travels in the same
+message as the outcome, a redelivery carries the identical list.
 
 ## EraResolutionCompleted 🔒
 
