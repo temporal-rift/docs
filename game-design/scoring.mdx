@@ -26,7 +26,7 @@ the exact delta applied to each entry.
 | | Chain broken by an unresolved chain-conflict paradox | −3 |
 | 📣 Activists | Rally-mode declaration's exact outcome wins | +6 |
 | | Momentum-mode declaration's exact outcome wins | +5 |
-| | Live Expose reveals a qualifying Round-1 Push, Suppress, or Swing signature | +2 |
+| | Live Expose reveals a qualifying Round-1 Push, Suppress, or Swing signature on the event your declaration names | +2 |
 
 An Annihilate scores only when its target was still in contention and held the highest probability among the
 event's remaining outcomes (a tie for highest counts) before that round's Annihilates took effect. Erasing a trailing
@@ -40,6 +40,13 @@ and the Prophet's writing and any Fulfillment on that event expire with no score
 wins. An Annihilate in an earlier round than the writing, or on a different outcome, scores as usual. This rule is
 the setting `game.rules.scoring.written-outcome-shields-annihilation` (on by default). Nothing announces it; the only
 trace is the missing score.
+
+An Expose still reveals the target's Round-1 signature at Round-2 close whatever the Activist declared, but it earns
+its +2 only when that signature is on the event your own declaration of the era (Rally or Momentum) names. A reveal on
+any other event, or by an Activist with no declaration in the era, scores nothing, and so does one whose declaration a
+Round-1 Nullify cancelled. This rule is the setting `game.rules.scoring.expose-requires-declared-event` (on by
+default); with it off, every reveal scores as before. An Activist earns at most one Expose score per era, decided at
+Round-2 close, so the target's Round-3 action cannot change it.
 
 A cascaded or stalled declaration has no winning outcome in that era and earns no declaration score. A Stall breaks
 the Activist's consecutive-era streak. Prophet writing and Fulfillment on that event expire without score or penalty,
