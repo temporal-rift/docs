@@ -28,11 +28,13 @@ flowchart TD
   E -->|Predicted outcome drawn as winner| F[emit ChainLinkAdded — chainLength++]
   E -->|Another outcome wins| G[emit ChainLinkInvalidated — no penalty]
   E -->|Event Stalls or cascades| G
-  E -->|Annihilated, Tapestry armed| H[emit ChainProtectionConsumed, then ChainLinkInvalidated]
+  E -->|Annihilated, Tapestry armed| H[emit ChainProtectionConsumed — chain guarded this era]
+  H --> I
   E -->|Annihilated, unprotected| I[raise CHAIN_CONFLICT paradox]
   I -->|Resolved — chain intact, erased outcome can't win| G
-  I -->|Cascaded| J[emit ChainBroken — saga ends; next THREAD starts a new chain]
-  F --> K{chainLength == 3?}
+  I -->|Cascaded, chain guarded| G
+  I -->|Cascaded, unguarded| J[emit ChainBroken — saga ends; next THREAD starts a new chain]
+  F --> K{chainLength == configured length, default 4?}
   K -->|Yes| L[emit ChainCompleted — saga ends]
   K -->|No| M[Saga stays open — wait for next THREAD]
 ```
@@ -44,9 +46,9 @@ flowchart TD
 | `TAPESTRY` played (chain ≥ 2, not yet used this era) | Arm protection for the pending link, for the rest of this era — emit `ChainProtectionArmed` |
 | `REWEAVE` played (once per era) | Move the current-era pending link to a different live current-era outcome — emit `ChainReAnchored`, length unchanged, link still pending; never completes the chain |
 | Pending link's event Stalls or cascades | Emit `ChainLinkInvalidated` in that era; confirmed links stay and a later Thread is a new prediction |
-| Unresolved `CHAIN_CONFLICT` paradox | Emit `ChainBroken`, saga ends — the chain's only reachable break trigger |
-| `GameEnded` with chain < 3 | Invalidate any pending link and end the incomplete chain without a bonus |
-| `GameEnded` with chain ≥ 3 | `ChainCompleted` already fired before `GameEnded` |
+| Unresolved `CHAIN_CONFLICT` paradox | Emit `ChainBroken`, saga ends — the chain's only reachable break trigger; if Tapestry protection was consumed against that link this era, only `ChainLinkInvalidated` |
+| `GameEnded` below the configured chain length | Invalidate any pending link and end the incomplete chain without a bonus |
+| `GameEnded` at the configured chain length | `ChainCompleted` already fired before `GameEnded` |
 
 ---
 

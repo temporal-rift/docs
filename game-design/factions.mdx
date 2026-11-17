@@ -12,9 +12,9 @@ assigned exactly one faction secretly at game start. No two players share a fact
 | Faction             | Goal                                              | Win condition                                               |
 |---------------------|---------------------------------------------------|-------------------------------------------------------------|
 | ⚡ **Erasers**       | Wipe outcomes completely                          | Annihilate 4+ leading outcomes OR reach 20 pts              |
-| 📜 **Prophets**     | Events resolve as written                         | 4+ events resolve as written OR reach 20 pts                |
+| 📜 **Prophets**     | Events resolve as written                         | 3+ events resolve as written OR reach 20 pts                |
 | 🔄 **Revisionists** | Secret preferred outcome changes each era         | Secret outcome wins 3+ eras OR reach 20 pts                 |
-| 🧵 **Weavers**      | Build causal chains across eras                   | Complete a chain of 3+ connected events OR reach 20 pts     |
+| 🧵 **Weavers**      | Build causal chains across eras                   | Complete a chain of 4 connected events OR reach 20 pts      |
 | 📣 **Activists**    | Publicly declare an outcome, score when it wins   | Correct declarations in 3+ consecutive eras OR reach 20 pts |
 
 ## Special actions
@@ -46,7 +46,7 @@ without it, a faction with a strong repeatable special would rarely need to play
 
 | Special         | Effect                                                                       |
 |-----------------|------------------------------------------------------------------------------|
-| **Foresight**   | See next era's fresh future events, with their printed starting weights, and write a current-era outcome; an Annihilate on that event moves its erased weight to the written outcome first, and an Annihilate that erases the written outcome in or after its writing round scores nothing for either side. The writing expires without score if the event Stalls or its written outcome is erased that way |
+| **Foresight**   | See next era's fresh future events, with their printed starting weights, and write a current-era outcome. Only your first writing of the era counts: later Foresights that era still show the next era but write nothing. An Annihilate on that event moves its erased weight to the written outcome first, and an Annihilate that erases the written outcome in or after its writing round scores nothing for either side and raises a Fate Contradiction paradox. The writing expires without score if the event Stalls or its written outcome is erased that way |
 | **Seal**        | Lock one outcome's probability through the end of the era — later shifts against it are blocked with weights unchanged and no paradox; shifts that leave sealed weights unchanged reroute normally. A sealed outcome never absorbs an erased outcome's probability, and Annihilate can still erase it |
 | **Fulfillment** | Declare a current-era event; score +8 if its written outcome wins this era. A Stall, or an Annihilate erasing the written outcome in or after its writing round, expires the declaration |
 
@@ -63,7 +63,7 @@ without it, a faction with a strong repeatable special would rarely need to play
 | Special      | Effect                                                                      |
 |--------------|-----------------------------------------------------------------------------|
 | **Thread**   | Name a current-era, not-yet-resolved outcome as a pending link; it shifts in your favor, but a Stall clears the link without penalty |
-| **Tapestry** | Arm protection for the chain's pending link for the rest of this era (requires chain of 2+); absorbs one Annihilate against it so the chain can't break, though the erased outcome can't win and the link clears — Thread again that era |
+| **Tapestry** | Arm protection for the chain's pending link for the rest of this era (requires chain of 2+). An Annihilate against the link still raises a Chain Conflict paradox, but the chain can't break: if the paradox cascades, only the link clears. The erased outcome can't win, so the link clears either way; until then it stays pending, so move it with Reweave rather than Thread a new one |
 | **Reweave**  | Once per era, move the chain's pending link to a different unresolved current-era outcome; the link still has to win to count, so Reweave dodges an Annihilate on the predicted outcome but never adds length on its own |
 
 ### 📣 Activists
@@ -76,7 +76,8 @@ without it, a faction with a strong repeatable special would rarely need to play
 
 An Activist has at most one Rally- or Momentum-mode declaration per era. The raw action remains private; its
 declaration of record and Expose's approved disclosures are public. An Expose response signature is never revealed.
-A stalled target makes the declaration fail in that era, breaks the consecutive-era streak, and does not grant
+The bet costs points when it misses: if the declared event resolves with another outcome, a Rally declaration scores
+−2 and a Momentum declaration −1. A stalled target makes the declaration fail in that era without that cost, breaks the consecutive-era streak, and does not grant
 Momentum next era. The carried event may be declared again as a new bet.
 
 A Round 1 Nullify naming the declaring Activist cancels that era's declaration entirely: no Rally boost, no Momentum

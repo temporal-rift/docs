@@ -55,18 +55,19 @@ Emitted when 5 eras complete with no winner.
 ```json
 {
   "gameId": "uuid",
-  "winners": [
+  "winners": [{ "playerId": "uuid", "faction": "ACTIVISTS" }],
+  "losers": [
     { "playerId": "uuid", "faction": "PROPHETS" },
-    { "playerId": "uuid", "faction": "WEAVERS", "activeChainLength": 2 }
-  ],
-  "losers": [{ "playerId": "uuid", "faction": "ERASERS" }]
+    { "playerId": "uuid", "faction": "ERASERS" }
+  ]
 }
 ```
 
-`winners` are the Prophets with enough written outcomes resolved as written and the Weavers with a long enough
-unbroken chain. `activeChainLength` appears only for a qualifying Weaver and gives that chain's confirmed links. If
-nobody qualifies, `winners` are every player with the highest total score. Players who abandoned never qualify and
-are always `losers`.
+By default `winners` are every player with the highest total score, shared on ties. Where the optional faction-claims
+rule is switched on, `winners` are instead the Prophets with enough written outcomes resolved as written and the
+Weavers with a long enough unbroken chain, with the highest score deciding only when nobody qualifies; there
+`activeChainLength` appears for a qualifying Weaver and gives that chain's confirmed links. Players who abandoned
+never win and are always `losers`.
 
 ## GameEndedAbnormally 🌐
 
