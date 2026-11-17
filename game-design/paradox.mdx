@@ -12,7 +12,8 @@ Paradoxes occur when contradictory conditions exist simultaneously on the same e
 |---|---|---|
 | **Dead Heat** | Two outcomes a Collide equalized this era are still tied for the highest eligible probability | `DEAD_HEAT` |
 | **Impossible Erasure** | Erasure leaves no eligible outcome with any probability, or no eligible outcome at all. Legal play never reaches this: an erasure the other outcomes can't absorb is rejected | `IMPOSSIBLE_ERASURE` |
-| **Chain Conflict** | A Weaver chain's pending link is Annihilated without Tapestry protection. Cascading breaks the chain; clearing it saves the chain but not the link, since the erased outcome can't win | `CHAIN_CONFLICT` |
+| **Chain Conflict** | A Weaver chain's pending link is Annihilated, even under Tapestry protection. Cascading breaks the chain unless Tapestry protected that link, in which case only the link clears; clearing the paradox saves the chain but not the link, since the erased outcome can't win | `CHAIN_CONFLICT` |
+| **Fate Contradiction** | The outcome a Prophet wrote for the event is Annihilated (in or after the round it was written). Cleared, neither side scores for that event; cascading carries the event into the next era, where both can act on it again | `FATE_CONTRADICTION` |
 
 An ordinary tie is not a paradox. If outcomes tie for the lead without a Collide — after a Suppress, for example — the
 weighted draw makes them equally likely. Erasing the leading outcome is not a paradox either: its probability moves
@@ -47,7 +48,8 @@ If one or more paradox findings remain on an event after the resolution phase, t
 Each remaining finding is identified in the event's one cascade fact. Cleared findings are recorded separately.
 Each detonator pays the base −2 penalty while every other player pays −4. Without a detonator, everyone pays −2.
 These penalties apply once per cascaded event, even if several findings remain. A stabilized event has no cascade
-penalty.
+penalty, but clearing it has a price: every player whose Stabilize targeted an event that did not cascade loses 1
+point, once per event. Everyone prefers that someone else pays, so sometimes nobody does and the paradox cascades.
 
 **3 cascaded events → `TimelineCollapsed`**. The era whose cascades raise the global count to three collapses the
 timeline. The players with the highest total score win; everyone else loses this special ending.

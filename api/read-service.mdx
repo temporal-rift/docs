@@ -251,7 +251,7 @@ authoritative expiry timestamps owned by `game-service`; `declarationExpiresAt` 
 open paradoxes — present only while `paradoxOpen` is true, absent otherwise).
 
 Each `paradoxes` entry is one paradox still pending in the open phase, listed in the order the phase opened them:
-`paradoxId`, `type` (`DEAD_HEAT`, `IMPOSSIBLE_ERASURE`, or `CHAIN_CONFLICT`), the `affectedEventId` it was detected
+`paradoxId`, `type` (`DEAD_HEAT`, `IMPOSSIBLE_ERASURE`, `CHAIN_CONFLICT`, or `FATE_CONTRADICTION`), the `affectedEventId` it was detected
 on, and the `affectedOutcomeIds` it involves. A paradox leaves the list once it is resolved or cascades. The entries
 are the same for every player and never include probabilities or anyone's choice.
 
