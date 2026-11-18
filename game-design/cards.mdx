@@ -73,8 +73,8 @@ the same outcome a single Redirect would pick; they never chain, whatever order 
 | Card | Effect | `cardType` |
 |---|---|---|
 | **Collide** | Equalize two outcomes; creates a Dead Heat if they are still tied highest among eligible outcomes when the era resolves | `COLLIDE` |
-| **Stabilize** | Clear every paradox on one event without changing its weights; it resolves by the ordinary weighted draw. Costs you 1 point unless the event cascades anyway | `STABILIZE` |
-| **Detonate** | If the event cascades, you pay the base −2 penalty while every other player pays −4 | `DETONATE` |
+| **Stabilize** | Clear every paradox on one event without changing its weights; it resolves by the ordinary weighted draw. Free by default, but each Detonate on the same event counts against it: the paradox clears only when Stabilize is not outnumbered (a tie clears) | `STABILIZE` |
+| **Detonate** | Counts against the Stabilize on the event: the paradox clears only when the Stabilizes are at least as many as the Detonates (a tie clears). If it cascades, every player pays −2 and you pay an extra −1 | `DETONATE` |
 
 ## Card grades
 
@@ -86,7 +86,7 @@ Graded cards carry grade **I**, **II** or **III**, which varies their magnitude 
 | **Suppress** | −10% | −20% | −30% |
 | **Swing** | 15% | 30% | 45% |
 | **Amplify** | ×1.5 | ×2 | ×3 |
-| **Scan** | 1 event | 2 events | all 3 |
+| **Scan** | 1 event | 2 events | every event of the era |
 | **Intercept** | 1 card | 2 cards | — |
 | **Trace** | one event | all events | — |
 | **Nullify** | cancel 1 | cancel 2 | — |
