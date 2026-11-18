@@ -11,7 +11,7 @@ description: "Per-era orchestration from event draw through resolution and win c
 
 ```mermaid
 flowchart TD
-  A[EraStarted] --> B[Draw 3 events — emit EventsDrawn 🌐]
+  A[EraStarted] --> B[Draw one event per player — emit EventsDrawn 🌐]
   B --> C[Deal 7 per player by category weight — emit HandDealt × N 🔒]
   C --> D[Wait for each player to keep 5 — emit HandSelected × N 🔒]
   D --> DW[Declaration window — one timed phase, Rally/Momentum, then Round 1]

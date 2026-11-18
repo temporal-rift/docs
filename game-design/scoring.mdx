@@ -22,7 +22,7 @@ the exact delta applied to each entry.
 | | Mimic never traced by another player (final era, once per game) | +4 |
 | | Successful Mimic contributed to outcome winning | +1 |
 | 🧵 Weavers | Event added to an active chain | +2 |
-| | Completed chain of 4 links, each from a later era than the one before | +10 |
+| | Completed chain of 3 links, each from a later era than the one before | +10 |
 | | Chain broken by an unresolved chain-conflict paradox | −3 |
 | 📣 Activists | Rally-mode declaration's exact outcome wins | +6 |
 | | Momentum-mode declaration's exact outcome wins | +5 |
@@ -91,22 +91,21 @@ Some rules apply to every player, regardless of faction:
 | A paradox cascades | −2 |
 | Your Stabilize targeted an event that did not cascade (once per event) | −1 |
 
-If any player submitted Detonate against a cascading event, each detonator pays the base −2 penalty and every other
-player pays −4. Multiple Detonates on the same cascade don't stack the multiplier beyond double. The penalty applies
-once per cascaded event, even if it has several paradox findings. If Stabilize clears the event, nobody pays a cascade
-penalty for it, but each player who played Stabilize on it pays 1 point. A Stabilize on an event that cascades anyway
-costs nothing.
+Every player pays −2 for a cascaded event, and each player who submitted Detonate against it pays an extra −1. The
+penalty applies once per cascaded event, even if it has several paradox findings. If Stabilize clears the event,
+nobody pays a cascade penalty for it, and the Stabilize itself costs nothing.
 
 ## Win conditions
 
-**Normal:** at the end of each era, every player with **20 points** or a completed faction objective wins; several
-players can share the victory.
+**Normal:** at the end of each era, every player with **20 points** or a completed faction objective qualifies. When
+several qualify together, only those with the highest total score win, and players tied on that total share the
+victory. In the final era each objective needs one step fewer for a player who advances it in that very era.
 
 Each default faction objective is reached before the points it earns on its own add up to 20: three written wins are
-worth 12 to a Prophet, a completed four-link chain 18 to a Weaver, and three consecutive successful declarations 16 to
+worth 12 to a Prophet, a completed three-link chain 16 to a Weaver, and three consecutive successful declarations 16 to
 18 to an Activist. Every faction advances its objective at most once per era — a Prophet's writing counts only for its
 first Foresight of the era — so no faction usually closes the game in era 3. Fulfillment is the Prophet's faster road
-to 20 points. A declaration is a real bet: a miss costs 2 with Rally and 1 with Momentum. Rally pays +6 against
+to 20 points. A declaration is a real bet: a miss costs 2 with Rally and 1 with Momentum, unless the declared outcome was erased that era, which voids the bet (no win, no miss), as it does for a Revisionist's Rewrite. Rally pays +6 against
 Momentum's +5, but the choice turns on expected Round 1
 support for the declared outcome, not only on its current chance: Rally boosts each inward Round 1 transfer to the
 declared outcome to 150% of its normal magnitude, while Momentum adds a one-time +10 percentage points at declaration.
@@ -118,11 +117,12 @@ Rally can win on both chance and expected score — a fresh 33% outcome backed b
 ## Special endings
 
 **Timeline Collapse (3 cascaded events).** Every player with the highest total score after that era's scoring,
-including cascade penalties, wins. Ties share the win. Faction does not matter, so the leader has a reason to let
+including cascade penalties, wins. A tie goes to the most progress toward the faction objective, and players still tied
+share the win. Faction does not otherwise matter, so the leader has a reason to let
 the timeline collapse and everyone behind has a reason to stabilize.
 
-**Timeline Stabilization (5 eras, no winner).** As in collapse, every player with the highest total score wins, shared
-on ties. No faction has a special claim on it.
+**Timeline Stabilization (5 eras, no winner).** As in collapse, every player with the highest total score wins, with
+the same tiebreak on objective progress. No faction has a special claim on it.
 
 Playtests and simulations can switch on the earlier rule (`game.rules.stabilization.faction-claims`), under which a
 Prophet with at least 3 written outcomes resolved as written and a Weaver with an unbroken chain of at least 2

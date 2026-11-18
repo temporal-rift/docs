@@ -46,10 +46,14 @@ If one or more paradox findings remain on an event after the resolution phase, t
 - The event carries forward to the next era with its probability state intact (not reset to its printed starting weights)
 
 Each remaining finding is identified in the event's one cascade fact. Cleared findings are recorded separately.
-Each detonator pays the base −2 penalty while every other player pays −4. Without a detonator, everyone pays −2.
-These penalties apply once per cascaded event, even if several findings remain. A stabilized event has no cascade
-penalty, but clearing it has a price: every player whose Stabilize targeted an event that did not cascade loses 1
-point, once per event. Everyone prefers that someone else pays, so sometimes nobody does and the paradox cascades.
+Every player pays −2 for a cascaded event, and each player who played Detonate on it pays an extra −1. These
+penalties apply once per cascaded event, even if several findings remain.
+
+Resolution is a contest of the table. An event's paradoxes clear only when the players who played Stabilize on it
+are at least as many as those who played Detonate on it (a tie clears), and at least one played Stabilize. Otherwise
+the event is judged as if nobody had stabilized it, and it cascades if the paradox still holds. Clearing is free:
+the players a paradox hurts, who are usually the ones who clear it, do not pay for it. Tearing time costs the one who
+tears it. With the contest rule off, a single Stabilize clears and a Detonate doubles everyone else's penalty.
 
 **3 cascaded events → `TimelineCollapsed`**. The era whose cascades raise the global count to three collapses the
 timeline. The players with the highest total score win; everyone else loses this special ending.
