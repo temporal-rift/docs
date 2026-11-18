@@ -18,7 +18,7 @@ the exact delta applied to each entry.
 | | Fulfillment declared and succeeds | +8 |
 | | Event resolves differently than written | −2 |
 | 🔄 Revisionists | Secret preferred outcome (your locked Rewrite) wins this era | +3 |
-| | Locked Rewrite's event resolves with a different outcome | −1 |
+| | Locked Rewrite's event resolves with a different outcome (no penalty if your preferred outcome was erased that era) | −1 |
 | | Mimic never traced by another player (final era, once per game) | +4 |
 | | Successful Mimic contributed to outcome winning | +1 |
 | 🧵 Weavers | Event added to an active chain | +2 |
@@ -68,7 +68,8 @@ carried event is independent. Each fact is recorded and consumed at most once fo
 A Revisionist's Rewrite is a commitment: the first Rewrite of an era is locked, and it is the only one you can make that
 era. Whether it scores is decided when the era resolves. If its event resolves with your preferred outcome you earn
 `SECRET_OUTCOME_WON`; if it resolves with a different outcome you lose points with `SECRET_OUTCOME_MISSED` (−1 by
-default; a deployment can set it to 0 to switch the penalty off); if the event stalls or cascades you earn nothing and
+default; a deployment can set it to 0 to switch the penalty off), unless your preferred outcome was erased that era,
+which voids the Rewrite: no win and no miss; if the event stalls or cascades you earn nothing and
 lose nothing. A Rewrite cancelled by Nullify leaves no preference and no penalty, but still uses your Rewrite for that
 era. A miss is a score entry like any other and gives no progress toward the Revisionist objective, which counts only
 eras where the preferred outcome won. The outcome you named stays private.
@@ -89,7 +90,6 @@ Some rules apply to every player, regardless of faction:
 | Rule | Points |
 |---|---|
 | A paradox cascades | −2 |
-| Your Stabilize targeted an event that did not cascade (once per event) | −1 |
 
 Every player pays −2 for a cascaded event, and each player who submitted Detonate against it pays an extra −1. The
 penalty applies once per cascaded event, even if it has several paradox findings. If Stabilize clears the event,

@@ -73,8 +73,8 @@ the same outcome a single Redirect would pick; they never chain, whatever order 
 | Card | Effect | `cardType` |
 |---|---|---|
 | **Collide** | Equalize two outcomes; creates a Dead Heat if they are still tied highest among eligible outcomes when the era resolves | `COLLIDE` |
-| **Stabilize** | Clear every paradox on one event without changing its weights; it resolves by the ordinary weighted draw. Free by default, but a Detonate on the same event cancels it: the paradox clears only when Stabilize is not outnumbered | `STABILIZE` |
-| **Detonate** | Cancels one Stabilize on the event. If it cascades, every player pays −2 and you pay an extra −1 | `DETONATE` |
+| **Stabilize** | Clear every paradox on one event without changing its weights; it resolves by the ordinary weighted draw. Free by default, but each Detonate on the same event counts against it: the paradox clears only when Stabilize is not outnumbered (a tie clears) | `STABILIZE` |
+| **Detonate** | Counts against the Stabilize on the event: the paradox clears only when the Stabilizes are at least as many as the Detonates (a tie clears). If it cascades, every player pays −2 and you pay an extra −1 | `DETONATE` |
 
 ## Card grades
 
