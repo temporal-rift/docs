@@ -71,16 +71,23 @@ Emitted when a chain's pending link confirms because its named outcome was drawn
   "playerId": "uuid",
   "invalidatedEventId": "uuid",
   "invalidatedOutcomeId": "uuid",
-  "chainLength": 2
+  "chainLength": 2,
+  "cause": "RESOLVED_DIFFERENTLY"
 }
 ```
 
 Emitted when a chain's pending link does not confirm: another outcome wins its event (including after a cleared
 chain-conflict paradox, since an annihilated outcome can't win), its chain-conflict paradox cascades after Tapestry
 protection was consumed against it, Tapestry absorbs an Annihilate against it (only where the absorbing Tapestry rule
-is configured), its event Stalls or cascades, or the game ends with it unconfirmed. The pending link clears without penalty — chain length is
-unchanged.
+is configured), its event Stalls or cascades, or the game ends with it unconfirmed. The pending link clears without a
+chain penalty — chain length is unchanged.
 The Weaver may `THREAD` again only while the chain and game remain active.
+
+`cause` names which of these happened (optional; always set by the producer from `timeline-event` 7.6.0):
+`RESOLVED_DIFFERENTLY` (another outcome won), `NO_WINNER` (the event stalled or cascaded, or the link expired when its
+era ended), `CHAIN_CONFLICT_CLEARED` (a chain-conflict paradox on the link cascaded or was cleared after Tapestry
+protection was consumed), `ANNIHILATE_ABSORBED` and `GAME_ENDED`. Only `RESOLVED_DIFFERENTLY` is a missed Thread
+(`CHAIN_LINK_MISSED`, −1 by default); an absent cause is not a miss.
 
 ## ChainCompleted 🌐
 
