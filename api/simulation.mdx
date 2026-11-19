@@ -153,7 +153,7 @@ Only succeeded cases are games. Each cohort reports its own case counts, its eli
 Every metric names its `statistic` and its `dimensions`:
 
 - `RATE` is the numerator over the denominator, `MEAN` is a total over its sample size, and `QUANTILE` is the smallest observed value whose cumulative share reaches the quantile.
-- `dimensions` restricts the metric to a `faction`, `cardType`, `cardGrade`, `specialAction`, `paradoxType`, `endReason`, `quantile`, or `failureCode`; a missing dimension means the metric is not split by it.
+- `dimensions` restricts the metric to a `faction`, `cardType`, `cardGrade`, `specialAction`, `paradoxType`, `endReason`, `quantile`, `failureCode`, `scoreReason`, or `winPath`; a missing dimension means the metric is not split by it.
 - A metric with no eligible data is `NO_DATA` with a null value.
 
 Faction win rate counts the games in which the faction's seat is among the winners, over the eligible games containing that faction. A shared win counts as a win for every winner and also feeds the faction's shared-win rate, so faction rates need not sum to 100%. For example, Erasers present in 10 games and winning 4, one of them shared, have a win rate of 0.4 and a shared-win rate of 0.1.
