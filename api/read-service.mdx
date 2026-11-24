@@ -141,7 +141,8 @@ Full per-player view — no raw probabilities, no other players' factions.
     "threshold": 4,
     "objectiveMet": false
   },
-  "chain": { "status": "ACTIVE", "length": 2 }
+  "chain": { "status": "ACTIVE", "length": 2, "confirmedEventIds": ["uuid", "uuid"] },
+  "cascadedEventIds": ["uuid"]
 }
 ```
 
@@ -163,9 +164,14 @@ retained state. Exact values appear only in the authenticated player's own `myRe
 </Note>
 
 <Note title="Weaver chain visibility">
-`chain` shows the current Weaver chain's `status` (`ACTIVE`/`COMPLETED`/`BROKEN`) and `length` identically to every
-player. It is `null` until a chain exists and clears once the game ends. It never identifies which player owns or
-broke the chain, before or after `FactionRevealed`.
+`chain` shows the current Weaver chain's `status` (`ACTIVE`/`COMPLETED`/`BROKEN`), `length`, and
+`confirmedEventIds` — the event of every confirmed link, in link order without repeats (`[]` when the chain has
+no confirmed link) — identically to every player. It is `null` until a chain exists and clears once the game ends.
+It never identifies which player owns or broke the chain, before or after `FactionRevealed`.
+
+`cascadedEventIds` lists every distinct event that has cascaded in the game so far, in the order each first
+cascaded — `[]` while none has — identically to every player, so a seat can tell how close the timeline is to
+collapse and that Threading an already-linked event is wasted.
 </Note>
 
 ### Hand fields
