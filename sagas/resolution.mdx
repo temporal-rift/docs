@@ -81,7 +81,7 @@ The lock clears when the event returns in the next era.
 | 6 | `CORRUPT` | Inverts other cards before they apply |
 | 7 | `MIMIC` | Picks the strongest inward transfer toward the named outcome (a Push targeting it or a Swing destined for it; largest base magnitude, then lowest player id — never a Suppress or a Swing away from it) and adds an independent copy at its base magnitude to the simultaneous tier |
 | 8 | `AMPLIFY` | Multiplies the named player's eligible card effect by the strongest multiplier naming it; several never compound |
-| 9 | All remaining cards, including `COLLIDE`, plus `MIMIC` copies and each accepted `THREAD`'s favorable shift | Simultaneously |
+| 9 | All remaining cards, including `COLLIDE`, plus `MIMIC` copies and each accepted `THREAD`'s configured shift (zero by default) | Simultaneously |
 
 `NULLIFY`, `REDIRECT` and `AMPLIFY` each target named players, never an action's submission position. Each named
 target is independently a clean no-op when that player skipped, has no eligible action, or was already cancelled, so

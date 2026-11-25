@@ -23,14 +23,17 @@ description: "Events emitted at era end and game conclusion"
   "winnerId": "uuid",
   "faction": "WEAVERS",
   "finalScore": 20,
-  "winType": "SCORE_THRESHOLD"
+  "winType": "SCORE_THRESHOLD",
+  "winConditions": ["SCORE_THRESHOLD", "FACTION_OBJECTIVE"]
 }
 ```
 
 One event per winner. `winType` is `SCORE_THRESHOLD` or `FACTION_OBJECTIVE` for a normal victory at the end of an
 era, or `LAST_PLAYER_STANDING` when all other players have abandoned and the remaining player's grace has not
-expired. `finalScore` is the committed total; scoring already in flight completes before the deferred ending is
-chosen. An expired player cannot win by being processed last.
+expired. When a winner met both conditions, `winType` is `SCORE_THRESHOLD`. `winConditions` lists every normal-victory
+condition the winner met, ordered `SCORE_THRESHOLD` before `FACTION_OBJECTIVE`; it is present on every normal-victory
+event and absent on a `LAST_PLAYER_STANDING` event. `finalScore` is the committed total; scoring already in flight
+completes before the deferred ending is chosen. An expired player cannot win by being processed last.
 
 ## TimelineCollapsed 🌐
 

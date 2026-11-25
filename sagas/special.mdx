@@ -23,7 +23,7 @@ that round cancels them outright.
 flowchart TD
   A[THREAD special played — judged at round close] --> B{Valid current-era, not-yet-resolved coordinate; no pending link already open?}
   B -->|Invalid| C[reject submission — emit ThreadRejected]
-  B -->|Valid| D[emit ChainLinkThreaded — pending link created, favorable push joins the round's simultaneous tier]
+  B -->|Valid| D[emit ChainLinkThreaded — pending link created, the configured Thread shift (zero by default) joins the round's simultaneous tier]
   D --> E{Pending link resolves}
   E -->|Predicted outcome drawn as winner| F[emit ChainLinkAdded — chainLength++]
   E -->|Another outcome wins| G[emit ChainLinkInvalidated — no penalty]
