@@ -22,7 +22,7 @@ paradox resolution, where the chain itself is at stake unless Tapestry protected
 ```
 
 Emitted when its round closes and an accepted `THREAD` creates a pending link naming a not-yet-resolved current-era
-outcome. The favorable probability push resolves with that round's other shifts. The link does not count toward `chainLength` until it confirms.
+outcome. The Thread's configured probability shift (`game.rules.probability.thread-shift`, zero by default) resolves with that round's other shifts. The link does not count toward `chainLength` until it confirms.
 Only one pending link can be open per chain at a time.
 
 ## ThreadRejected 🔒

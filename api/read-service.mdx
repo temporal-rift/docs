@@ -325,7 +325,7 @@ Once `phase` is `GAME_ENDED`, `result` carries the authoritative terminal facts:
 
 `endReason` is how the game ended: `WIN_CONDITION_MET`, `TIMELINE_COLLAPSED`, `TIMELINE_STABILIZED`, or, for an
 abnormal ending with no winners, `DECK_EXHAUSTED`, `RESOLUTION_FAILED`, or `ALL_PLAYERS_ABANDONED`. Every winner of a
-`WIN_CONDITION_MET` ending carries a `winType` saying how they won: `SCORE_THRESHOLD`, `FACTION_OBJECTIVE`, or `LAST_PLAYER_STANDING`.
+`WIN_CONDITION_MET` ending carries a `winType` saying how they won: `SCORE_THRESHOLD`, `FACTION_OBJECTIVE`, or `LAST_PLAYER_STANDING`. A winner of a normal victory also carries `winConditions`, listing every condition they met (`SCORE_THRESHOLD`, `FACTION_OBJECTIVE`, or both, in that order); it is absent for `LAST_PLAYER_STANDING` and every special ending.
 
 ## Get full game history
 
